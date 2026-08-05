@@ -2,7 +2,9 @@
 
 Custom shortcuts defined by this config. `<leader>` is **Space** (see `init.lua`).
 
-Only maps we actually set are listed here. Built-in Vim/Neovim keys (`hjkl`, `:w`, …) are omitted unless we remapped them.
+Only maps we actually set are listed here. Built-in Vim/Neovim keys (`hjkl`, `:w`, `gt` / `gT`, …) are omitted unless we remapped them.
+
+`vim.keymap.set(mode, lhs, rhs, opts?)` — **mode** = when; **lhs** = keys you press; **rhs** = action; **opts** = usually `{ desc = "…" }`.
 
 ---
 
@@ -12,6 +14,39 @@ Only maps we actually set are listed here. Built-in Vim/Neovim keys (`hjkl`, `:w
 | --- | --- |
 | `<Space>` (`mapleader`) | Global leader prefix for custom maps |
 | `\` (`maplocalleader`) | Buffer-local leader (unused so far; reserved) |
+
+Defined in `init.lua`.
+
+---
+
+## Buffers & windows
+
+Defined in `lua/config/keymaps.lua`. **Buffers ≠ tabpages** — `gt` / `gT` stay as real Vim tab keys.
+
+### Buffers
+
+| Key | Mode | Action |
+| --- | --- | --- |
+| `<S-h>` | n | Previous buffer (`:bprevious`) |
+| `<S-l>` | n | Next buffer (`:bnext`) |
+| `<leader>bd` | n | Delete current buffer (`:bdelete`) |
+
+Commented alternates in config: `]b`/`[b`, force delete (`bdelete!`), `<leader>c`, wipeout.
+
+### Windows (splits)
+
+| Key | Mode | Action |
+| --- | --- | --- |
+| `<C-h>` | n | Focus left window |
+| `<C-l>` | n | Focus right window |
+| `<C-j>` | n | Focus lower window |
+| `<C-k>` | n | Focus upper window |
+
+### Search
+
+| Key | Mode | Action |
+| --- | --- | --- |
+| `<Esc>` | n | Clear search highlight (`:nohlsearch`) |
 
 ---
 
@@ -64,4 +99,4 @@ Commented alternates in config: `<leader>g…` prefix, inline preview (`hi`), di
 
 ## Growing this doc
 
-When you add keymaps in a later slice (buffers, which-key, telescope, LSP), append a section here in the same table style and link the defining file.
+When you add keymaps in a later slice (bufferline, which-key, telescope, LSP), append a section here in the same table style and link the defining file.

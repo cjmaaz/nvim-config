@@ -22,5 +22,7 @@ vim.g.have_nerd_font = true -- terminal uses a Nerd Font
 
 -- Loads lua/config/options.lua
 require("config.options")
+-- Loads lua/config/keymaps.lua (after leaders above so <leader> maps resolve)
+require("config.keymaps")
 -- Loads lua/config/lazy.lua (bootstraps the plugin manager)
 require("config.lazy")
