@@ -9,141 +9,165 @@ local opt = vim.opt
 
 -- Hide "-- INSERT --" in the command line; lualine already shows the mode.
 opt.showmode = false
+-- opt.showmode = true -- also show mode in the cmdline (redundant with lualine)
 
--- 3 = one statusline for the whole screen (works with laststatus + lualine).
--- 2 = a separate statusline in every window (busier with splits).
-opt.laststatus = 3
+-- How many statuslines to draw.
+opt.laststatus = 3 -- one global statusline (best with lualine)
+-- opt.laststatus = 2 -- one statusline per window (busier with splits)
+-- opt.laststatus = 0 -- hide statusline entirely
 
--- Always reserve the gutter for signs (gitsigns, diagnostics).
--- "yes" avoids text jumping when a sign appears; "auto" only shows when needed.
+-- Always reserve the gutter for signs (gitsigns, diagnostics) so text does not jump.
 opt.signcolumn = "yes"
+-- opt.signcolumn = "auto" -- only show the column when a sign is present
+-- opt.signcolumn = "no" -- never reserve space (signs can shift text)
 
 -- --- Line numbers ---
 
 -- Absolute number on the current line.
 opt.number = true
+-- opt.number = false -- hide absolute line numbers
 
 -- Other lines show distance from the cursor (so 8j / 5k are easy to count).
--- Set false if you prefer absolute numbers on every line.
 opt.relativenumber = true
+-- opt.relativenumber = false -- absolute numbers on every line (Kickstart-ish)
 
 -- --- Input / system ---
 
--- Enable the mouse in all modes (click, scroll, visual select).
--- Set to "" if you want keyboard-only.
-opt.mouse = "a"
+-- Mouse support (click, scroll, visual select).
+opt.mouse = "a" -- all modes
+-- opt.mouse = "" -- keyboard-only
+-- opt.mouse = "nvi" -- normal/visual/insert only (no cmdline)
 
--- Sync the unnamedplus register with the OS clipboard (y/p ↔ Cmd/Ctrl+C/V).
--- Deferred until after UI start so clipboard detection does not slow boot.
--- Omit this block to keep Neovim registers separate from the system clipboard.
+-- Sync y/p with the OS clipboard (Cmd/Ctrl+C/V). Deferred so clipboard
+-- detection does not slow startup.
 vim.schedule(function()
   opt.clipboard = "unnamedplus"
+  -- opt.clipboard = "" -- keep Neovim registers separate from the OS clipboard
 end)
 
 -- --- Editing comfort ---
 
 -- When a long line wraps, continuation lines keep the same indent as the start.
 opt.breakindent = true
+-- opt.breakindent = false -- wrapped continuation starts at column 0
 
 -- Save undo history to disk so u / Ctrl-r survive quitting and reopening a file.
 opt.undofile = true
+-- opt.undofile = false -- undo only lasts for the current session
 
 -- Highlight the line the cursor is on (easier to track in tall files).
 opt.cursorline = true
+-- opt.cursorline = false -- no current-line highlight
 
 -- On :q / :bd with unsaved changes, ask to save instead of failing with an error.
 opt.confirm = true
+-- opt.confirm = false -- refuse the command until you :w or :q!
 
 -- --- Search ---
 
 -- / and ? ignore case by default (e.g. /foo matches Foo).
 opt.ignorecase = true
+-- opt.ignorecase = false -- always case-sensitive
 
--- If the pattern contains any uppercase letter, search becomes case-sensitive
+-- If the pattern has any uppercase letter, search becomes case-sensitive
 -- (e.g. /Foo matches Foo only). Needs ignorecase = true to matter.
 opt.smartcase = true
+-- opt.smartcase = false -- ignorecase alone controls case (no uppercase exception)
 
--- Matches stay highlighted after search (Neovim default). Clear with :nohlsearch.
--- opt.hlsearch = true
+-- Matches stay highlighted after search. Clear with :nohlsearch.
+opt.hlsearch = true -- Neovim default; kept explicit so you can flip it
+-- opt.hlsearch = false -- clear highlights as soon as you move the cursor
 
 -- --- Timing ---
 
--- How long Neovim waits idle before firing CursorHold (gitsigns refresh, etc.).
--- Default is 4000 ms; 250 feels snappier for plugins that hook that event.
-opt.updatetime = 250
+-- Idle wait before CursorHold (gitsigns refresh, etc.). Default is 4000 ms.
+opt.updatetime = 250 -- snappy for plugins that hook CursorHold
+-- opt.updatetime = 4000 -- Neovim default (feels sluggish with modern plugins)
 
 -- How long to wait for the next key in a mapped chord (e.g. <leader>…).
--- Lower = faster which-key popup later; raise (500–1000) if you mistype chords.
-opt.timeoutlen = 300
+opt.timeoutlen = 300 -- faster which-key later; still usable for short chords
+-- opt.timeoutlen = 500 -- more forgiving if you mistype leader sequences
+-- opt.timeoutlen = 1000 -- very slow chords; rare unless you want maximum leeway
 
 -- --- Splits / scroll ---
 
--- Vertical :vsplit opens to the right of the current window.
-opt.splitright = true
+-- Where :vsplit places the new window.
+opt.splitright = true -- open to the right
+-- opt.splitright = false -- open to the left
 
--- Horizontal :split opens below the current window.
-opt.splitbelow = true
+-- Where :split places the new window.
+opt.splitbelow = true -- open below
+-- opt.splitbelow = false -- open above
 
--- Keep this many lines above/below the cursor when scrolling vertically.
--- Higher (e.g. 10) shows more context but wastes vertical space.
-opt.scrolloff = 8
+-- Lines of context kept above/below the cursor when scrolling vertically.
+opt.scrolloff = 8 -- balanced context vs usable height
+-- opt.scrolloff = 10 -- Kickstart-ish: more context, less buffer space
+-- opt.scrolloff = 0 -- cursor can sit on the first/last visible line
 
 -- Same idea for horizontal scroll when wrap is off and lines are long.
 opt.sidescrolloff = 8
+-- opt.sidescrolloff = 0 -- cursor can sit on the leftmost/rightmost column
 
 -- --- Indent ---
--- These four work as a set: change all together if you prefer 4-space indent.
+-- shiftwidth / tabstop / softtabstop work as a set — change them together.
 
 -- Insert spaces when you press Tab (instead of a real tab character).
 opt.expandtab = true
+-- opt.expandtab = false -- insert real <Tab> characters
 
--- Size of an indent step for >>, <<, and autoindent (spaces when expandtab).
-opt.shiftwidth = 2
+-- Size of an indent step for >>, <<, and autoindent.
+opt.shiftwidth = 2 -- 2-space indent (common for Lua / JS / web)
+-- opt.shiftwidth = 4 -- 4-space indent (common for Python / many codebases)
 
 -- How wide a real <Tab> character displays when one is already in the file.
 opt.tabstop = 2
+-- opt.tabstop = 4 -- match 4-space indent if you switch the set above
 
 -- How many spaces a Tab keypress inserts/deletes in insert mode.
 opt.softtabstop = 2
+-- opt.softtabstop = 4 -- match 4-space indent if you switch the set above
 
 -- Rough C-like autoindent (new line after {, etc.). Language plugins may override.
 opt.smartindent = true
-
--- Prefer 4 spaces instead? Uncomment and set the three widths above to 4.
--- opt.shiftwidth = 4
--- opt.tabstop = 4
--- opt.softtabstop = 4
+-- opt.smartindent = false -- rely only on filetype / treesitter indent
 
 -- --- Wrap / invisible characters ---
 
--- Do not soft-wrap long lines (scroll horizontally instead). Set true for prose.
-opt.wrap = false
+-- Soft-wrap long lines in the window (does not change the file).
+opt.wrap = false -- scroll horizontally instead (typical for code)
+-- opt.wrap = true -- wrap for prose / markdown
 
 -- If wrap is on, break at word boundaries rather than mid-word.
 opt.linebreak = true
+-- opt.linebreak = false -- may break in the middle of a word when wrap is on
 
 -- Show otherwise-invisible characters using listchars below.
 opt.list = true
+-- opt.list = false -- hide tabs / trailing spaces / nbsp markers
 
--- What those invisibles look like: tabs, trailing spaces, non-breaking spaces.
+-- Glyphs used when list is on.
 opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" }
+-- opt.listchars = { tab = "> ", trail = "-", nbsp = "+" } -- ASCII-only fallback
 
 -- --- Command-line / completion UI (before a dedicated completion plugin) ---
 
--- While typing :s/…/…/, show a live preview of replacements in a split.
--- Use "nosplit" to preview only in-buffer (quieter on small screens).
-opt.inccommand = "split"
+-- Live preview while typing :s/…/…/.
+opt.inccommand = "split" -- preview replacements in a split
+-- opt.inccommand = "nosplit" -- preview only in-buffer (quieter on small screens)
+-- opt.inccommand = "" -- no live substitute preview
 
--- Builtin completion popup behavior (omni / keyword complete, etc.):
---   menu     = show the popup
---   menuone  = show even for a single match
---   noselect = do not auto-select the first item (you choose explicitly)
+-- Builtin completion popup behavior (omni / keyword complete, etc.).
+-- menu = show popup; menuone = even for one match; noselect = you pick explicitly.
 opt.completeopt = { "menu", "menuone", "noselect" }
+-- opt.completeopt = { "menu", "menuone" } -- auto-select the first item
 
--- Cap how tall the completion popup can grow.
+-- Max height of the completion popup.
 opt.pumheight = 12
+-- opt.pumheight = 0 -- unlimited (can cover the whole screen)
+-- opt.pumheight = 8 -- shorter menu on small terminals
 
 -- Smoother scrolling for wrapped lines / mouse wheel (Neovim 0.10+ only).
 if vim.fn.has("nvim-0.10") == 1 then
   opt.smoothscroll = true
+  -- opt.smoothscroll = false -- classic line-by-line scroll
 end
