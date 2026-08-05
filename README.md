@@ -3,12 +3,11 @@
 ```text
 nvim-config/
 ├── docs/                 # project notes
-├── init.lua              # tiny entry: require bootstrap only (planned)
+├── init.lua              # entry: loader, leaders, require config.*
 └── lua/
-    ├── config/           # editor core — load before plugins (planned)
-    │   ├── options/      # or a single options.lua
-    │   ├── keymaps/
-    │   ├── autocmds/
-    │   └── lazy/         # bootstrap + lazy.setup only
+    ├── config/           # editor core — load before plugins
+    │   ├── options.lua   # statusline-related options (expand later)
+    │   └── lazy.lua      # bootstrap lazy.nvim + import plugins/
     └── plugins/          # one plugin (or small family) per file
+        └── init.lua      # empty spec list until plugins are added
 ```

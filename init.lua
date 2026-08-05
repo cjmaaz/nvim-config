@@ -1,27 +1,19 @@
 --------------------------------------------------------------------------------
----                      1. Init - Starting Point                            ---
+-- 1. Entry point
+-- Runs first. Keep this thin: leaders + require the real config modules.
 --------------------------------------------------------------------------------
 
-  -- Replace Neovim's normal Lua module-loading path with faster one.
-  -- overrides `loadfile()`
-  vim.loader.enable()
+-- Faster Lua module loading (Neovim built-in; safe to keep).
+vim.loader.enable()
 
+-- Must be set BEFORE any plugin that creates <leader> maps.
+vim.g.mapleader = " "
+-- Buffer-local leader; keeps local maps out of the Space namespace.
+vim.g.maplocalleader = "\\"
+-- Used later for icons; set false if the terminal font is not a Nerd Font.
+vim.g.have_nerd_font = true
 
-  -- <" " (Space)> is your leader for future maps (<leader>...). 
-  vim.g.mapleader = " "
-
-
-  -- Separate leader for buffer-local maps it doesn't fight <leader> (<Space>).
-  vim.g.maplocalleader = "\\"
-
-
-  -- Flag to use nerd font, if nerd font not available make it false.
-  vim.g.have_nerd_font = true
-
-
-  -- Loads lua/config/options.lua
-  require("config.options")
-
-  -- Loads lua/config/lazy.lua (plugin manager)
-  require("config.lazy")
-
+-- Loads lua/config/options.lua
+require("config.options")
+-- Loads lua/config/lazy.lua (bootstraps the plugin manager)
+require("config.lazy")
