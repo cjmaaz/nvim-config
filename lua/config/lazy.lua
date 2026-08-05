@@ -15,7 +15,9 @@ if not vim.uv.fs_stat(lazypath) then
     "git",
     "clone",
     "--filter=blob:none", -- shallow-ish clone (less history to download)
-    "--branch=stable", -- use lazy's stable branch, not random HEAD
+    -- omit --filter for a full clone if you need complete history
+    "--branch=stable", -- lazy's stable branch
+    -- "--branch=main", -- bleeding edge (more breakage risk)
     "https://github.com/folke/lazy.nvim.git",
     lazypath,
   })
@@ -34,18 +36,22 @@ require("lazy").setup({
   -- (e.g. lua/plugins/init.lua, lua/plugins/statusline.lua, ...).
   spec = {
     { import = "plugins" },
+    -- { import = "plugins.lang" }, -- optional second import tree later
   },
 
   defaults = {
     -- Plugins load on events/keys unless a spec sets lazy = false.
-    lazy = true,
-    -- false = track latest git commits of plugins (good while learning).
-    -- "*" would pin to release tags when plugins publish them.
-    version = false,
+    lazy = true, -- defer until needed (faster startup)
+    -- lazy = false, -- load everything at startup (simpler debugging, slower open)
+
+    -- Which plugin versions to track by default.
+    version = false, -- latest git commits (good while learning / iterating)
+    -- version = "*", -- newest semver release tag when the plugin publishes one
   },
 
-  -- When you edit a plugin file, lazy can reload; skip the noisy popup.
+  -- When you edit a plugin file, lazy can reload configs.
   change_detection = {
-    notify = false,
+    notify = false, -- silent reload (less noise while tuning)
+    -- notify = true, -- popup each time a plugin file changes
   },
 })

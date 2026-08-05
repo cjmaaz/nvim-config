@@ -13,38 +13,60 @@
 --------------------------------------------------------------------------------
 
 return {
-  -- Active: VS Code Noctis Bordo (warm rose / burgundy). Other variants:
-  --   noctis, noctis_azureus, noctis_minimus, noctis_uva, noctis_viola,
-  --   noctis_obscuro, noctis_sereno, noctis_lux, noctis_lilac, noctis_hibernus
-  --
+  -- Active: VS Code Noctis Bordo (warm rose / burgundy).
   -- talha-akram/noctis.nvim has no plugin setup()/opts API (unlike kanagawa).
   -- The `opts` table below mirrors the kanagawa knobs we care about and is
   -- applied with nvim_set_hl after :colorscheme.
   {
     "talha-akram/noctis.nvim",
-    lazy = false, -- colorschemes should not wait for an event
-    priority = 1000, -- load before other UI plugins paint
+    -- Load timing: colorschemes should paint before other UI plugins.
+    lazy = false, -- load at startup (required for colorschemes)
+    -- lazy = true, -- wrong for themes: UI would flash the default first
+    priority = 1000, -- load before other UI plugins
+    -- priority = 50, -- too late; statusline/theme plugins may paint first
+
     opts = {
       -- Typography aligned with common Neovim theme defaults (Tokyo Night /
       -- Catppuccin): italic for comments (+ keywords); plain functions/types;
       -- strikethrough only for markup/deprecated — not for normal code.
-      undercurl = true, -- spell + diagnostic underlines (not the same as strike)
-      transparent = false, -- true = clear Normal/SignColumn backgrounds
-      -- transparent = true,
-      dimInactive = true, -- dim NormalNC when the window is unfocused
-      -- dimInactive = false,
-      terminalColors = true, -- push a Bordo-ish 16-color palette into :terminal
+
+      -- Spell + diagnostic underlines (not the same as strikethrough).
+      undercurl = true, -- undercurl for spell/diagnostics
+      -- undercurl = false, -- plain underlines / no special underline style
+
+      -- Clear editor backgrounds (terminal wallpaper shows through).
+      transparent = false, -- solid backgrounds
+      -- transparent = true, -- clear Normal / SignColumn / etc.
+
+      -- Dim unfocused windows.
+      dimInactive = true, -- fade NormalNC when another window is focused
+      -- dimInactive = false, -- same brightness in all windows
+
+      -- Push a Bordo-ish 16-color palette into :terminal.
+      terminalColors = true, -- tint :terminal to match the theme
+      -- terminalColors = false, -- leave the terminal's own palette alone
 
       -- Italic (soft / secondary meaning)
       commentStyle = { italic = true }, -- almost universal
-      keywordStyle = { italic = true }, -- Tokyo Night default; Catppuccin often leaves plain
-      -- keywordStyle = {}, -- uncomment for Catppuccin-style plain keywords
+      -- commentStyle = {}, -- plain comments
+      -- commentStyle = { bold = true }, -- rare; heavy comments
+
+      keywordStyle = { italic = true }, -- Tokyo Night–style
+      -- keywordStyle = {}, -- Catppuccin-style plain keywords
+      -- keywordStyle = { bold = true }, -- heavier keywords
 
       -- Plain by default (color carries meaning; avoid bold-everything)
-      statementStyle = {}, -- was bold under Kanagawa; modern themes usually leave plain/italic via Keyword
+      statementStyle = {}, -- modern themes usually leave plain
+      -- statementStyle = { bold = true }, -- older Kanagawa-ish bold statements
+      -- statementStyle = { italic = true }, -- soft statements via Keyword link
+
       functionStyle = {}, -- neither bold nor italic
+      -- functionStyle = { bold = true }, -- emphasize function names
+      -- functionStyle = { italic = true }, -- soft functions
+
       typeStyle = {}, -- neither bold nor italic
       -- typeStyle = { bold = true }, -- optional: some themes emphasize types
+      -- typeStyle = { italic = true }, -- soft types
 
       -- Markup / LSP only (see config apply below)
       -- strikethrough: @markup.strikethrough, @lsp.mod.deprecated
@@ -52,9 +74,18 @@ return {
       -- italic: @markup.italic
     },
     config = function(_, opts)
-      vim.cmd.colorscheme("noctis_bordo")
-      -- vim.cmd.colorscheme("noctis")
-      -- vim.cmd.colorscheme("noctis_azureus")
+      -- Active Noctis variant.
+      vim.cmd.colorscheme("noctis_bordo") -- warm rose / burgundy
+      -- vim.cmd.colorscheme("noctis") -- default Noctis
+      -- vim.cmd.colorscheme("noctis_azureus") -- blue-leaning
+      -- vim.cmd.colorscheme("noctis_minimus")
+      -- vim.cmd.colorscheme("noctis_uva")
+      -- vim.cmd.colorscheme("noctis_viola")
+      -- vim.cmd.colorscheme("noctis_obscuro")
+      -- vim.cmd.colorscheme("noctis_sereno")
+      -- vim.cmd.colorscheme("noctis_lux")
+      -- vim.cmd.colorscheme("noctis_lilac")
+      -- vim.cmd.colorscheme("noctis_hibernus")
 
       -- Palette snippets from noctis_bordo (for overrides / terminal).
       local pal = {
@@ -182,37 +213,46 @@ return {
     end,
   },
 
-  -- Kanagawa Dragon (disable/remove noctis above if you switch back):
+  -- Kanagawa Dragon (disable/remove noctis above if you switch back).
   -- Typography matches the active noctis opts (community defaults).
   -- {
   --   "rebelot/kanagawa.nvim",
-  --   lazy = false,
-  --   priority = 1000,
+  --   lazy = false, -- load at startup
+  --   -- lazy = true, -- wrong for themes
+  --   priority = 1000, -- before other UI plugins
   --   opts = {
-  --     compile = false,
-  --     undercurl = true,
-  --     transparent = false,
-  --     -- transparent = true,
-  --     dimInactive = true,
+  --     compile = false, -- no compiled cache (simpler while tuning)
+  --     -- compile = true, -- faster startup after :KanagawaCompile
+  --     undercurl = true, -- spell/diagnostic undercurls
+  --     -- undercurl = false,
+  --     transparent = false, -- solid backgrounds
+  --     -- transparent = true, -- clear backgrounds
+  --     dimInactive = true, -- fade unfocused windows
   --     -- dimInactive = false,
-  --     terminalColors = true,
-  --     -- Italic: comments + keywords (Tokyo Night–style)
-  --     commentStyle = { italic = true },
-  --     keywordStyle = { italic = true },
+  --     terminalColors = true, -- tint :terminal
+  --     -- terminalColors = false,
+  --     commentStyle = { italic = true }, -- almost universal
+  --     -- commentStyle = {},
+  --     keywordStyle = { italic = true }, -- Tokyo Night–style
   --     -- keywordStyle = {}, -- Catppuccin-style plain keywords
-  --     -- Plain: statements / functions / types (no bold-everything)
-  --     statementStyle = {},
+  --     statementStyle = {}, -- plain statements
+  --     -- statementStyle = { bold = true }, -- older Kanagawa bold
   --     functionStyle = {},
+  --     -- functionStyle = { bold = true },
   --     typeStyle = {},
   --     -- typeStyle = { bold = true }, -- optional emphasis
-  --     theme = "dragon",
+  --     theme = "dragon", -- dark default when background=dark is unset
+  --     -- theme = "wave",
+  --     -- theme = "lotus",
   --     background = {
-  --       dark = "dragon", -- "wave" | "dragon" | "lotus"
-  --       light = "lotus",
+  --       dark = "dragon", -- strongest dark pick here
+  --       -- dark = "wave", -- classic Kanagawa dark
+  --       -- dark = "lotus", -- not typical for dark bg
+  --       light = "lotus", -- light background variant
+  --       -- light = "wave",
   --     },
   --     -- overrides = function(colors)
   --     --   return {
-  --     --     -- Markup / deprecated (Treesitter + LSP)
   --     --     ["@markup.strong"] = { bold = true },
   --     --     ["@markup.italic"] = { italic = true },
   --     --     ["@markup.strikethrough"] = { strikethrough = true },
@@ -222,31 +262,38 @@ return {
   --   },
   --   config = function(_, opts)
   --     require("kanagawa").setup(opts)
-  --     vim.cmd.colorscheme("kanagawa-dragon")
+  --     vim.cmd.colorscheme("kanagawa-dragon") -- matches background.dark above
   --     -- vim.cmd.colorscheme("kanagawa-wave")
   --     -- vim.cmd.colorscheme("kanagawa-lotus")
   --   end,
   -- },
 
-  -- Tokyo Night (disable noctis if you switch):
+  -- Tokyo Night (disable noctis if you switch).
   -- Same typography via built-in `styles` (comments + keywords italic; rest plain).
   -- {
   --   "folke/tokyonight.nvim",
   --   lazy = false,
   --   priority = 1000,
   --   opts = {
-  --     style = "night",
-  --     transparent = false,
+  --     style = "night", -- darkest built-in
+  --     -- style = "storm", -- slightly softer dark
+  --     -- style = "moon", -- cooler dark
+  --     -- style = "day", -- light
+  --     transparent = false, -- solid backgrounds
   --     -- transparent = true,
-  --     terminal_colors = true,
-  --     dim_inactive = true,
+  --     terminal_colors = true, -- tint :terminal
+  --     -- terminal_colors = false,
+  --     dim_inactive = true, -- fade unfocused windows
+  --     -- dim_inactive = false,
   --     styles = {
   --       comments = { italic = true },
-  --       keywords = { italic = true },
+  --       -- comments = {},
+  --       keywords = { italic = true }, -- Tokyo Night default
   --       -- keywords = {}, -- plain keywords
   --       functions = {},
+  --       -- functions = { bold = true },
   --       variables = {},
-  --       -- sidebars = "dark",
+  --       -- sidebars = "dark", -- "dark" | "transparent" | "normal"
   --       -- floats = "dark",
   --     },
   --     -- on_highlights = function(hl, c)
@@ -258,25 +305,31 @@ return {
   --   },
   --   config = function(_, opts)
   --     require("tokyonight").setup(opts)
-  --     vim.cmd.colorscheme("tokyonight-night")
+  --     vim.cmd.colorscheme("tokyonight-night") -- match opts.style
+  --     -- vim.cmd.colorscheme("tokyonight-storm")
+  --     -- vim.cmd.colorscheme("tokyonight-moon")
+  --     -- vim.cmd.colorscheme("tokyonight-day")
   --   end,
   -- },
 
-  -- Solarized Osaka / Craftzdog (disable noctis if you switch):
+  -- Solarized Osaka / Craftzdog (disable noctis if you switch).
   -- Align styles with the same convention when you enable it.
   -- {
   --   "craftzdog/solarized-osaka.nvim",
   --   lazy = false,
   --   priority = 1000,
   --   opts = {
-  --     transparent = true, -- Craftzdog default feel; set false for a solid background
-  --     -- transparent = false,
+  --     transparent = true, -- Craftzdog default feel
+  --     -- transparent = false, -- solid background
   --     terminal_colors = true,
+  --     -- terminal_colors = false,
   --     styles = {
   --       comments = { italic = true },
+  --       -- comments = {},
   --       keywords = { italic = true },
   --       -- keywords = {},
   --       functions = {},
+  --       -- functions = { bold = true },
   --       variables = {},
   --       -- conditionals = { italic = true }, -- Catppuccin sometimes italics these
   --     },

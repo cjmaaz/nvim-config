@@ -1,7 +1,7 @@
 --------------------------------------------------------------------------------
 -- Statusline: lualine + file icons
 -- Refs: CodeOSS ui.lua (standalone lualine); Craftzdog/LazyVim only tweak LazyVim's.
--- Alternatives to lualine (pick one ecosystem later — don't enable two bars):
+-- Alternatives to lualine (pick one ecosystem — don't enable two bars):
 --   - echasnovski/mini.statusline  (lighter, mini.nvim family)
 --   - rebelot/heirline.nvim        (max control, more code)
 --   - built-in 'statusline' string (no plugin; weak icons/git unless you script it)
@@ -10,80 +10,95 @@
 return {
   {
     "nvim-lualine/lualine.nvim",
-    -- VeryLazy: after UI start. Alternatives:
-    --   event = "UIEnter"
-    --   lazy = false  -- load at startup (slightly slower open, bar appears sooner)
-    event = "VeryLazy",
+    -- When to load the statusline plugin.
+    event = "VeryLazy", -- after UI start (fast open; bar appears a tick later)
+    -- event = "UIEnter", -- as soon as the UI is ready
+    -- lazy = false, -- load at startup (bar sooner, slightly slower open)
+
     dependencies = {
-      -- Filetype icons. Alternative: echasnovski/mini.icons (what current LazyVim prefers).
+      -- Filetype icons in the statusline / other UI.
       {
-        "nvim-tree/nvim-web-devicons",
-        enabled = vim.g.have_nerd_font,
+        "nvim-tree/nvim-web-devicons", -- classic icon set (CodeOSS / many configs)
+        -- "echasnovski/mini.icons", -- what current LazyVim prefers (swap the string)
+        enabled = vim.g.have_nerd_font, -- only if the terminal has a Nerd Font
+        -- enabled = true, -- always try icons (may show tofu boxes without a Nerd Font)
+        -- enabled = false, -- text-only statusline components
       },
     },
     opts = {
       options = {
-        -- "auto" follows colorscheme. Or a built-in name: "auto", "codedark", …
-        -- Custom table: see :help lualine-themes
-        theme = "auto",
+        -- Color theme for the bar.
+        theme = "auto", -- follow the active colorscheme
+        -- theme = "codedark", -- built-in named theme (:help lualine-themes)
+        -- theme = "nightfly", -- another built-in; or pass a custom table
 
-        -- Thin separators. Powerline-style (needs Nerd Font glyphs):
-        -- component_separators = { left = "", right = "" },
-        -- section_separators = { left = "", right = "" },
-        component_separators = { left = "│", right = "│" },
-        section_separators = { left = "", right = "" },
+        -- Separators between components / sections.
+        component_separators = { left = "│", right = "│" }, -- thin ASCII-friendly
+        section_separators = { left = "", right = "" }, -- flat sections
+        -- component_separators = { left = "", right = "" }, -- Powerline (needs Nerd Font)
+        -- section_separators = { left = "", right = "" }, -- Powerline wedges
 
-        -- true + vim.opt.laststatus = 3 → one bar for all windows.
-        -- false + laststatus = 2 → one bar per split.
-        globalstatus = true,
+        -- One bar for the whole screen vs one per window.
+        globalstatus = true, -- one bar (pair with vim.opt.laststatus = 3)
+        -- globalstatus = false, -- one bar per split (pair with laststatus = 2)
 
         -- disabled_filetypes = { statusline = { "alpha", "dashboard" } }, -- hide on splash screens
-        -- ignore_focus = { "NvimTree", "neo-tree" }, -- keep showing "last" file when focus is a sidebar
+        -- ignore_focus = { "NvimTree", "neo-tree" }, -- keep showing "last" file in sidebars
         -- always_divide_middle = true, -- force left/right sections to stay split
-        -- icons_enabled = true, -- false = text-only components even with an icon plugin
+        -- icons_enabled = true, -- false = text-only even when an icon plugin is present
+        -- icons_enabled = false, -- force text-only components
       },
       sections = {
         -- Layout: lualine_a .. _c (left) | lualine_x .. _z (right)
         -- Inactive windows use `inactive_sections` if you define it.
-        lualine_a = { "mode" },
-        -- "mode" alternatives: { "mode", fmt = function(s) return s:sub(1, 1) end } -- first letter only
+
+        -- Mode indicator (NORMAL / INSERT / …).
+        lualine_a = { "mode" }, -- full mode name
+        -- lualine_a = { { "mode", fmt = function(s) return s:sub(1, 1) end } }, -- first letter only
 
         lualine_b = {
-          "branch", -- needs git; empty outside a repo
-          "diff", -- counts; richer when gitsigns is loaded
-          -- "branch" alt: { "branch", icon = "" },
-          -- "diff" alt: { "diff", symbols = { added = "+", modified = "~", removed = "-" } },
+          "branch", -- git branch; empty outside a repo
+          -- { "branch", icon = "" }, -- custom branch icon
+          "diff", -- +/-/~ counts; richer when gitsigns is loaded
+          -- { "diff", symbols = { added = "+", modified = "~", removed = "-" } }, -- ASCII diff symbols
         },
 
         lualine_c = {
           {
             "filename",
-            -- path: 0 = name, 1 = relative, 2 = absolute, 3 = absolute with ~ for home
-            path = 1,
-            -- file_status = true, -- show [+] modified, [-] readonly, etc.
+            -- How much of the path to show.
+            path = 1, -- relative to cwd
+            -- path = 0, -- filename only
+            -- path = 2, -- absolute
+            -- path = 3, -- absolute with ~ for home
+            -- file_status = true, -- show [+] modified, [-] readonly, etc. (default on)
             -- newfile_status = true, -- flag buffers not yet on disk
             -- shorting_target = 40, -- shorten long paths to keep the bar readable
             -- symbols = { modified = "●", readonly = "", unnamed = "[No Name]" },
           },
-          -- Optional mid components:
-          -- "filesize",
-          -- { "searchcount", maxcount = 999 }, -- matches when searching
+          -- "filesize", -- optional mid component
+          -- { "searchcount", maxcount = 999 }, -- match count while searching
         },
 
         lualine_x = {
-          "diagnostics", -- LSP/Vim diagnostics; empty until an LSP (or similar) attaches
+          "diagnostics", -- LSP/Vim diagnostics; empty until an LSP attaches
           -- { "diagnostics", sources = { "nvim_diagnostic" }, sections = { "error", "warn" } },
-          "encoding", -- e.g. utf-8; hide if you always use utf-8: omit this entry
-          "fileformat", -- unix/dos/mac line endings
-          "filetype", -- name + icon when web-devicons/mini.icons is present
-          -- "lsp_status", -- Neovim 0.10+ LSP client names (if you prefer over plain filetype)
+          "encoding", -- e.g. utf-8; omit this entry if you always use utf-8
+          "fileformat", -- unix / dos / mac line endings
+          "filetype", -- name + icon when web-devicons / mini.icons is present
+          -- "lsp_status", -- Neovim 0.10+ LSP client names (instead of / besides filetype)
         },
 
-        lualine_y = { "progress" }, -- % through buffer; alt: "selectioncount"
-        lualine_z = { "location" }, -- line:col; alt: { "location", padding = { left = 0, right = 1 } }
+        -- Progress through the buffer.
+        lualine_y = { "progress" }, -- percent through file
+        -- lualine_y = { "selectioncount" }, -- visual-selection size instead
+
+        -- Cursor position.
+        lualine_z = { "location" }, -- line:col
+        -- lualine_z = { { "location", padding = { left = 0, right = 1 } } }, -- tighter padding
       },
 
-      -- Shown in windows that are not current (only if globalstatus = false):
+      -- Shown in windows that are not current (only matters if globalstatus = false).
       -- inactive_sections = {
       --   lualine_c = { { "filename", path = 1 } },
       --   lualine_x = { "location" },

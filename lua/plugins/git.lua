@@ -11,13 +11,14 @@
 return {
   {
     "lewis6991/gitsigns.nvim",
-    -- Attach when editing a file. Alternatives:
-    --   event = "VeryLazy"
-    --   lazy = false
-    event = { "BufReadPre", "BufNewFile" },
+    -- When to attach gitsigns to buffers.
+    event = { "BufReadPre", "BufNewFile" }, -- as soon as a file buffer opens
+    -- event = "VeryLazy", -- defer until after startup UI settles
+    -- lazy = false, -- load at startup (signs ready immediately; slightly slower open)
+
     opts = {
-      -- Characters in the signcolumn (requires vim.opt.signcolumn = "yes"|auto).
-      -- Active: Nerd Font glyphs (needs vim.g.have_nerd_font / a Nerd Font in the terminal).
+      -- Characters in the signcolumn (needs vim.opt.signcolumn = "yes"|auto).
+      -- Active: Nerd Font glyphs (needs vim.g.have_nerd_font / a Nerd Font terminal).
       signs = {
         add = { text = "▎" },
         change = { text = "▎" },
@@ -36,23 +37,45 @@ return {
       --   untracked = { text = "┆" },
       -- },
 
-      -- signcolumn = true, -- false = no gutter signs (statusline diff can still work)
-      -- numhl = false, -- true = color the line number for changed lines
-      -- linehl = false, -- true = highlight the whole changed line (noisy)
-      -- word_diff = false, -- true = highlight changed words inside the line
-      -- attach_to_untracked = true, -- show signs for new untracked files
+      -- Show signs in the gutter.
+      signcolumn = true, -- gutter signs on (default)
+      -- signcolumn = false, -- no gutter signs (lualine diff can still work)
 
-      -- current_line_blame = false, -- true = virtual text blame on the cursor line
+      -- Color the line number for changed lines.
+      numhl = false, -- off (less visual noise)
+      -- numhl = true, -- tint line numbers on hunks
+
+      -- Highlight the whole changed line.
+      linehl = false, -- off (noisy in busy diffs)
+      -- linehl = true, -- full-line highlight for hunks
+
+      -- Highlight changed words inside the line.
+      word_diff = false, -- off until you want inline word highlights
+      -- word_diff = true, -- show word-level diffs in the buffer
+
+      -- Signs for brand-new untracked files.
+      attach_to_untracked = true, -- show untracked markers
+      -- attach_to_untracked = false, -- skip untracked files
+
+      -- Virtual-text blame on the cursor line.
+      current_line_blame = false, -- off for now (add later if you like inline blame)
+      -- current_line_blame = true, -- show author/date at EOL (or see opts below)
       -- current_line_blame_opts = {
       --   delay = 500, -- ms before blame appears
-      --   virt_text_pos = "eol", -- "eol" | "overlay" | "right_align"
+      --   -- delay = 1000, -- slower / less distracting
+      --   virt_text_pos = "eol", -- strongest default: end of line
+      --   -- virt_text_pos = "overlay", -- over the buffer text
+      --   -- virt_text_pos = "right_align", -- right edge of the window
       -- },
 
-      -- watch_gitdir = { follow_files = true }, -- track renames inside the repo
+      -- Follow renames inside the repo when watching .git.
+      -- watch_gitdir = { follow_files = true }, -- default-ish; enable if you rename often
       -- max_file_length = 40000, -- skip signs on huge files (perf)
+      -- max_file_length = 10000, -- stricter cutoff on slow machines
 
-      -- Preview / blame floating windows:
-      -- preview_config = { border = "rounded", style = "minimal" },
+      -- Preview / blame floating windows.
+      -- preview_config = { border = "rounded", style = "minimal" }, -- rounded float
+      -- preview_config = { border = "single", style = "minimal" }, -- simpler border
 
       -- Next slice: buffer-local hunk maps, e.g.
       -- on_attach = function(bufnr)
@@ -60,7 +83,7 @@ return {
       --   local function map(mode, lhs, rhs, desc)
       --     vim.keymap.set(mode, lhs, rhs, { buffer = bufnr, desc = desc })
       --   end
-      --   -- Motion style A (Vim diff muscle memory):
+      --   -- Motion style A (Vim diff muscle memory) — strongest default later:
       --   map("n", "]c", function() gs.nav_hunk("next") end, "Next hunk")
       --   map("n", "[c", function() gs.nav_hunk("prev") end, "Prev hunk")
       --   -- Motion style B (hunk-oriented):
