@@ -17,23 +17,24 @@ return {
     event = { "BufReadPre", "BufNewFile" },
     opts = {
       -- Characters in the signcolumn (requires vim.opt.signcolumn = "yes"|auto).
-      -- Nerd Font style example (uncomment and delete the ASCII set if you prefer):
-      -- signs = {
-      --   add = { text = "▎" },
-      --   change = { text = "▎" },
-      --   delete = { text = "" },
-      --   topdelete = { text = "" },
-      --   changedelete = { text = "▎" },
-      --   untracked = { text = "▎" },
-      -- },
+      -- Active: Nerd Font glyphs (needs vim.g.have_nerd_font / a Nerd Font in the terminal).
       signs = {
-        add = { text = "+" },
-        change = { text = "~" },
-        delete = { text = "_" },
-        topdelete = { text = "‾" },
-        changedelete = { text = "~" },
-        untracked = { text = "┆" },
+        add = { text = "▎" },
+        change = { text = "▎" },
+        delete = { text = "" },
+        topdelete = { text = "" },
+        changedelete = { text = "▎" },
+        untracked = { text = "▎" },
       },
+      -- ASCII fallback (use if the terminal font is not a Nerd Font):
+      -- signs = {
+      --   add = { text = "+" },
+      --   change = { text = "~" },
+      --   delete = { text = "_" },
+      --   topdelete = { text = "‾" },
+      --   changedelete = { text = "~" },
+      --   untracked = { text = "┆" },
+      -- },
 
       -- signcolumn = true, -- false = no gutter signs (statusline diff can still work)
       -- numhl = false, -- true = color the line number for changed lines
