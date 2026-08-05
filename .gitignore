@@ -1,0 +1,10 @@
+# Local-only learning material and agent context (never publish)
+references/
+.cursor/
+CLAUDE.md
+AGENTS.md
+
+# OS / editor noise
+.DS_Store
+*.swp
+*~
