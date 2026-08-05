@@ -25,18 +25,31 @@ return {
     lazy = false, -- colorschemes should not wait for an event
     priority = 1000, -- load before other UI plugins paint
     opts = {
-      -- Same spirit as kanagawa's opts; implemented manually in `config`.
-      undercurl = true, -- keep undercurl on spell/diagnostics (theme default)
+      -- Typography aligned with common Neovim theme defaults (Tokyo Night /
+      -- Catppuccin): italic for comments (+ keywords); plain functions/types;
+      -- strikethrough only for markup/deprecated — not for normal code.
+      undercurl = true, -- spell + diagnostic underlines (not the same as strike)
       transparent = false, -- true = clear Normal/SignColumn backgrounds
       -- transparent = true,
       dimInactive = true, -- dim NormalNC when the window is unfocused
       -- dimInactive = false,
       terminalColors = true, -- push a Bordo-ish 16-color palette into :terminal
-      commentStyle = { italic = true },
-      keywordStyle = { italic = true },
-      statementStyle = { bold = true },
-      -- functionStyle = { italic = false },
-      -- typeStyle = { bold = true },
+
+      -- Italic (soft / secondary meaning)
+      commentStyle = { italic = true }, -- almost universal
+      keywordStyle = { italic = true }, -- Tokyo Night default; Catppuccin often leaves plain
+      -- keywordStyle = {}, -- uncomment for Catppuccin-style plain keywords
+
+      -- Plain by default (color carries meaning; avoid bold-everything)
+      statementStyle = {}, -- was bold under Kanagawa; modern themes usually leave plain/italic via Keyword
+      functionStyle = {}, -- neither bold nor italic
+      typeStyle = {}, -- neither bold nor italic
+      -- typeStyle = { bold = true }, -- optional: some themes emphasize types
+
+      -- Markup / LSP only (see config apply below)
+      -- strikethrough: @markup.strikethrough, @lsp.mod.deprecated
+      -- bold: @markup.strong
+      -- italic: @markup.italic
     },
     config = function(_, opts)
       vim.cmd.colorscheme("noctis_bordo")
@@ -61,45 +74,56 @@ return {
       }
 
       local hl = vim.api.nvim_set_hl
-      local function style(enabled, attr)
-        return enabled and attr or false
+      local function has(style_tbl, key)
+        return style_tbl and style_tbl[key] == true
       end
 
-      -- commentStyle / keywordStyle / statementStyle (kanagawa equivalents)
+      -- Comments → italic
       hl(0, "Comment", {
         fg = pal.light_grey,
-        italic = style(opts.commentStyle and opts.commentStyle.italic, true),
+        italic = has(opts.commentStyle, "italic"),
+        bold = has(opts.commentStyle, "bold"),
       })
       hl(0, "@comment", { link = "Comment" })
 
+      -- Keywords → italic (not bold)
       hl(0, "Keyword", {
         fg = pal.red,
-        italic = style(opts.keywordStyle and opts.keywordStyle.italic, true),
-        bold = style(opts.keywordStyle and opts.keywordStyle.bold, true),
+        italic = has(opts.keywordStyle, "italic"),
+        bold = has(opts.keywordStyle, "bold"),
       })
       hl(0, "@keyword", { link = "Keyword" })
 
+      -- Statements → follow statementStyle (default: plain; don't force bold)
       hl(0, "Statement", {
         fg = pal.red,
-        bold = style(opts.statementStyle and opts.statementStyle.bold, true),
-        italic = style(opts.statementStyle and opts.statementStyle.italic, true),
+        italic = has(opts.statementStyle, "italic"),
+        bold = has(opts.statementStyle, "bold"),
       })
 
-      if opts.typeStyle then
-        hl(0, "Type", {
-          fg = pal.yellow,
-          bold = style(opts.typeStyle.bold, true),
-          italic = style(opts.typeStyle.italic, true),
-        })
-      end
+      -- Functions / types → plain unless opted in
+      hl(0, "Function", {
+        fg = pal.green,
+        italic = has(opts.functionStyle, "italic"),
+        bold = has(opts.functionStyle, "bold"),
+      })
+      hl(0, "@function", { link = "Function" })
 
-      if opts.functionStyle then
-        hl(0, "Function", {
-          fg = pal.green,
-          bold = style(opts.functionStyle.bold, true),
-          italic = style(opts.functionStyle.italic, true),
-        })
-      end
+      hl(0, "Type", {
+        fg = pal.yellow,
+        italic = has(opts.typeStyle, "italic"),
+        bold = has(opts.typeStyle, "bold"),
+      })
+      hl(0, "@type", { link = "Type" })
+
+      -- Markup (Treesitter): bold / italic / strike only where the document asks
+      hl(0, "@markup.strong", { bold = true })
+      hl(0, "@markup.italic", { italic = true })
+      hl(0, "@markup.strikethrough", { strikethrough = true })
+
+      -- Deprecated symbols (LSP) → strikethrough, not normal keywords
+      hl(0, "@lsp.mod.deprecated", { strikethrough = true, italic = true })
+      hl(0, "DiagnosticDeprecated", { strikethrough = true })
 
       -- transparent (kanagawa.transparent)
       if opts.transparent then
@@ -159,63 +183,109 @@ return {
   },
 
   -- Kanagawa Dragon (disable/remove noctis above if you switch back):
+  -- Typography matches the active noctis opts (community defaults).
   -- {
   --   "rebelot/kanagawa.nvim",
   --   lazy = false,
   --   priority = 1000,
   --   opts = {
-  --     compile = false, -- true = generate a faster compiled theme (optional later)
-  --     undercurl = true, -- spell/diagnostics use undercurl when the terminal supports it
-  --     transparent = false, -- true = no Normal background (terminal shows through)
+  --     compile = false,
+  --     undercurl = true,
+  --     transparent = false,
   --     -- transparent = true,
-  --     dimInactive = true, -- dim windows that are not focused
+  --     dimInactive = true,
   --     -- dimInactive = false,
-  --     terminalColors = true, -- push palette into :terminal
+  --     terminalColors = true,
+  --     -- Italic: comments + keywords (Tokyo Night–style)
   --     commentStyle = { italic = true },
   --     keywordStyle = { italic = true },
-  --     statementStyle = { bold = true },
-  --     -- functionStyle = { italic = false },
-  --     -- typeStyle = {},
-  --     theme = "dragon", -- default variant when using :colorscheme kanagawa
+  --     -- keywordStyle = {}, -- Catppuccin-style plain keywords
+  --     -- Plain: statements / functions / types (no bold-everything)
+  --     statementStyle = {},
+  --     functionStyle = {},
+  --     typeStyle = {},
+  --     -- typeStyle = { bold = true }, -- optional emphasis
+  --     theme = "dragon",
   --     background = {
-  --       -- Used if you ever set vim.o.background = "dark"|"light" with :colorscheme kanagawa
   --       dark = "dragon", -- "wave" | "dragon" | "lotus"
   --       light = "lotus",
   --     },
   --     -- overrides = function(colors)
-  --     --   return {} -- tweak highlight groups once you know what you want
+  --     --   return {
+  --     --     -- Markup / deprecated (Treesitter + LSP)
+  --     --     ["@markup.strong"] = { bold = true },
+  --     --     ["@markup.italic"] = { italic = true },
+  --     --     ["@markup.strikethrough"] = { strikethrough = true },
+  --     --     ["@lsp.mod.deprecated"] = { strikethrough = true, italic = true },
+  --     --   }
   --     -- end,
   --   },
   --   config = function(_, opts)
   --     require("kanagawa").setup(opts)
-  --     -- Load the variant by name so background/theme tables cannot surprise you.
-  --     -- Other kanagawa commands: kanagawa-wave, kanagawa-lotus, kanagawa
   --     vim.cmd.colorscheme("kanagawa-dragon")
   --     -- vim.cmd.colorscheme("kanagawa-wave")
   --     -- vim.cmd.colorscheme("kanagawa-lotus")
   --   end,
   -- },
 
-  -- Example: Tokyo Night instead (disable noctis if you switch):
+  -- Tokyo Night (disable noctis if you switch):
+  -- Same typography via built-in `styles` (comments + keywords italic; rest plain).
   -- {
   --   "folke/tokyonight.nvim",
   --   lazy = false,
   --   priority = 1000,
-  --   opts = { style = "night", transparent = false },
+  --   opts = {
+  --     style = "night",
+  --     transparent = false,
+  --     -- transparent = true,
+  --     terminal_colors = true,
+  --     dim_inactive = true,
+  --     styles = {
+  --       comments = { italic = true },
+  --       keywords = { italic = true },
+  --       -- keywords = {}, -- plain keywords
+  --       functions = {},
+  --       variables = {},
+  --       -- sidebars = "dark",
+  --       -- floats = "dark",
+  --     },
+  --     -- on_highlights = function(hl, c)
+  --     --   hl["@markup.strong"] = { bold = true }
+  --     --   hl["@markup.italic"] = { italic = true }
+  --     --   hl["@markup.strikethrough"] = { strikethrough = true }
+  --     --   hl["@lsp.mod.deprecated"] = { strikethrough = true, italic = true }
+  --     -- end,
+  --   },
   --   config = function(_, opts)
   --     require("tokyonight").setup(opts)
   --     vim.cmd.colorscheme("tokyonight-night")
   --   end,
   -- },
 
-  -- Example: Craftzdog's Solarized Osaka instead (disable noctis if you switch):
+  -- Solarized Osaka / Craftzdog (disable noctis if you switch):
+  -- Align styles with the same convention when you enable it.
   -- {
   --   "craftzdog/solarized-osaka.nvim",
   --   lazy = false,
   --   priority = 1000,
   --   opts = {
   --     transparent = true, -- Craftzdog default feel; set false for a solid background
-  --     -- styles = { comments = { italic = true }, keywords = { italic = true } },
+  --     -- transparent = false,
+  --     terminal_colors = true,
+  --     styles = {
+  --       comments = { italic = true },
+  --       keywords = { italic = true },
+  --       -- keywords = {},
+  --       functions = {},
+  --       variables = {},
+  --       -- conditionals = { italic = true }, -- Catppuccin sometimes italics these
+  --     },
+  --     -- on_highlights = function(hl, c)
+  --     --   hl["@markup.strong"] = { bold = true }
+  --     --   hl["@markup.italic"] = { italic = true }
+  --     --   hl["@markup.strikethrough"] = { strikethrough = true }
+  --     --   hl["@lsp.mod.deprecated"] = { strikethrough = true, italic = true }
+  --     -- end,
   --   },
   --   config = function(_, opts)
   --     require("solarized-osaka").setup(opts)
