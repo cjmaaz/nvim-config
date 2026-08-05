@@ -1,6 +1,6 @@
 --------------------------------------------------------------------------------
 -- Git signs in the gutter (feeds lualine "diff" / branch context)
--- Hunk keymaps intentionally omitted — add in a later slice (on_attach).
+-- Hunk navigation + actions live in on_attach (see docs/KEYMAPS.md).
 --
 -- Alternatives / related tools (don't enable overlapping UIs blindly):
 --   - lualine "branch"/"diff" alone (no gutter) — thinner setup
@@ -77,23 +77,74 @@ return {
       -- preview_config = { border = "rounded", style = "minimal" }, -- rounded float
       -- preview_config = { border = "single", style = "minimal" }, -- simpler border
 
-      -- Next slice: buffer-local hunk maps, e.g.
-      -- on_attach = function(bufnr)
-      --   local gs = require("gitsigns")
-      --   local function map(mode, lhs, rhs, desc)
-      --     vim.keymap.set(mode, lhs, rhs, { buffer = bufnr, desc = desc })
-      --   end
-      --   -- Motion style A (Vim diff muscle memory) — strongest default later:
-      --   map("n", "]c", function() gs.nav_hunk("next") end, "Next hunk")
-      --   map("n", "[c", function() gs.nav_hunk("prev") end, "Prev hunk")
-      --   -- Motion style B (hunk-oriented):
-      --   -- map("n", "]h", function() gs.nav_hunk("next") end, "Next hunk")
-      --   -- map("n", "[h", function() gs.nav_hunk("prev") end, "Prev hunk")
-      --   -- Leader prefix: <leader>h (hunk) vs <leader>g (git) — pick one family later.
-      --   -- map("n", "<leader>hs", gs.stage_hunk, "Stage hunk")
-      --   -- map("n", "<leader>hr", gs.reset_hunk, "Reset hunk")
-      --   -- map("n", "<leader>hp", gs.preview_hunk, "Preview hunk")
-      -- end,
+      -- Buffer-local hunk maps (only in git-backed buffers gitsigns attaches to).
+      -- Cheatsheet: docs/KEYMAPS.md
+      on_attach = function(bufnr)
+        local gs = require("gitsigns")
+
+        local function map(mode, lhs, rhs, desc)
+          vim.keymap.set(mode, lhs, rhs, { buffer = bufnr, desc = desc })
+        end
+
+        -- Next / previous hunk.
+        -- Style A: ]c/[c — Vim diff keys; in a :diff window, keep builtin ]c/[c.
+        map("n", "]c", function()
+          if vim.wo.diff then
+            vim.cmd.normal({ "]c", bang = true })
+          else
+            gs.nav_hunk("next")
+          end
+        end, "Next git hunk")
+        map("n", "[c", function()
+          if vim.wo.diff then
+            vim.cmd.normal({ "[c", bang = true })
+          else
+            gs.nav_hunk("prev")
+          end
+        end, "Previous git hunk")
+        -- Style B: ]h/[h — hunk-only; leaves ]c/[c alone for :diff
+        -- map("n", "]h", function() gs.nav_hunk("next") end, "Next git hunk")
+        -- map("n", "[h", function() gs.nav_hunk("prev") end, "Previous git hunk")
+
+        -- Hunk actions — <leader>h… (hunk). Swap h→g if you prefer <leader>g….
+        map("n", "<leader>hs", gs.stage_hunk, "Stage hunk")
+        map("n", "<leader>hr", gs.reset_hunk, "Reset hunk")
+        -- map("n", "<leader>gs", gs.stage_hunk, "Stage hunk")
+        -- map("n", "<leader>gr", gs.reset_hunk, "Reset hunk")
+
+        -- Same actions on a visual selection (stage/reset only those lines).
+        map("v", "<leader>hs", function()
+          gs.stage_hunk({ vim.fn.line("."), vim.fn.line("v") })
+        end, "Stage selected hunk")
+        map("v", "<leader>hr", function()
+          gs.reset_hunk({ vim.fn.line("."), vim.fn.line("v") })
+        end, "Reset selected hunk")
+
+        -- Whole-buffer stage/reset (capital letter = “bigger”).
+        map("n", "<leader>hS", gs.stage_buffer, "Stage buffer")
+        map("n", "<leader>hR", gs.reset_buffer, "Reset buffer")
+
+        -- Preview
+        map("n", "<leader>hp", gs.preview_hunk, "Preview hunk") -- float
+        -- map("n", "<leader>hi", gs.preview_hunk_inline, "Preview hunk inline")
+
+        -- Blame / diff
+        map("n", "<leader>hb", function()
+          gs.blame_line({ full = true })
+        end, "Blame line")
+        map("n", "<leader>hd", gs.diffthis, "Diff against index")
+        -- map("n", "<leader>hD", function() gs.diffthis("~") end, "Diff against previous commit")
+
+        -- Optional extras (enable when you want them):
+        -- map("n", "<leader>hq", gs.setqflist, "Quickfix current-file changes")
+        -- map("n", "<leader>hQ", function() gs.setqflist("all") end, "Quickfix all repo changes")
+        -- map("n", "<leader>tb", gs.toggle_current_line_blame, "Toggle line blame")
+        -- map("n", "<leader>tw", gs.toggle_word_diff, "Toggle word diff")
+
+        -- Text object: operator/visual around the hunk under the cursor (e.g. cih, vah).
+        map({ "o", "x" }, "ih", gs.select_hunk, "Select git hunk")
+        -- map({ "o", "x" }, "ah", gs.select_hunk, "Select git hunk") -- same target; "a" vs "i" is taste
+      end,
     },
   },
 }
