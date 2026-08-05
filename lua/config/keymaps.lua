@@ -3,8 +3,11 @@
 -- Cheatsheet: docs/KEYMAPS.md
 --
 -- vim.keymap.set(mode, lhs, rhs, opts?)
---   mode = when it applies ("n"/"i"/"v"/… or { "n", "v" })
---   lhs  = keys you press ("<S-h>", "<leader>bd", …)
+--   mode = when it applies (string or list). Common values:
+--     "n" = normal    "i" = insert    "v" = visual (select + visual)
+--     "x" = visual only    "o" = operator-pending    "t" = terminal
+--     "c" = command-line    { "n", "v" } = several modes at once
+--   lhs  = keys you press ("<S-h>", "<leader>bd", "<Esc><Esc>", …)
 --   rhs  = command string, key sequence, or Lua function
 --   opts = optional { desc = "…" } (and buffer/silent/…)
 --------------------------------------------------------------------------------
@@ -37,3 +40,39 @@ map("n", "<C-h>", "<C-w>h", { desc = "Focus left window" })
 map("n", "<C-l>", "<C-w>l", { desc = "Focus right window" })
 map("n", "<C-j>", "<C-w>j", { desc = "Focus lower window" })
 map("n", "<C-k>", "<C-w>k", { desc = "Focus upper window" })
+
+-- --- Motion comfort (keep cursor centered) ---
+
+-- Search next/prev, then recenter + open folds if needed.
+map("n", "n", "nzzzv", { desc = "Next search result" })
+map("n", "N", "Nzzzv", { desc = "Previous search result" })
+-- map("n", "n", "n", { desc = "Next search result" }) -- stock Vim (no recenter)
+
+-- Half-page scroll, then recenter.
+map("n", "<C-d>", "<C-d>zz", { desc = "Half page down" })
+map("n", "<C-u>", "<C-u>zz", { desc = "Half page up" })
+-- map("n", "<C-d>", "<C-d>", { desc = "Half page down" }) -- stock (no recenter)
+
+-- --- Visual: move selected lines ---
+
+-- Move the visual selection down/up without dropping the selection.
+map("v", "J", ":m '>+1<CR>gv=gv", { desc = "Move selection down" })
+map("v", "K", ":m '<-2<CR>gv=gv", { desc = "Move selection up" })
+-- Note: overrides visual-mode J (join) / K (keyword lookup). Join in visual → :join
+-- map("v", "J", "J", { desc = "Join lines" }) -- restore stock if you prefer
+
+-- --- Terminal ---
+-- Enter with :terminal (or :split | terminal / :vsplit | terminal) — not :!
+-- :!cmd runs once in the shell and returns; :terminal opens an interactive job buffer.
+
+-- Built-in leave is <C-\><C-n>; double Esc is easier to discover.
+map("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
+-- map("t", "<Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" }) -- single Esc (can fight TUI apps)
+
+-- --- hjkl training (arrows do not move) ---
+
+map("n", "<left>", '<cmd>echo "Use h to move!"<CR>', { desc = "Remind: use h" })
+map("n", "<right>", '<cmd>echo "Use l to move!"<CR>', { desc = "Remind: use l" })
+map("n", "<up>", '<cmd>echo "Use k to move!"<CR>', { desc = "Remind: use k" })
+map("n", "<down>", '<cmd>echo "Use j to move!"<CR>', { desc = "Remind: use j" })
+-- To allow arrows again, delete or comment the four lines above.

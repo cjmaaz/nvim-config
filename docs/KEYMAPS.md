@@ -4,7 +4,7 @@ Custom shortcuts defined by this config. `<leader>` is **Space** (see `init.lua`
 
 Only maps we actually set are listed here. Built-in Vim/Neovim keys (`hjkl`, `:w`, `gt` / `gT`, …) are omitted unless we remapped them.
 
-`vim.keymap.set(mode, lhs, rhs, opts?)` — **mode** = when; **lhs** = keys you press; **rhs** = action; **opts** = usually `{ desc = "…" }`.
+`vim.keymap.set(mode, lhs, rhs, opts?)` — **mode** = when (`n` normal, `i` insert, `v` visual, `t` terminal, …); **lhs** = keys you press; **rhs** = action; **opts** = usually `{ desc = "…" }`.
 
 ---
 
@@ -47,6 +47,40 @@ Commented alternates in config: `]b`/`[b`, force delete (`bdelete!`), `<leader>c
 | Key | Mode | Action |
 | --- | --- | --- |
 | `<Esc>` | n | Clear search highlight (`:nohlsearch`) |
+
+### Motion comfort
+
+| Key | Mode | Action |
+| --- | --- | --- |
+| `n` | n | Next search match, then center (`nzzzv`) |
+| `N` | n | Previous search match, then center |
+| `<C-d>` | n | Half page down, then center |
+| `<C-u>` | n | Half page up, then center |
+
+### Visual line move
+
+| Key | Mode | Action |
+| --- | --- | --- |
+| `J` | v | Move selection down (overrides visual join) |
+| `K` | v | Move selection up (overrides visual keyword lookup) |
+
+### Terminal
+
+Interactive shell buffer (not `:!`):
+
+| Command / key | Action |
+| --- | --- |
+| `:terminal` | Open a terminal in the current window |
+| `:split \| terminal` / `:vsplit \| terminal` | Terminal in a split |
+| `<Esc><Esc>` | **t** — leave terminal-job mode → normal mode in that buffer (`<C-\><C-n>`) |
+
+`:!cmd` only runs a one-shot shell command and returns; it does **not** enter terminal mode.
+
+### hjkl training
+
+| Key | Mode | Action |
+| --- | --- | --- |
+| `<left>` / `<right>` / `<up>` / `<down>` | n | Echo “Use h/l/k/j to move!” (no cursor move) |
 
 ---
 
