@@ -9,7 +9,7 @@ Nav: [index](./README.md) · [core](./core.md) · [git](./git.md) · [explorer](
 | Piece | File | What you get |
 | --- | --- | --- |
 | Treesitter | `lua/plugins/treesitter.lua` | Syntax highlight, indentexpr, expr folds (`foldlevel` 99 = open). Parsers include Lua/web, **Java** (`java`, `xml`, `properties`, `groovy`), **Salesforce** (`apex`, `soql`, `sosl`, `sflog`), **rust** / **cpp**. Autotag closes/renames HTML/JSX tags. |
-| Indent guides | `lua/plugins/indent.lua` | Dim passive `│` guides (same light gray as space dots); **bright current scope** (rainbow-synced) with **reverse-L** underlines. Apex via `scope.include.node_type.apex`. Scope bar glyph `▏`. Palette: `lua/config/rainbow_palette.lua`. |
+| Indent guides | `lua/plugins/indent.lua` | Dim passive + bright scope both use `▎` (slight right of `▏`, left of centered `│`); reverse-L underlines; Apex via `scope.include.node_type.apex`. Palette: `lua/config/rainbow_palette.lua`. |
 | Rainbow brackets | `lua/plugins/rainbow.lua` | Depth-colored `()` / `[]` / `{}` (shared palette with indent scope) |
 | Autopairs | `lua/plugins/autopairs.lua` | Auto-close brackets/quotes in insert; `check_ts` when Treesitter is on |
 

@@ -5,6 +5,24 @@
 -- Cheatsheet: docs/keymaps/explorer.md
 --------------------------------------------------------------------------------
 
+--- Sidebar panel bg (keep in sync with which-key panel if you want matching chrome).
+local function apply_neo_tree_hl()
+  local bg = "#000000" -- solid black sidebar
+  -- local bg = "#0a0a0a" -- near-black
+  -- local bg = "#2B2528" -- Bordo bg2 (dimmer than editor)
+  -- local bg = nil -- leave theme defaults (comment out the set_hl calls below)
+  local fg = "#C9BEC2"
+  vim.api.nvim_set_hl(0, "NeoTreeNormal", { fg = fg, bg = bg })
+  vim.api.nvim_set_hl(0, "NeoTreeNormalNC", { fg = fg, bg = bg })
+  vim.api.nvim_set_hl(0, "NeoTreeEndOfBuffer", { fg = bg, bg = bg }) -- hide ~ filler
+  vim.api.nvim_set_hl(0, "NeoTreeWinSeparator", { fg = "#3C2F34", bg = bg })
+  -- vim.api.nvim_set_hl(0, "NeoTreeWinSeparator", { link = "WinSeparator" })
+  vim.api.nvim_set_hl(0, "NeoTreeFloatNormal", { fg = fg, bg = bg })
+  vim.api.nvim_set_hl(0, "NeoTreeFloatBorder", { fg = "#D17B9A", bg = bg })
+  -- vim.api.nvim_set_hl(0, "NeoTreeFloatBorder", { link = "FloatBorder" })
+  vim.api.nvim_set_hl(0, "NeoTreeTitleBar", { fg = "#F6C38A", bg = bg, bold = true })
+end
+
 return {
   {
     "nvim-neo-tree/neo-tree.nvim",
@@ -130,5 +148,14 @@ return {
         },
       },
     },
+
+    config = function(_, opts)
+      require("neo-tree").setup(opts)
+      apply_neo_tree_hl()
+      vim.api.nvim_create_autocmd("ColorScheme", {
+        group = vim.api.nvim_create_augroup("neo_tree_hl", { clear = true }),
+        callback = apply_neo_tree_hl,
+      })
+    end,
   },
 }

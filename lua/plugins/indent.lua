@@ -55,11 +55,18 @@ return {
 
       require("ibl").setup({
         indent = {
-          char = "│", -- passive guide character (straight dim line on every indent)
+          -- Keep indent.char and scope.char on the same left/right bias so the
+          -- column doesn’t jump when the bright scope replaces a dim guide.
+          char = "▎", -- U+258E left quarter — slight right of ▏, still left of │
+          -- char = "▏", -- U+258F left eighth (more gutter-left)
+          -- char = "▍", -- U+258D left three-eighths (nudge further right)
+          -- char = "│", -- centered box-drawing
           -- char = "┊", -- lighter dotted guide
           -- char = "¦",
           -- char = " ", -- invisible passive guides (scope-only mode)
-          tab_char = "│", -- guides on real tab indents (same glyph as spaces)
+          -- char = "▕", -- right edge of the indent cell
+          tab_char = "▎", -- same glyph as spaces (keep in sync with char)
+          -- tab_char = "│",
           -- tab_char = "┊",
           -- tab_char = "→",
           highlight = "IblIndent", -- dim passive columns (see apply_indent_highlights)
@@ -77,23 +84,24 @@ return {
           enabled = true, -- highlight the treesitter scope under the cursor
           -- enabled = false, -- guides only, no current-block emphasis
 
-          -- Vertical bar glyph. Left-edge blocks sit more “in the gutter” than │.
-          char = "▏", -- U+258F left one-eighth block (reads a bit more left)
-          -- char = "▎", -- U+258E left quarter block (thicker, still left-biased)
-          -- char = "│", -- centered box-drawing (default ibl look)
+          -- Match indent.char. ▎ = small nudge right from ▏ without the │ overshoot.
+          char = "▎", -- U+258E left quarter block
+          -- char = "▏", -- more left (previous)
+          -- char = "▍", -- slightly more right than ▎
+          -- char = "│", -- centered (felt too far right before)
           -- char = "┃", -- heavy centered bar
           -- char = "▌", -- full left half block (very obvious)
 
-          -- Reverse-L: underline on first + last line of the scope + vertical bar.
+          -- Reverse-L underlines share the indent cell with the bar (terminal is
+          -- cell-grid only — no true sub-pixel inset). show_exact_scope jumps the
+          -- underline to the TS node (often under the keyword) and gaps the L.
           show_start = true, -- top of the “L” / underline at scope start
           show_end = true, -- bottom underline at scope end
           -- show_start = false, -- vertical bar only (old look)
           -- show_end = false,
 
-          -- Underline from the exact node start/end column (not only at indent col).
-          -- Keep false so the bar/underline stay on the indent column (left of `if`/`for`).
-          show_exact_scope = false, -- classic indent-column reverse-L
-          -- show_exact_scope = true, -- underlines hug the real TS node edges (often under the keyword)
+          show_exact_scope = false, -- underline from indent column (keeps reverse-L)
+          -- show_exact_scope = true, -- underline from exact TS node (more to the right)
 
           injected_languages = true, -- scopes inside injections (JS in HTML, …)
           -- injected_languages = false,
