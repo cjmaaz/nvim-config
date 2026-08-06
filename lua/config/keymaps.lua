@@ -18,9 +18,17 @@ local map = vim.keymap.set
 
 -- Cycle through the buffer list.
 map("n", "<S-h>", "<cmd>bprevious<CR>", { desc = "Previous buffer" }) -- Shift+h
--- map("n", "[b", "<cmd>bprevious<CR>", { desc = "Previous buffer" }) -- ]b/[b style
 map("n", "<S-l>", "<cmd>bnext<CR>", { desc = "Next buffer" }) -- Shift+l
--- map("n", "]b", "<cmd>bnext<CR>", { desc = "Next buffer" })
+
+-- Unimpaired-style ]/[ families (same color within a/A and b/B in which-key).
+map("n", "]b", "<cmd>bnext<CR>", { desc = "Next buffer" })
+map("n", "[b", "<cmd>bprevious<CR>", { desc = "Previous buffer" })
+map("n", "]B", "<cmd>blast<CR>", { desc = "Last buffer" })
+map("n", "[B", "<cmd>bfirst<CR>", { desc = "First buffer" })
+map("n", "]a", "<cmd>next<CR>", { desc = "Next argument" })
+map("n", "[a", "<cmd>previous<CR>", { desc = "Previous argument" })
+map("n", "]A", "<cmd>last<CR>", { desc = "Last argument" })
+map("n", "[A", "<cmd>first<CR>", { desc = "First argument" })
 
 -- Close the current buffer (window often stays; next buffer fills it).
 map("n", "<leader>bd", "<cmd>bdelete<CR>", { desc = "Delete buffer" })

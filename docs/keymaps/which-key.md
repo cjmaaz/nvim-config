@@ -4,7 +4,7 @@ Defined in `lua/plugins/which-key.lua`. Discovers pending keys after a prefix; d
 
 Popup: **classic** full-width strip with **rounded border**, panel bg from `lua/config/ui_chrome.lua` (Bordo bg0 darkened — shared with neo-tree + Telescope), max height ~45% of the screen, `no_overlap = false`.
 
-Icons (when `vim.g.have_nerd_font`): every `spec` group has an icon; **every mapped action** gets a specific glyph via `icons.rules` (family color kept — e.g. all Search green, all SF blue, all Git orange). No catch-all plugin rules for multi-key plugins.
+Icons (when `vim.g.have_nerd_font`): **color = related-action family**, not the whole leader group. Similar/paired maps share a color with different glyphs (e.g. SF tests `a`/`A`/`t`/`T` green; retrieve/metadata azure; `<leader>c` format/lint/action each their own color). `]a`/`A`/`b`/`B` (and `[` twins) are mapped in `keymaps.lua` with buffer=cyan / argument=azure.
 
 Nav: [index](./README.md) · [core](./core.md) · [git](./git.md) · [explorer](./explorer.md) · [telescope](./telescope.md) · [treesitter](./treesitter.md) · [lsp](./lsp.md) · [salesforce](./salesforce.md) · [comment](./comment.md) · [qol](./qol.md)
 

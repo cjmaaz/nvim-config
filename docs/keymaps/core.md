@@ -14,9 +14,13 @@ Nav: [index](./README.md) · [git](./git.md) · [explorer](./explorer.md) · [te
 | --- | --- | --- |
 | `<S-h>` | n | Previous buffer (`:bprevious`) |
 | `<S-l>` | n | Next buffer (`:bnext`) |
+| `]b` / `[b` | n | Next / previous buffer |
+| `]B` / `[B` | n | Last / first buffer |
+| `]a` / `[a` | n | Next / previous argument (`:next` / `:previous`) |
+| `]A` / `[A` | n | Last / first argument |
 | `<leader>bd` | n | Delete current buffer (`:bdelete`) |
 
-Commented alternates in config: `]b`/`[b`, force delete (`bdelete!`), `<leader>c`, wipeout.
+Commented alternates in config: force delete (`bdelete!`), `<leader>c` as buffer-delete, wipeout.
 
 ### Bufferline (UI)
 
