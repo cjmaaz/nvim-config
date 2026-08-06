@@ -42,7 +42,7 @@ return {
       },
     },
     keys = {
-      -- Org
+      -- Org (fetch with <leader>SF before set_target / set_global)
       { "<leader>SF", sf_action("fetch_org_list"), desc = "SF: fetch orgs" },
       { "<leader>So", sf_action("set_target_org"), desc = "SF: set target org" },
       { "<leader>SO", sf_action("set_global_target_org"), desc = "SF: set global org" },

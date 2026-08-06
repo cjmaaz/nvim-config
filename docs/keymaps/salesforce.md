@@ -26,9 +26,9 @@ Also: `:SF` then Tab for command categories.
 
 | Key | Mode | Action |
 | --- | --- | --- |
-| `<leader>SF` | n | Fetch / refresh authenticated orgs |
-| `<leader>So` | n | Set **target** org (local) |
-| `<leader>SO` | n | Set **global** target org |
+| `<leader>SF` | n | Fetch / refresh authenticated orgs (`:SF org fetchList`) |
+| `<leader>So` | n | Set **target** org (local) — run `<leader>SF` first |
+| `<leader>SO` | n | Set **global** target org — run `<leader>SF` first |
 | `<leader>Sb` | n | Open target org in browser |
 | `<leader>SB` | n | Open current metadata in org |
 | `<leader>Sr` | n | Retrieve current file from org |
@@ -56,9 +56,11 @@ Also: `:SF` then Tab for command categories.
 
 ## Notes
 
-- **fzf-lua** is installed for metadata pickers only; everyday file search remains **Telescope** (`<leader>sf` / `sg`).
+- **Org flow:** `<leader>SF` (fetch) → then `<leader>So` / `SO` (pick target). Upstream’s “No orgs…” error wrongly says `:SF org list`; the real command is **`:SF org fetchList`** / `<leader>SF`.
+- **fzf-lua** is installed for metadata pickers only; everyday file search remains **Telescope** (`<leader>sf` / `sg`). Needs host **`fzf`** (`brew install fzf` · `sudo pacman -S fzf`) — see [TOOLS.md](../TOOLS.md).
 - Coverage signs appear after a **coverage** test run (`ST` / `SA`) when `auto_display_code_sign` is on.
 - Cancel (`<leader>Sx`) aborts the in-flight sf.nvim terminal job (deploy, retrieve, tests, …).
 - Optional statusline: `require("sf").get_target_org()` / `covered_percent()` — not wired in lualine yet.
+- Custom objects / `__mdt` “Invalid type” in `apex_ls`: set target org, then `<leader>Ss` (needs `curl`) to refresh SObject stubs under `.sfdx/tools/sobjects/`.
 
 Nav: [index](./README.md) · [lsp](./lsp.md) · [which-key](./which-key.md)
