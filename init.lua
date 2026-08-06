@@ -26,3 +26,5 @@ require("config.options")
 require("config.keymaps")
 -- Loads lua/config/lazy.lua (bootstraps the plugin manager)
 require("config.lazy")
+-- Loads lua/config/autocmds.lua
+require("config.autocmds")

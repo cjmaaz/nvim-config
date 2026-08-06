@@ -24,6 +24,7 @@ nvim-config/
     ├── config/           # editor core — load before plugins
     │   ├── options.lua   # everyday editing options
     │   ├── keymaps.lua   # non-plugin maps (buffers, windows, …)
+    │   ├── autocmds.lua  # yank, trim, final newline (Apex exempt), filetypes
     │   └── lazy.lua      # bootstrap lazy.nvim + import plugins/
     └── plugins/          # one plugin (or small family) per file
         ├── init.lua      # empty list; keeps `import = "plugins"` valid
