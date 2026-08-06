@@ -5,22 +5,19 @@
 -- Cheatsheet: docs/keymaps/explorer.md
 --------------------------------------------------------------------------------
 
---- Sidebar panel bg (keep in sync with which-key panel if you want matching chrome).
+--- Sidebar panel bg (shared with which-key / Telescope via config.ui_chrome).
 local function apply_neo_tree_hl()
-  local bg = "#000000" -- solid black sidebar
-  -- local bg = "#0a0a0a" -- near-black
-  -- local bg = "#2B2528" -- Bordo bg2 (dimmer than editor)
-  -- local bg = nil -- leave theme defaults (comment out the set_hl calls below)
-  local fg = "#C9BEC2"
+  local chrome = require("config.ui_chrome")
+  local bg, fg = chrome.panel_bg, chrome.panel_fg
   vim.api.nvim_set_hl(0, "NeoTreeNormal", { fg = fg, bg = bg })
   vim.api.nvim_set_hl(0, "NeoTreeNormalNC", { fg = fg, bg = bg })
   vim.api.nvim_set_hl(0, "NeoTreeEndOfBuffer", { fg = bg, bg = bg }) -- hide ~ filler
-  vim.api.nvim_set_hl(0, "NeoTreeWinSeparator", { fg = "#3C2F34", bg = bg })
+  vim.api.nvim_set_hl(0, "NeoTreeWinSeparator", { fg = chrome.separator_fg, bg = bg })
   -- vim.api.nvim_set_hl(0, "NeoTreeWinSeparator", { link = "WinSeparator" })
   vim.api.nvim_set_hl(0, "NeoTreeFloatNormal", { fg = fg, bg = bg })
-  vim.api.nvim_set_hl(0, "NeoTreeFloatBorder", { fg = "#D17B9A", bg = bg })
+  vim.api.nvim_set_hl(0, "NeoTreeFloatBorder", { fg = chrome.border_fg, bg = bg })
   -- vim.api.nvim_set_hl(0, "NeoTreeFloatBorder", { link = "FloatBorder" })
-  vim.api.nvim_set_hl(0, "NeoTreeTitleBar", { fg = "#F6C38A", bg = bg, bold = true })
+  vim.api.nvim_set_hl(0, "NeoTreeTitleBar", { fg = chrome.title_fg, bg = bg, bold = true })
 end
 
 return {

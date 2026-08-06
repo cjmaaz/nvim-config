@@ -1,22 +1,19 @@
 --------------------------------------------------------------------------------
 -- which-key: discover pending keybinds after a prefix (e.g. <leader>)
--- Refs: Kickstart (delay 0 + spec groups); CodeOSS ui.lua (delay 300 + groups).
+-- Refs: Kickstart (delay 0 + spec groups); CodeOSS ui.lua (delay 300 + icons).
 -- LazyVim ships which-key in the distro; starter repo often has no local spec.
 -- Alt: skip and use docs/keymaps/ only · or mini.clue (lighter).
 --------------------------------------------------------------------------------
 
 --- Distinct panel vs editor; classic preset is otherwise NormalFloat-camouflaged.
 local function apply_which_key_hl()
-  local bg = "#000000" -- solid black panel
-  -- local bg = "#0a0a0a" -- near-black
-  -- local bg = "#3C2F34" -- Bordo float (bg1) — previous lifted panel
-  -- local bg = "#2B2528" -- darker Bordo (bg2)
-  vim.api.nvim_set_hl(0, "WhichKeyNormal", { fg = "#C9BEC2", bg = bg })
+  local chrome = require("config.ui_chrome")
+  local bg, fg = chrome.panel_bg, chrome.panel_fg
+  vim.api.nvim_set_hl(0, "WhichKeyNormal", { fg = fg, bg = bg })
   -- vim.api.nvim_set_hl(0, "WhichKeyNormal", { link = "NormalFloat" }) -- blend with floats
-  vim.api.nvim_set_hl(0, "WhichKeyBorder", { fg = "#D17B9A", bg = bg })
+  vim.api.nvim_set_hl(0, "WhichKeyBorder", { fg = chrome.border_fg, bg = bg })
   -- vim.api.nvim_set_hl(0, "WhichKeyBorder", { link = "FloatBorder" })
-  -- vim.api.nvim_set_hl(0, "WhichKeyBorder", { fg = "#7BE6AB", bg = bg }) -- green edge
-  vim.api.nvim_set_hl(0, "WhichKeyTitle", { fg = "#F6C38A", bg = bg, bold = true })
+  vim.api.nvim_set_hl(0, "WhichKeyTitle", { fg = chrome.title_fg, bg = bg, bold = true })
   -- vim.api.nvim_set_hl(0, "WhichKeyTitle", { link = "FloatTitle" })
 end
 
@@ -73,58 +70,151 @@ return {
         -- mappings = false, -- text-only labels
         -- colors = false, -- monochrome icons
 
-        -- Color families (same action + its reverse share a color):
-        --   orange  Git brand (logo, hunks, LazyGit, blame) — exception
-        --   blue    Salesforce brand — exception
-        --   green   Search / find / Telescope / TODO search
-        --   cyan    Buffer + window / split / focus (nav chrome)
-        --   azure   File explorer + sessions (workspace)
+        -- Color families (paired opposites share a color; glyphs differ per action):
+        --   orange  Git (LazyGit, hunks, blame, diff)
+        --   blue    Salesforce
+        --   green   Search / find / Telescope / TODO
+        --   cyan    Buffer + window / split / focus
+        --   azure   File explorer + sessions
         --   purple  Code / LSP / format / lint / yank / undotree
-        --   yellow  Toggle + dial (inc/dec) + flash jump
-        --   red     Delete / Trouble / diagnostics lists
+        --   yellow  Toggle + dial + flash
+        --   red     Delete / Trouble / diagnostics jumps
         --   grey    Comment
-        -- Checked before which-key’s built-in rules. Children inherit the group
-        -- icon/color when nothing more specific matches.
+        -- Avoid catch-all `plugin = "…"` for multi-key plugins — that paints every
+        -- key the same before desc patterns run. Specific patterns first.
         rules = {
-          -- Brand / plugin (keep logo colors).
-          { plugin = "sf.nvim", icon = "󰢎", color = "blue" },
-          { plugin = "lazygit.nvim", icon = "", color = "orange" },
-          { pattern = "^sf:", icon = "󰢎", color = "blue" },
-          { pattern = "salesforce", icon = "󰢎", color = "blue" },
+          ------------------------------------------------------------------ Git (orange)
+          { pattern = "lazygit %(current file%)", icon = "󰈙", color = "orange" },
           { pattern = "lazygit", icon = "", color = "orange" },
-          { pattern = "hunk", icon = "󰊢", color = "orange" },
-          { pattern = "blame", icon = "󰊢", color = "orange" },
+          { pattern = "toggle git status explorer", icon = "󰊢", color = "orange" },
+          { pattern = "next git hunk", icon = "󰁔", color = "orange" },
+          { pattern = "previous git hunk", icon = "󰁍", color = "orange" },
+          { pattern = "stage selected hunk", icon = "󰐕", color = "orange" },
+          { pattern = "reset selected hunk", icon = "󰜺", color = "orange" },
+          { pattern = "stage hunk", icon = "󰐕", color = "orange" },
+          { pattern = "reset hunk", icon = "󰛧", color = "orange" },
+          { pattern = "stage buffer", icon = "󰐖", color = "orange" },
+          { pattern = "reset buffer", icon = "󰕍", color = "orange" },
+          { pattern = "preview hunk", icon = "󰈈", color = "orange" },
+          { pattern = "blame line", icon = "󰍕", color = "orange" },
+          { pattern = "diff against index", icon = "󰦓", color = "orange" },
+          { pattern = "select git hunk", icon = "󰒉", color = "orange" },
+          { pattern = "toggle line blame", icon = "󰍕", color = "orange" },
           { pattern = "%f[%a]git", icon = "", color = "orange" },
 
-          -- Search / find (next/prev search, Telescope, TODOs).
-          { plugin = "telescope.nvim", icon = "", color = "green" },
-          { plugin = "todo-comments.nvim", icon = "󱅊", color = "green" },
+          ---------------------------------------------------------- Salesforce (blue)
+          { pattern = "sf: fetch org", icon = "󰄨", color = "blue" },
+          { pattern = "sf: set target org", icon = "󰷏", color = "blue" },
+          { pattern = "sf: set global org", icon = "󰖟", color = "blue" },
+          { pattern = "sf: open org in browser", icon = "󰖟", color = "blue" },
+          { pattern = "sf: open current metadata", icon = "󰈙", color = "blue" },
+          { pattern = "sf: retrieve", icon = "󰇚", color = "blue" },
+          { pattern = "sf: diff", icon = "󰦓", color = "blue" },
+          { pattern = "sf: pull debug log", icon = "󰌱", color = "blue" },
+          { pattern = "sf: toggle terminal", icon = "", color = "blue" },
+          { pattern = "sf: hide terminal", icon = "󰖐", color = "blue" },
+          { pattern = "sf: cancel", icon = "󰜺", color = "blue" },
+          { pattern = "sf: save and deploy", icon = "󰅧", color = "blue" },
+          { pattern = "sf: test under cursor %+ coverage", icon = "󰝖", color = "blue" },
+          { pattern = "sf: test under cursor", icon = "󰙨", color = "blue" },
+          { pattern = "sf: all tests in file %+ coverage", icon = "󰝖", color = "blue" },
+          { pattern = "sf: all tests in file", icon = "󰙨", color = "blue" },
+          { pattern = "sf: repeat last tests", icon = "󰑖", color = "blue" },
+          { pattern = "sf: toggle coverage signs", icon = "󰍕", color = "blue" },
+          { pattern = "sf: previous uncovered", icon = "󰁍", color = "blue" },
+          { pattern = "sf: next uncovered", icon = "󰁔", color = "blue" },
+          { pattern = "sf: run selected soql", icon = "󰆼", color = "blue" },
+          { pattern = "sf: pull metadata inventory", icon = "󰉓", color = "blue" },
+          { pattern = "sf: list metadata to retrieve", icon = "󰉓", color = "blue" },
+          { pattern = "sf: pull metadata types", icon = "󰀫", color = "blue" },
+          { pattern = "sf: list metadata types", icon = "󰀫", color = "blue" },
+          { pattern = "sf: refresh sobject", icon = "󰓅", color = "blue" },
+          { pattern = "sf: create apex ctags", icon = "󰓻", color = "blue" },
+          { pattern = "^sf:", icon = "󰢎", color = "blue" },
+          { pattern = "salesforce", icon = "󰢎", color = "blue" },
+
+          ------------------------------------------------------------- Search (green)
+          { pattern = "search help", icon = "󰋖", color = "green" },
+          { pattern = "search keymaps", icon = "󰌌", color = "green" },
+          { pattern = "search files", icon = "󰈞", color = "green" },
+          { pattern = "search select telescope", icon = "", color = "green" },
+          { pattern = "search current word", icon = "󰓡", color = "green" },
+          { pattern = "search by grep", icon = "󰈲", color = "green" },
+          { pattern = "search diagnostics", icon = "󱖫", color = "green" },
+          { pattern = "search resume", icon = "󰐊", color = "green" },
+          { pattern = "search commands", icon = "󰘳", color = "green" },
+          { pattern = "search recent files", icon = "󰋚", color = "green" },
+          { pattern = "search in open files", icon = "󰈙", color = "green" },
+          { pattern = "search neovim config", icon = "", color = "green" },
+          { pattern = "search todo", icon = "󱅊", color = "green" },
+          { pattern = "fuzzy search current buffer", icon = "󰈔", color = "green" },
+          { pattern = "find buffers", icon = "󰓩", color = "green" },
+          { pattern = "next todo", icon = "󰒭", color = "green" },
+          { pattern = "previous todo", icon = "󰒮", color = "green" },
+          { pattern = "next search result", icon = "󰒭", color = "green" },
+          { pattern = "previous search result", icon = "󰒮", color = "green" },
+          { pattern = "clear search highlight", icon = "󰛑", color = "green" },
+          { pattern = "todo", icon = "󱅊", color = "green" },
           { pattern = "search", icon = "", color = "green" },
           { pattern = "find", icon = "", color = "green" },
-          { pattern = "todo", icon = "󱅊", color = "green" },
           { pattern = "telescope", icon = "", color = "green" },
 
-          -- Buffer + window / split / focus (pairs share cyan).
-          { pattern = "buffer", icon = "󰈔", color = "cyan" },
-          { pattern = "split", icon = "", color = "cyan" },
-          { pattern = "window", icon = "", color = "cyan" },
-          { pattern = "focus", icon = "", color = "cyan" },
+          --------------------------------------------------------------- Toggle (yellow)
+          -- Before generic format/lint/flash so toggle maps stay in this family.
+          { pattern = "toggle format on save", icon = "", color = "yellow" },
+          { pattern = "toggle auto%-lint", icon = "󱉶", color = "yellow" },
+          { pattern = "toggle inlay", icon = "󰔢", color = "yellow" },
+          { pattern = "toggle flash search", icon = "⚡", color = "yellow" },
+          { pattern = "toggle file explorer", icon = "󰙅", color = "azure" }, -- explorer family
+          { pattern = "dial additive increment", icon = "󰐖", color = "yellow" },
+          { pattern = "dial additive decrement", icon = "󰍴", color = "yellow" },
+          { pattern = "dial increment", icon = "󰐖", color = "yellow" },
+          { pattern = "dial decrement", icon = "󰍴", color = "yellow" },
+          { pattern = "flash treesitter", icon = "󰌪", color = "yellow" },
+          { pattern = "remote flash", icon = "󰑮", color = "yellow" },
+          { pattern = "treesitter search", icon = "󰔱", color = "yellow" },
+          { pattern = "flash jump", icon = "⚡", color = "yellow" },
+          { pattern = "flash", icon = "⚡", color = "yellow" },
+          { pattern = "dial", icon = "󰐖", color = "yellow" },
+          { pattern = "increment", icon = "󰐖", color = "yellow" },
+          { pattern = "decrement", icon = "󰍴", color = "yellow" },
+          { pattern = "toggle", icon = "", color = "yellow" },
 
-          -- Explorer + sessions (workspace).
-          { plugin = "neo-tree.nvim", icon = "󰙅", color = "azure" },
-          { plugin = "persistence.nvim", icon = "", color = "azure" },
+          ------------------------------------------------ File explorer + sessions (azure)
+          { pattern = "reveal current file in explorer", icon = "󰈙", color = "azure" },
+          { pattern = "session restore %(cwd%)", icon = "󰦛", color = "azure" },
+          { pattern = "session restore %(last%)", icon = "󰋚", color = "azure" },
+          { pattern = "session select", icon = "󰒓", color = "azure" },
+          { pattern = "session don't save", icon = "󰩺", color = "azure" },
           { pattern = "explorer", icon = "󰙅", color = "azure" },
           { pattern = "session", icon = "", color = "azure" },
 
-          -- Code / LSP / format / lint / yank / undo (edit tools).
-          { plugin = "conform.nvim", icon = "", color = "purple" },
-          { plugin = "nvim-lint", icon = "󱉶", color = "purple" },
-          { plugin = "yanky.nvim", icon = "󰅇", color = "purple" },
-          { plugin = "undotree", icon = "󰕌", color = "purple" },
+          ------------------------------------------- Code / LSP / yank / undo (purple)
+          { pattern = "format buffer", icon = "", color = "purple" },
+          { pattern = "lint current buffer", icon = "󱉶", color = "purple" },
+          { pattern = "lsp: hover", icon = "󰋽", color = "purple" },
+          { pattern = "lsp: go to declaration", icon = "󰳽", color = "purple" },
+          { pattern = "lsp: go to definition", icon = "󰳽", color = "purple" },
+          { pattern = "lsp: go to implementation", icon = "󰡕", color = "purple" },
+          { pattern = "lsp: type definition", icon = "󰊕", color = "purple" },
+          { pattern = "lsp: rename", icon = "󰑕", color = "purple" },
+          { pattern = "lsp: code action", icon = "󰌵", color = "purple" },
+          { pattern = "lsp: references", icon = "󰈇", color = "purple" },
+          { pattern = "lsp: document symbols", icon = "󰈙", color = "purple" },
+          { pattern = "lsp: workspace symbols", icon = "󰒓", color = "purple" },
+          { pattern = "lsp:", icon = "", color = "purple" },
+          { pattern = "code action", icon = "󰌵", color = "purple" },
+          { pattern = "yanky yank", icon = "󰆏", color = "purple" },
+          { pattern = "yanky put after", icon = "󰆒", color = "purple" },
+          { pattern = "yanky put before", icon = "󰆑", color = "purple" },
+          { pattern = "yanky gput after", icon = "󰆒", color = "purple" },
+          { pattern = "yanky gput before", icon = "󰆑", color = "purple" },
+          { pattern = "yanky previous entry", icon = "󰒮", color = "purple" },
+          { pattern = "yanky next entry", icon = "󰒭", color = "purple" },
+          { pattern = "yanky", icon = "󰅇", color = "purple" },
+          { pattern = "undotree", icon = "󰕌", color = "purple" },
           { pattern = "format", icon = "", color = "purple" },
           { pattern = "lint", icon = "󱉶", color = "purple" },
-          { pattern = "lsp:", icon = "", color = "purple" },
-          { pattern = "code", icon = "", color = "purple" },
           { pattern = "rename", icon = "󰑕", color = "purple" },
           { pattern = "hover", icon = "󰋽", color = "purple" },
           { pattern = "definition", icon = "󰳽", color = "purple" },
@@ -132,30 +222,52 @@ return {
           { pattern = "implementation", icon = "󰡕", color = "purple" },
           { pattern = "references", icon = "󰈇", color = "purple" },
           { pattern = "symbol", icon = "", color = "purple" },
-          { pattern = "yanky", icon = "󰅇", color = "purple" },
-          { pattern = "undotree", icon = "󰕌", color = "purple" },
+          { pattern = "code", icon = "", color = "purple" },
 
-          -- Toggle + dial (inc/dec) + flash (jump variants) — yellow family.
-          { plugin = "flash.nvim", icon = "⚡", color = "yellow" },
-          { plugin = "dial.nvim", icon = "󰐖", color = "yellow" },
-          { pattern = "toggle", icon = "", color = "yellow" },
-          { pattern = "flash", icon = "⚡", color = "yellow" },
-          { pattern = "dial", icon = "󰐖", color = "yellow" },
-          { pattern = "inlay", icon = "󰔢", color = "yellow" },
-          { pattern = "increment", icon = "󰐖", color = "yellow" },
-          { pattern = "decrement", icon = "󰍴", color = "yellow" },
-
-          -- Delete / Trouble / diagnostics (problem lists).
-          { plugin = "trouble.nvim", icon = "󰔫", color = "red" },
-          { pattern = "trouble", icon = "󰔫", color = "red" },
+          ------------------------------------ Delete / Trouble / diagnostics (red)
+          { pattern = "delete to eol", icon = "󰆴", color = "red" },
+          { pattern = "delete char", icon = "󰛌", color = "red" },
+          { pattern = "delete buffer", icon = "󰅖", color = "red" },
           { pattern = "black hole", icon = "󰩹", color = "red" },
           { pattern = "delete", icon = "󰩹", color = "red" },
+          { pattern = "buffer diagnostics %(trouble%)", icon = "󰈔", color = "red" },
+          { pattern = "diagnostics %(trouble%)", icon = "󱖫", color = "red" },
+          { pattern = "symbols %(trouble%)", icon = "", color = "red" },
+          { pattern = "location list %(trouble%)", icon = "󰍉", color = "red" },
+          { pattern = "quickfix %(trouble%)", icon = "󰁨", color = "red" },
+          { pattern = "next diagnostic", icon = "󰁔", color = "red" },
+          { pattern = "previous diagnostic", icon = "󰁍", color = "red" },
+          { pattern = "show diagnostic", icon = "󰋽", color = "red" },
+          { pattern = "trouble", icon = "󰔫", color = "red" },
           { pattern = "diagnostic", icon = "󱖫", color = "red" },
           { pattern = "quickfix", icon = "󱖫", color = "red" },
           { pattern = "location list", icon = "󱖫", color = "red" },
 
-          -- Comment line / block (same grey).
+          -------------------------------------- Buffer + window / split (cyan)
+          { pattern = "previous buffer", icon = "󰒮", color = "cyan" },
+          { pattern = "next buffer", icon = "󰒭", color = "cyan" },
+          { pattern = "split horizontal", icon = "󰤻", color = "cyan" },
+          { pattern = "split vertical", icon = "󰤼", color = "cyan" },
+          { pattern = "focus left window", icon = "󰁍", color = "cyan" },
+          { pattern = "focus right window", icon = "󰁔", color = "cyan" },
+          { pattern = "focus lower window", icon = "󰁅", color = "cyan" },
+          { pattern = "focus upper window", icon = "󰁝", color = "cyan" },
+          { pattern = "half page down", icon = "󰁅", color = "cyan" },
+          { pattern = "half page up", icon = "󰁝", color = "cyan" },
+          { pattern = "move selection down", icon = "󰁅", color = "cyan" },
+          { pattern = "move selection up", icon = "󰁝", color = "cyan" },
+          { pattern = "buffer", icon = "󰈔", color = "cyan" },
+          { pattern = "split", icon = "", color = "cyan" },
+          { pattern = "window", icon = "", color = "cyan" },
+          { pattern = "focus", icon = "", color = "cyan" },
+
+          ---------------------------------------------------------- Comment (grey)
+          { pattern = "comment line", icon = "󰆈", color = "grey" },
+          { pattern = "comment block", icon = "󰅺", color = "grey" },
           { pattern = "comment", icon = "󰅺", color = "grey" },
+
+          -------------------------------------------------------------- Misc
+          { pattern = "exit terminal mode", icon = "", color = "red" },
         },
       },
 

@@ -40,6 +40,34 @@ return {
       local telescope = require("telescope")
       local actions = require("telescope.actions")
 
+      --- Soft Bordo-dark panel (shared with which-key / neo-tree).
+      local function apply_telescope_hl()
+        local chrome = require("config.ui_chrome")
+        local bg, fg = chrome.panel_bg, chrome.panel_fg
+        local border = chrome.border_fg
+        for _, group in ipairs({
+          "TelescopeNormal",
+          "TelescopePromptNormal",
+          "TelescopeResultsNormal",
+          "TelescopePreviewNormal",
+        }) do
+          vim.api.nvim_set_hl(0, group, { fg = fg, bg = bg })
+        end
+        for _, group in ipairs({
+          "TelescopeBorder",
+          "TelescopePromptBorder",
+          "TelescopeResultsBorder",
+          "TelescopePreviewBorder",
+        }) do
+          vim.api.nvim_set_hl(0, group, { fg = border, bg = bg })
+        end
+        vim.api.nvim_set_hl(0, "TelescopePromptTitle", { fg = chrome.title_fg, bg = bg, bold = true })
+        vim.api.nvim_set_hl(0, "TelescopeResultsTitle", { fg = chrome.title_fg, bg = bg })
+        vim.api.nvim_set_hl(0, "TelescopePreviewTitle", { fg = chrome.title_fg, bg = bg })
+        vim.api.nvim_set_hl(0, "TelescopeSelection", { fg = fg, bg = chrome.separator_fg, bold = true })
+        -- vim.api.nvim_set_hl(0, "TelescopeNormal", { link = "NormalFloat" }) -- theme default floats
+      end
+
       telescope.setup({
         defaults = {
           path_display = { "smart" }, -- shorten long paths intelligently
@@ -96,6 +124,12 @@ return {
             require("telescope.themes").get_dropdown(),
           },
         },
+      })
+
+      apply_telescope_hl()
+      vim.api.nvim_create_autocmd("ColorScheme", {
+        group = vim.api.nvim_create_augroup("telescope_panel_hl", { clear = true }),
+        callback = apply_telescope_hl,
       })
 
       pcall(telescope.load_extension, "fzf")

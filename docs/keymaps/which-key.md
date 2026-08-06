@@ -2,9 +2,9 @@
 
 Defined in `lua/plugins/which-key.lua`. Discovers pending keys after a prefix; does **not** add maps by itself (labels come from each map’s `desc` plus `spec` groups).
 
-Popup: **classic** full-width strip with **rounded border**, **black** `WhichKeyNormal` bg, max height ~45% of the screen (`win.height`), `no_overlap = false` so it doesn’t shrink near the cursor.
+Popup: **classic** full-width strip with **rounded border**, panel bg from `lua/config/ui_chrome.lua` (Bordo bg0 darkened — shared with neo-tree + Telescope), max height ~45% of the screen, `no_overlap = false`.
 
-Icons (when `vim.g.have_nerd_font`): every `spec` group has an icon; Lazy plugin keys + desc patterns are covered in `icons.rules` (children inherit the group icon when nothing more specific matches). Colors are grouped by action family (paired opposites share a color); **git** stays orange and **Salesforce** stays blue as brand exceptions.
+Icons (when `vim.g.have_nerd_font`): every `spec` group has an icon; **every mapped action** gets a specific glyph via `icons.rules` (family color kept — e.g. all Search green, all SF blue, all Git orange). No catch-all plugin rules for multi-key plugins.
 
 Nav: [index](./README.md) · [core](./core.md) · [git](./git.md) · [explorer](./explorer.md) · [telescope](./telescope.md) · [treesitter](./treesitter.md) · [lsp](./lsp.md) · [salesforce](./salesforce.md) · [comment](./comment.md) · [qol](./qol.md)
 
