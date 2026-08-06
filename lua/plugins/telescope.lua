@@ -1,6 +1,8 @@
 --------------------------------------------------------------------------------
 -- Telescope — fuzzy find files, text, buffers, help, …
 -- Refs: CodeOSS telescope.lua; Kickstart init.lua; Craftzdog editor.lua (heavier).
+-- TJ video (multi-grep + lazy packages): https://www.youtube.com/watch?v=xdXE1tOT-qg
+--   → lua/config/telescope/multigrep.lua (`<leader>sm`); packages: `<leader>sp`
 -- Alts: fzf-lua (faster, needs fzf binary) · snacks.picker (LazyVim-modern).
 -- Needs: ripgrep (rg), fd — see docs/TOOLS.md. Optional: make (fzf-native).
 --------------------------------------------------------------------------------
@@ -132,10 +134,12 @@ return {
         callback = apply_telescope_hl,
       })
 
+      -- fzf-native: load after setup so the sorter is wired (TJ video prerequisite).
       pcall(telescope.load_extension, "fzf")
       pcall(telescope.load_extension, "ui-select")
 
       local builtin = require("telescope.builtin")
+      local live_multigrep = require("config.telescope.multigrep")
 
       -- Search family (<leader>s…)
       vim.keymap.set("n", "<leader>sh", builtin.help_tags, { desc = "Search help" })
@@ -144,6 +148,8 @@ return {
       vim.keymap.set("n", "<leader>ss", builtin.builtin, { desc = "Search select Telescope" })
       vim.keymap.set({ "n", "x" }, "<leader>sw", builtin.grep_string, { desc = "Search current word" })
       vim.keymap.set("n", "<leader>sg", builtin.live_grep, { desc = "Search by grep" })
+      -- TJ multi-grep: `pattern<space><space>glob` (or shortcut: l→*.lua, a→*.cls, …)
+      vim.keymap.set("n", "<leader>sm", live_multigrep, { desc = "Search multi-grep" })
       vim.keymap.set("n", "<leader>sd", builtin.diagnostics, { desc = "Search diagnostics" })
       vim.keymap.set("n", "<leader>sr", builtin.resume, { desc = "Search resume" })
       vim.keymap.set("n", "<leader>sc", builtin.commands, { desc = "Search commands" })
@@ -159,6 +165,14 @@ return {
       vim.keymap.set("n", "<leader>sn", function()
         builtin.find_files({ cwd = vim.fn.stdpath("config"), follow = true })
       end, { desc = "Search Neovim config" })
+
+      -- Video `<leader>ep`: browse installed lazy.nvim plugin sources.
+      vim.keymap.set("n", "<leader>sp", function()
+        builtin.find_files({
+          cwd = vim.fn.stdpath("data") .. "/lazy",
+          prompt_title = "Lazy plugin packages",
+        })
+      end, { desc = "Search plugin packages" })
 
       vim.keymap.set("n", "<leader><leader>", builtin.buffers, { desc = "Find buffers" })
 

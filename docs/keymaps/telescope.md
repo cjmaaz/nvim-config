@@ -24,6 +24,7 @@ Nav: [index](./README.md) · [core](./core.md) · [git](./git.md) · [explorer](
 | --- | --- | --- |
 | `<leader>sf` | n | **Find files** in the project (respects `.gitignore` via `fd`/`rg` when available) |
 | `<leader>sg` | n | **Live grep** — type text; results update as you type (`rg`) |
+| `<leader>sm` | n | **Live multi-grep** — type `pattern`, then **two spaces**, then a glob (e.g. `TODO  *.lua`) or a shortcut (`TODO  l`) |
 | `<leader>sw` | n, x | Grep for the **word under cursor** / visual selection |
 | `<leader>s.` | n | **Recent files** (oldfiles) |
 | `<leader><leader>` | n | List open **buffers** (pick one to jump) |
@@ -37,6 +38,7 @@ Nav: [index](./README.md) · [core](./core.md) · [git](./git.md) · [explorer](
 | `<leader>st` | n | Search **TODO / FIXME** comments (todo-comments) |
 | `<leader>sr` | n | **Resume** the last Telescope picker |
 | `<leader>sn` | n | Find files under your **Neovim config** dir (`stdpath("config")`) |
+| `<leader>sp` | n | Find files under **lazy.nvim plugin packages** (`stdpath("data")/lazy`) |
 
 Sidebar tree instead: [explorer.md](./explorer.md) (`<leader>fe`). Diagnostics jump keys: [core.md](./core.md#diagnostics).
 
@@ -69,6 +71,28 @@ Tip: `<leader>sr` reopens whatever you just closed — handy after a mis-click.
 | --- | --- |
 | `fzf` | Native fuzzy sorter (`telescope-fzf-native`; needs `make` on first install) |
 | `ui-select` | Routes Neovim `vim.ui.select` menus through Telescope (dropdown) |
+
+---
+
+## Live multi-grep (`<leader>sm`)
+
+Custom picker from [TJ’s Advanced Telescope scripting](https://www.youtube.com/watch?v=xdXE1tOT-qg) — `lua/config/telescope/multigrep.lua`.
+
+1. Type a ripgrep **pattern** (can include spaces).
+2. Type **two spaces**, then a **glob** (or a one-letter shortcut).
+3. Results update live via `rg -e pattern -g glob`.
+
+Examples:
+
+| Prompt | Effect |
+| --- | --- |
+| `function` | Grep for `function` everywhere (same idea as live_grep) |
+| `function  *.lua` | Only `*.lua` |
+| `TODO  l` | Shortcut `l` → `*.lua` |
+| `Account  a` | Shortcut `a` → `*.{cls,trigger,apex}` |
+| `useState  j` | Shortcut `j` → `*.{js,jsx,ts,tsx}` |
+
+Shortcuts (`l` `v` `n` `c` `r` `g` `j` `a` `h` `p` `m`) live in `multigrep.lua` — edit the table there. Stock `<leader>sg` stays plain live_grep.
 
 ---
 

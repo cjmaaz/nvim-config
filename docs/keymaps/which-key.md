@@ -24,7 +24,7 @@ Nav: [index](./README.md) · [core](./core.md) · [git](./git.md) · [explorer](
 | `<leader>f` | File/Find | `lua/plugins/explorer.lua` (`fe`, `fE`) | [explorer.md](./explorer.md) |
 | `<leader>g` | Git | `explorer.lua` (`ge`); `lazygit.lua` (`gg`, `gf`) | [explorer.md](./explorer.md) · [git.md](./git.md) |
 | `<leader>d` | Delete (black hole) | `keymaps.lua` (`d`, `D`); `x` also black-hole | [core.md](./core.md) |
-| `<leader>s` | Search | `telescope.lua` (`sf`, `sg`, …); `todo-comments` (`st`) | [telescope.md](./telescope.md) · [comment.md](./comment.md) |
+| `<leader>s` | Search | `telescope.lua` (`sf`, `sg`, `sm` multi-grep, `sp` packages, …); `todo-comments` (`st`) | [telescope.md](./telescope.md) · [comment.md](./comment.md) |
 | `<leader>S` | Salesforce | `lua/plugins/salesforce.lua` (`Sp`, `Sx`, …) | [salesforce.md](./salesforce.md) |
 | `<leader>c` | Code | `formatting.lua` (`cf`); `linting.lua` (`cl`); LSP `ca` | [lsp.md](./lsp.md) |
 | `<leader>t` | Toggle | `tf` FoS · `tl` lint · `th` inlays · `tb` blame | [lsp.md](./lsp.md) · [git.md](./git.md) |
