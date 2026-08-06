@@ -26,6 +26,17 @@ return {
       { "nvim-tree/nvim-web-devicons", enabled = vim.g.have_nerd_font },
     },
     config = function()
+      -- Telescope master uses `utils.if_nil = vim.nonnil or vim.F.if_nil`.
+      -- On Nvim 0.12 that can be nil → layout_strategies / ui-select crash
+      -- (e.g. <leader>So org picker). Always install a tiny compatible shim.
+      local t_utils = require("telescope.utils")
+      t_utils.if_nil = function(x, default)
+        if x == nil then
+          return default
+        end
+        return x
+      end
+
       local telescope = require("telescope")
       local actions = require("telescope.actions")
 
@@ -45,7 +56,10 @@ return {
           },
         },
         extensions = {
-          ["ui-select"] = require("telescope.themes").get_dropdown(),
+          -- Table form avoids odd merge issues with get_dropdown() as a bare table.
+          ["ui-select"] = {
+            require("telescope.themes").get_dropdown(),
+          },
         },
       })
 

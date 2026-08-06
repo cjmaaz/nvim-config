@@ -18,7 +18,8 @@ return {
       {
         "<leader>cl", -- Code Lint (pairs with <leader>cf format)
         function()
-          require("lint").try_lint()
+          -- ignore_errors: missing binary (pre-Mason) should not spam ERROR notify
+          require("lint").try_lint(nil, { ignore_errors = true })
         end,
         desc = "Lint current buffer",
       },
@@ -122,6 +123,27 @@ return {
 
       local ensure_once = {} -- avoid re-queueing the same package
 
+      -- nvim-lint notifies ERROR on ENOENT; during BufEnter that aborts the autocmd
+      -- (E5108 via neo-tree open, etc.). Only run linters whose cmd is on PATH.
+      -- Declared before ensure_mason_package so the install callback can call it.
+      local function available_linters(ft)
+        local names = {}
+        for _, name in ipairs(lint.linters_by_ft[ft] or {}) do
+          local linter = lint.linters[name]
+          if type(linter) == "function" then
+            linter = linter()
+          end
+          local cmd = linter and linter.cmd
+          if type(cmd) == "function" then
+            cmd = cmd()
+          end
+          if type(cmd) == "string" and vim.fn.executable(cmd) == 1 then
+            names[#names + 1] = name
+          end
+        end
+        return names
+      end
+
       local function ensure_mason_package(pkg_name)
         local ok_reg, registry = pcall(require, "mason-registry")
         if not ok_reg then
@@ -146,8 +168,12 @@ return {
             end
             -- Lint current buffer once the tool is ready (if still on a matching ft).
             vim.schedule(function()
-              if not vim.g.disable_autolint and vim.bo.modifiable then
-                lint.try_lint()
+              if vim.g.disable_autolint or not vim.bo.modifiable then
+                return
+              end
+              local names = available_linters(vim.bo.filetype)
+              if #names > 0 then
+                lint.try_lint(names, { ignore_errors = true })
               end
             end)
           end)
@@ -171,8 +197,13 @@ return {
         if not vim.bo[bufnr].modifiable then
           return -- skip hover popups / readonly buffers
         end
-        ensure_linters_for_ft(vim.bo[bufnr].filetype) -- kick off install if needed
-        lint.try_lint() -- no-op / empty if binary not on PATH yet; retries after install
+        local ft = vim.bo[bufnr].filetype
+        ensure_linters_for_ft(ft) -- kick off Mason install if needed; lint retries on closed
+        local names = available_linters(ft)
+        if #names > 0 then
+          -- ignore_errors: never let a spawn failure abort BufEnter (neo-tree open)
+          lint.try_lint(names, { ignore_errors = true })
+        end
       end
 
       local lint_group = vim.api.nvim_create_augroup("user_lint", { clear = true })

@@ -14,6 +14,7 @@ Config: `lua/config/keymaps.lua` (`vim.diagnostic.config` + jump maps).
 | --- | --- |
 | Where diagnostics appear + settings | [display.md](./display.md) |
 | Severity, hide, suppress, filters | [quiet.md](./quiet.md) |
+| Mason `eslint_d` / `~/.npmrc` `min-release-age` | [quiet.md § example](./quiet.md#example-no-eslint-diagnostics--mason-eslint_d-failed) |
 | Java / `jdtls` “non-project file” | [java.md](./java.md) |
 | Minimal Maven example (copy or open) | [../examples/java-maven-minimal/](../examples/java-maven-minimal/) |
 

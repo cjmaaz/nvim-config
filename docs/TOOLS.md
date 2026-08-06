@@ -71,6 +71,6 @@ Without `tree-sitter` + a C compiler, `:TSUpdate` / parser install will fail.
 | `lua/plugins/autopairs.lua` | Treesitter optional (`check_ts`) |
 | `lua/plugins/lsp.lua` | network (Mason), JDK for Apex; `:Mason` for on-demand servers |
 | `lua/plugins/formatting.lua` | Mason formatters (`stylua` auto; others as needed) |
-| `lua/plugins/linting.lua` | Mason linters lazy-by-ft (`eslint_d`, `ruff`, …) |
+| `lua/plugins/linting.lua` | Mason linters lazy-by-ft (`eslint_d`, `ruff`, …); skip until binary on PATH; npm `min-release-age` can block installs — [quiet.md](./diagnostics/quiet.md#example-no-eslint-diagnostics--mason-eslint_d-failed) |
 | `lua/plugins/completion.lua` | optional `make` for LuaSnip jsregexp |
 | `lua/plugins/salesforce.lua` | `sf` CLI; host **`fzf`** (fzf-lua); `curl` for SObject refresh; optional ctags |

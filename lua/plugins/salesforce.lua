@@ -14,6 +14,83 @@ local function sf_action(method, ...)
   end
 end
 
+-- Modern `sf org display --json` redacts accessToken ("[REDACTED] Use 'sf org auth
+-- show-access-token'…"). sf.nvim still feeds that into curl → HTTP 401 on
+-- <leader>Ss even when retrieve/deploy work. Intercept display --json and splice
+-- in a real token from `sf org auth show-access-token`.
+local function install_sf_access_token_fix()
+  if vim.g._sf_access_token_fix then
+    return
+  end
+  vim.g._sf_access_token_fix = true
+
+  local orig_system = vim.system
+  vim.system = function(cmd, opts, on_exit)
+    local is_org_display_json = type(cmd) == "table"
+      and cmd[1] == "sf"
+      and cmd[2] == "org"
+      and cmd[3] == "display"
+      and vim.tbl_contains(cmd, "--json")
+
+    if not is_org_display_json then
+      return orig_system(cmd, opts, on_exit)
+    end
+
+    -- Support vim.system(cmd, on_exit) two-arg form.
+    if type(opts) == "function" then
+      on_exit = opts
+      opts = nil
+    end
+
+    local org
+    for i, v in ipairs(cmd) do
+      if (v == "-o" or v == "--target-org") and cmd[i + 1] then
+        org = cmd[i + 1]
+        break
+      end
+    end
+
+    if type(on_exit) ~= "function" or not org then
+      return orig_system(cmd, opts, on_exit)
+    end
+
+    return orig_system(cmd, opts, function(obj)
+      if obj.code ~= 0 then
+        return on_exit(obj)
+      end
+
+      local ok, parsed = pcall(vim.json.decode, obj.stdout or "")
+      if not ok or type(parsed) ~= "table" or type(parsed.result) ~= "table" then
+        return on_exit(obj)
+      end
+
+      local token = parsed.result.accessToken
+      if type(token) == "string" and token ~= "" and not token:find("REDACTED", 1, true) then
+        return on_exit(obj)
+      end
+
+      orig_system(
+        { "sf", "org", "auth", "show-access-token", "-o", org, "--json", "-p" },
+        { text = true },
+        function(tok_obj)
+          if tok_obj.code == 0 then
+            local tok_ok, tok_parsed = pcall(vim.json.decode, tok_obj.stdout or "")
+            local real = tok_ok
+              and type(tok_parsed) == "table"
+              and tok_parsed.result
+              and tok_parsed.result.accessToken
+            if type(real) == "string" and real ~= "" then
+              parsed.result.accessToken = real
+              obj.stdout = vim.json.encode(parsed)
+            end
+          end
+          on_exit(obj)
+        end
+      )
+    end)
+  end
+end
+
 return {
   {
     "xixiaofinland/sf.nvim",
@@ -102,6 +179,8 @@ return {
       { "<leader>Sc", sf_action("create_ctags"), desc = "SF: create Apex ctags" },
     },
     config = function()
+      install_sf_access_token_fix()
+
       require("sf").setup({
         enable_hotkeys = false, -- we define <leader>S… above (avoids fighting Telescope <leader>s)
         -- enable_hotkeys = true, -- upstream defaults (many conflicts)

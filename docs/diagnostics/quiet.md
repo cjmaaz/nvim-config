@@ -89,11 +89,59 @@ Prefer fixing the project or config over scattering suppress comments.
 
 ---
 
+## Example: no ESLint diagnostics / Mason `eslint_d` failed
+
+JS/TS/Vue lint in this config comes from **`eslint_d`** via `nvim-lint` (source in the float: `eslint_d`). If nothing appears, or neo-tree briefly errored with `ENOENT`, the binary is usually missing or still installing.
+
+### 1. Install with Mason
+
+```vim
+:MasonInstall eslint_d
+```
+
+Or open `:Mason`, find `eslint_d`, install. First open of a matching filetype also **lazy-installs** it (you may see “Installing eslint_d…”). Auto-lint skips until the cmd is on PATH.
+
+Check: `:echo executable('eslint_d')` → `1`, or `~/.local/share/nvim/mason/bin/eslint_d`.
+
+### 2. If install fails with `ETARGET` / “date before …”
+
+Mason uses **npm**. A host `~/.npmrc` with supply-chain delay can block a brand-new Mason pin:
+
+```ini
+min-release-age=7
+```
+
+That refuses packages newer than N days. Example: Mason wants `eslint_d@15.0.3` published yesterday → npm error `notarget … with a date before …`.
+
+**Fix (keep the policy, allow this tool):**
+
+```ini
+# ~/.npmrc
+min-release-age=7
+min-release-age-exclude[]=eslint_d
+```
+
+Then `:MasonInstall eslint_d` again.
+
+**Alts:** wait until the package is old enough · temporarily `npm config delete min-release-age` · install · restore.
+
+Also, if npm says the cache is root-owned:
+
+```bash
+sudo chown -R "$(id -u):$(id -g)" ~/.npm
+```
+
+### 3. After install
+
+Re-open the buffer or `<leader>cl`. You still need a project ESLint config (`eslint.config.*` / `.eslintrc.*`) for useful rules — missing config ≠ Mason failure.
+
+---
+
 ## Checklist
 
 1. Source? → float `<leader>e`
 2. UI too busy? → [display.md](./display.md) layouts B–E
 3. Java “non-project”? → [java.md](./java.md) + [example](../examples/java-maven-minimal/)
-4. Nothing at all? → `:LspInfo` · `:Mason` · is the buffer modifiable? · did lint run (`<leader>cl`)?
+4. Nothing at all? → `:LspInfo` · `:Mason` · is the buffer modifiable? · did lint run (`<leader>cl`)? · for ESLint: [Mason / npmrc above](#example-no-eslint-diagnostics--mason-eslint_d-failed)
 
 Nav: [index](./README.md) · [display](./display.md) · [java](./java.md) · [example](../examples/java-maven-minimal/)

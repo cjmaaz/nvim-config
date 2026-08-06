@@ -69,7 +69,7 @@ External linters (ESLint, Ruff, …) → same diagnostic UI as LSP (`]d`, `<lead
 
 **Auto-lint is on** by default. If it’s noisy or slow: `<leader>tl`, or comment the autocmd in `linting.lua` and use `<leader>cl` only.
 
-**Lazy Mason:** first time you open a matching filetype, Neovim installs the tool (`eslint_d`, `ruff`, `sqlfluff`, `shellcheck`, `stylelint`, `markdownlint`, …). Disable a language by commenting its line in `linters_by_ft` (same style as statusline options).
+**Lazy Mason:** first time you open a matching filetype, Neovim installs the tool (`eslint_d`, `ruff`, `sqlfluff`, `shellcheck`, `stylelint`, `markdownlint`, …). Auto-lint **skips** a linter until its binary is on PATH (avoids ENOENT / neo-tree `BufEnter` errors while Mason installs). Manual: `:MasonInstall eslint_d`. If npm fails with `ETARGET` / “date before …”, check `~/.npmrc` `min-release-age` — see [diagnostics/quiet.md](../diagnostics/quiet.md#example-no-eslint-diagnostics--mason-eslint_d-failed). Disable a language by commenting its line in `linters_by_ft` (same style as statusline options).
 
 ---
 

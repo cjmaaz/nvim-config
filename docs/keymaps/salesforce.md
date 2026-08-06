@@ -63,5 +63,6 @@ Also: `:SF` then Tab for command categories.
 - Cancel (`<leader>Sx`) aborts the in-flight sf.nvim terminal job (deploy, retrieve, tests, …).
 - Optional statusline: `require("sf").get_target_org()` / `covered_percent()` — not wired in lualine yet.
 - Custom objects / `__mdt` “Invalid type” in `apex_ls`: set target org, then `<leader>Ss` (needs `curl`) to refresh SObject stubs under `.sfdx/tools/sobjects/`.
+- **Note:** modern `sf org display --json` **redacts** `accessToken`. Upstream sf.nvim still feeds that into curl → HTTP 401 on `<leader>Ss` even when retrieve/deploy work. `salesforce.lua` wraps `vim.system` and splices a real token from `sf org auth show-access-token` (config-side; survives `:Lazy sync`).
 
 Nav: [index](./README.md) · [lsp](./lsp.md) · [which-key](./which-key.md)

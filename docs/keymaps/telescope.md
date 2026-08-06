@@ -6,6 +6,8 @@ Defined in `lua/plugins/telescope.lua`. Fuzzy UI over files, text, buffers, help
 
 Pinned to Telescope **`master`** (not frozen `0.1.x`) so preview highlighting works with nvim-treesitter **`main`** / Neovim 0.12. Fallback if needed: `defaults.preview.treesitter = false` in `telescope.lua`.
 
+Config also shims `telescope.utils.if_nil` when missing (Nvim 0.12 + Telescope master can leave it nil, which breaks `vim.ui.select` / org picker via ui-select).
+
 Nav: [index](./README.md) · [core](./core.md) · [git](./git.md) · [explorer](./explorer.md) · [treesitter](./treesitter.md) · [lsp](./lsp.md) · [which-key](./which-key.md)
 
 ---
