@@ -2,6 +2,8 @@
 
 Defined in `lua/plugins/which-key.lua`. Discovers pending keys after a prefix; does **not** add maps by itself (labels come from each map’s `desc` plus `spec` groups).
 
+Popup: **classic** full-width strip with **rounded border**, lifted `WhichKeyNormal` bg, max height ~45% of the screen (`win.height`), `no_overlap = false` so it doesn’t shrink near the cursor.
+
 Nav: [index](./README.md) · [core](./core.md) · [git](./git.md) · [explorer](./explorer.md) · [telescope](./telescope.md) · [treesitter](./treesitter.md) · [lsp](./lsp.md) · [salesforce](./salesforce.md) · [comment](./comment.md) · [qol](./qol.md)
 
 ---
@@ -10,6 +12,7 @@ Nav: [index](./README.md) · [core](./core.md) · [git](./git.md) · [explorer](
 | --- | --- |
 | See leader groups | Press `<Space>`, wait ~300ms (`delay`) |
 | Open a group | Press the next key (`h` = Git hunk, `b` = Buffer, `f` = File/Find, …) |
+| Scroll popup | `Ctrl-d` / `Ctrl-u` (less needed with taller `win.height`) |
 | Leave the popup | `<Esc>` |
 
 | Group prefix | Label in popup | Maps live in | Doc |

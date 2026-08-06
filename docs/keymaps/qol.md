@@ -107,7 +107,7 @@ Smarter `<C-a>` / `<C-x>`: numbers, dates (`YYYY-MM-DD`), bools, `and`/`or`, `&&
 
 ## Indent scope / reverse-L (`lua/plugins/indent.lua`)
 
-Passive guides stay **dim**; the current treesitter scope uses the rainbow color for that depth, with `show_start` + `show_end` underlines (reverse-L). Comment those flags or set `scope.highlight = "IblScope"` for a single color — see comments in `indent.lua`.
+Passive guides stay **dim**; the current treesitter scope uses the rainbow color for that depth, with `show_start` + `show_end` underlines (reverse-L). Vertical bar glyph defaults to **`▏`** (left-biased in the cell). Apex works via `scope.include.node_type.apex` (ibl doesn’t ship Apex in its built-in scope language map). Comment flags / swap `char` / use single `IblScope` color — see comments in `indent.lua`.
 
 ---
 

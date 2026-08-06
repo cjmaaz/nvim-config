@@ -28,11 +28,13 @@ return {
       local function apply_indent_highlights()
         palette.apply({ bold = true })
 
-        -- Non-active indent columns — keep very dim so the scope pops.
-        vim.api.nvim_set_hl(0, "IblIndent", { fg = "#2a2833", nocombine = true })
-        -- vim.api.nvim_set_hl(0, "IblIndent", { fg = "#1e1c24", nocombine = true }) -- even dimmer
+        -- Non-active indent columns — same “quiet but visible” weight as listchars
+        -- space dots (Whitespace ≈ #3d3a45 in autocmds.lua). Active scope stays bright.
+        vim.api.nvim_set_hl(0, "IblIndent", { fg = "#3d3a45", nocombine = true })
+        -- vim.api.nvim_set_hl(0, "IblIndent", { fg = "#2a2833", nocombine = true }) -- near-invisible
         -- vim.api.nvim_set_hl(0, "IblIndent", { fg = "#4a4654", nocombine = true }) -- stronger guides
-        -- vim.api.nvim_set_hl(0, "IblIndent", { link = "Whitespace" }) -- match listchars dots
+        -- vim.api.nvim_set_hl(0, "IblIndent", { fg = "#5c5866", nocombine = true }) -- match stronger Whitespace
+        -- vim.api.nvim_set_hl(0, "IblIndent", { link = "Whitespace" }) -- always track listchars dots
 
         -- Fallback single-color scope (used only if scope.highlight is a string / IblScope).
         -- When using the rainbow list below, depth colors come from RainbowDelimiterCustom*.
@@ -53,13 +55,15 @@ return {
 
       require("ibl").setup({
         indent = {
-          char = "│", -- passive guide character
+          char = "│", -- passive guide character (straight dim line on every indent)
           -- char = "┊", -- lighter dotted guide
           -- char = "¦",
           -- char = " ", -- invisible passive guides (scope-only mode)
-          tab_char = "│", -- guides on real tab indents
+          tab_char = "│", -- guides on real tab indents (same glyph as spaces)
+          -- tab_char = "┊",
           -- tab_char = "→",
-          highlight = "IblIndent", -- dim passive columns
+          highlight = "IblIndent", -- dim passive columns (see apply_indent_highlights)
+          -- highlight = "Whitespace", -- force same hl group as space dots
           -- highlight = rainbow_names, -- rainbow every indent column (noisier)
           -- smart_indent_cap = true, -- default-ish: cap indent depth oddly
         },
@@ -73,10 +77,12 @@ return {
           enabled = true, -- highlight the treesitter scope under the cursor
           -- enabled = false, -- guides only, no current-block emphasis
 
-          char = "│", -- vertical bar for the active scope
-          -- char = "┃", -- heavier bar (more visible)
-          -- char = "║",
-          -- char = "▌", -- thick block (very obvious)
+          -- Vertical bar glyph. Left-edge blocks sit more “in the gutter” than │.
+          char = "▏", -- U+258F left one-eighth block (reads a bit more left)
+          -- char = "▎", -- U+258E left quarter block (thicker, still left-biased)
+          -- char = "│", -- centered box-drawing (default ibl look)
+          -- char = "┃", -- heavy centered bar
+          -- char = "▌", -- full left half block (very obvious)
 
           -- Reverse-L: underline on first + last line of the scope + vertical bar.
           show_start = true, -- top of the “L” / underline at scope start
@@ -85,8 +91,9 @@ return {
           -- show_end = false,
 
           -- Underline from the exact node start/end column (not only at indent col).
+          -- Keep false so the bar/underline stay on the indent column (left of `if`/`for`).
           show_exact_scope = false, -- classic indent-column reverse-L
-          -- show_exact_scope = true, -- underlines hug the real TS node edges
+          -- show_exact_scope = true, -- underlines hug the real TS node edges (often under the keyword)
 
           injected_languages = true, -- scopes inside injections (JS in HTML, …)
           -- injected_languages = false,
@@ -96,14 +103,39 @@ return {
           -- highlight = "IblScope", -- single bright color instead of rainbow
           -- highlight = { "IblScope" },
 
+          -- ibl only ships scope node maps for some langs (JS/Lua/Java/…). Apex is
+          -- missing upstream — register nodes here (from apex locals.scm / grammar).
           include = {
-            -- node_type = { ["*"] = { "*" } }, -- very aggressive (noisy)
+            node_type = {
+              apex = {
+                "block",
+                "class_body",
+                "class_declaration",
+                "interface_declaration",
+                "enum_declaration",
+                "trigger_declaration",
+                "method_declaration",
+                "constructor_declaration",
+                "if_statement",
+                "for_statement",
+                "while_statement",
+                "do_statement",
+                "try_statement",
+                "catch_clause",
+                "enhanced_for_statement",
+                -- "switch_expression",
+                -- "switch_statement",
+              },
+              -- soql = { "source_file", "select_clause", … }, -- uncomment if you want SOQL scopes
+              -- ["*"] = { "*" }, -- every named node (very noisy)
+            },
           },
           exclude = {
             language = {}, -- e.g. { "help", "markdown" }
             -- language = { "markdown", "text" },
             node_type = {
               -- ["*"] = { "source_file", "program" }, -- skip whole-file scopes
+              -- apex = { "class_declaration" }, -- if whole-class scope feels too big
             },
           },
         },

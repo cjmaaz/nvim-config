@@ -5,6 +5,19 @@
 -- Alt: skip and use docs/keymaps/ only · or mini.clue (lighter).
 --------------------------------------------------------------------------------
 
+--- Make the popup readable on Noctis Bordo (classic is borderless + NormalFloat).
+local function apply_which_key_hl()
+  -- Slightly lifted panel vs editor bg0 (#312A2D); border tint for edge.
+  vim.api.nvim_set_hl(0, "WhichKeyNormal", { fg = "#C9BEC2", bg = "#3C2F34" })
+  -- vim.api.nvim_set_hl(0, "WhichKeyNormal", { link = "NormalFloat" }) -- blend with floats
+  -- vim.api.nvim_set_hl(0, "WhichKeyNormal", { fg = "#C9BEC2", bg = "#2B2528" }) -- darker panel
+  vim.api.nvim_set_hl(0, "WhichKeyBorder", { fg = "#D17B9A", bg = "#3C2F34" })
+  -- vim.api.nvim_set_hl(0, "WhichKeyBorder", { link = "FloatBorder" })
+  -- vim.api.nvim_set_hl(0, "WhichKeyBorder", { fg = "#7BE6AB", bg = "#3C2F34" }) -- green edge
+  vim.api.nvim_set_hl(0, "WhichKeyTitle", { fg = "#F6C38A", bg = "#3C2F34", bold = true })
+  -- vim.api.nvim_set_hl(0, "WhichKeyTitle", { link = "FloatTitle" })
+end
+
 return {
   {
     "folke/which-key.nvim",
@@ -18,9 +31,39 @@ return {
       -- delay = 0, -- Kickstart: show immediately
 
       -- Popup look (which-key v3 presets).
-      preset = "classic", -- default folke layout
-      -- preset = "modern", -- denser / newer look
-      -- preset = "helix", -- Helix-inspired
+      preset = "classic", -- full-width bottom strip
+      -- preset = "modern", -- centered floating panel + rounded border
+      -- preset = "helix", -- Helix-inspired side panel
+
+      -- Classic defaults to border=none + short max; override for contrast + fewer scrolls.
+      win = {
+        no_overlap = false, -- don't shrink when near cursor (was cutting height)
+        -- no_overlap = true, -- stock: keep clear of cursor line
+        border = "rounded", -- edge so the strip isn't camouflaged
+        -- border = "single",
+        -- border = "double",
+        -- border = "none", -- classic stock (hard to see on Bordo)
+        title = true,
+        title_pos = "center",
+        -- title = false,
+        height = { min = 6, max = 0.45 }, -- up to ~45% of screen; less ^D/^U
+        -- height = { min = 4, max = 25 }, -- classic stock (line cap)
+        -- height = { min = 8, max = math.huge }, -- grow to fit when possible
+        -- height = { min = 4, max = 0.75 }, -- helix-style tall panel
+        padding = { 1, 2 },
+        -- padding = { 0, 1 }, -- tighter
+        wo = {
+          winblend = 0, -- opaque panel (readable over code)
+          -- winblend = 10, -- slight see-through
+        },
+      },
+
+      layout = {
+        width = { min = 20 }, -- column min width
+        -- width = { min = 12 }, -- denser columns → shorter popup, more scroll
+        spacing = 3,
+        -- spacing = 2,
+      },
 
       icons = {
         -- Mapping icons in the popup (needs a Nerd Font when true).
@@ -50,6 +93,15 @@ return {
         -- { "gr", group = "LSP", mode = { "n" } },
       },
     },
+
+    config = function(_, opts)
+      require("which-key").setup(opts)
+      apply_which_key_hl()
+      vim.api.nvim_create_autocmd("ColorScheme", {
+        group = vim.api.nvim_create_augroup("which_key_hl", { clear = true }),
+        callback = apply_which_key_hl,
+      })
+    end,
 
     -- Optional: show buffer-local maps only (Kickstart-style helper).
     -- keys = {
