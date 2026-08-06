@@ -88,6 +88,21 @@ Interactive shell buffer (not `:!`):
 | --- | --- | --- |
 | `<left>` / `<right>` / `<up>` / `<down>` | n | Echo “Use h/l/k/j to move!” (no cursor move) |
 
+### Diagnostics
+
+Defined in `lua/config/keymaps.lua` (`vim.diagnostic.config` + maps). Works before LSP; maps are no-ops until a server or linter reports issues. Jump opens a float via `jump.on_jump` (not the deprecated `float = true` jump opt).
+
+| Key | Mode | Action |
+| --- | --- | --- |
+| `]d` | n | Next diagnostic (float on jump) |
+| `[d` | n | Previous diagnostic (float on jump) |
+| `<leader>e` | n | Show diagnostic float at cursor |
+| `<leader>q` | n | Fill **location list** with buffer diagnostics (`:lopen` / `:lclose`) |
+
+Display: virtual text on, underline from WARN+, severity-sorted, Nerd Font / ASCII signs. Commented alts in config: `virtual_lines`, full underline, `setqflist` instead of loclist.
+
+Also: Telescope `<leader>sd` searches diagnostics once they exist.
+
 ---
 
 ## Git (gitsigns)
@@ -291,6 +306,7 @@ Pairs with `vim.opt.timeoutlen = 300` in `lua/config/options.lua`.
 | Bufferline | Top bar of open buffers; cycle with `<S-h>` / `<S-l>` |
 | neo-tree | `<leader>fe` toggle · `<leader>fE` reveal · `<leader>ge` git status |
 | Telescope | `<leader>sf` files · `<leader>sg` grep · `<leader><leader>` buffers · … |
+| Diagnostics | `]d`/`[d` · `<leader>e` float · `<leader>q` loclist |
 | Colorscheme | Set at startup (`noctis_bordo`); change in `lua/plugins/colorscheme.lua` |
 | which-key | `<Space>` then wait — see leader groups above |
 | Plugin manager | `:Lazy` — UI for install/update/profile |
@@ -299,4 +315,4 @@ Pairs with `vim.opt.timeoutlen = 300` in `lua/config/options.lua`.
 
 ## Growing this doc
 
-When you add keymaps in a later slice (LSP, diagnostics), append a section here in the same table style and link the defining file. Uncomment matching `spec` groups in `which-key.lua` when those prefixes exist.
+When you add keymaps in a later slice (LSP), append a section here in the same table style and link the defining file. Uncomment matching `spec` groups in `which-key.lua` when those prefixes exist.

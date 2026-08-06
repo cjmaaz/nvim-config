@@ -6,7 +6,7 @@ From-scratch Neovim config (lazy.nvim). Built one slice at a time.
 
 | Doc | Contents |
 | --- | --- |
-| [docs/KEYMAPS.md](docs/KEYMAPS.md) | Custom shortcuts (leaders, neo-tree, Telescope, which-key, …) |
+| [docs/KEYMAPS.md](docs/KEYMAPS.md) | Custom shortcuts (leaders, Telescope, diagnostics, neo-tree, …) |
 | [docs/TOOLS.md](docs/TOOLS.md) | Host tools: Neovim, fonts, `rg` / `fd`, … |
 | [docs/COMMITIZEN.md](docs/COMMITIZEN.md) | Optional conventional-commit CLI |
 
@@ -23,13 +23,13 @@ nvim-config/
 └── lua/
     ├── config/           # editor core — load before plugins
     │   ├── options.lua   # everyday editing options
-    │   ├── keymaps.lua   # non-plugin maps (buffers, windows, …)
+    │   ├── keymaps.lua   # non-plugin maps (buffers, windows, diagnostics, …)
     │   ├── autocmds.lua  # yank, trim, final newline (Apex exempt), filetypes
     │   └── lazy.lua      # bootstrap lazy.nvim + import plugins/
     └── plugins/          # one plugin (or small family) per file
         ├── init.lua      # empty list; keeps `import = "plugins"` valid
-        ├── colorscheme.lua
-        ├── statusline.lua
+        ├── colorscheme.lua # noctis_bordo + highlight overlays
+        ├── statusline.lua  # lualine + web-devicons
         ├── bufferline.lua # visual buffer bar (not tabpages)
         ├── explorer.lua  # neo-tree file / git explorer
         ├── telescope.lua # fuzzy find / grep / buffers

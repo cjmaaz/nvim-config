@@ -69,6 +69,57 @@ map("v", "K", ":m '<-2<CR>gv=gv", { desc = "Move selection up" })
 map("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
 -- map("t", "<Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" }) -- single Esc (can fight TUI apps)
 
+-- --- Diagnostics (work before LSP; empty until a server/linter reports) ---
+-- Refs: CodeOSS keymaps.lua; Kickstart diagnostic.config + <leader>q.
+-- Alts: Craftzdog <C-j> next-diag (we keep <C-j> for windows) · wait until LSP file.
+
+vim.diagnostic.config({
+  update_in_insert = false, -- don't spam while typing
+  -- update_in_insert = true,
+  severity_sort = true, -- errors before hints in lists/floats
+  float = { border = "rounded", source = "if_many" },
+  underline = { severity = { min = vim.diagnostic.severity.WARN } }, -- skip hint underlines
+  -- underline = true, -- underline every severity
+  virtual_text = true, -- message at end of line
+  -- virtual_text = false,
+  -- virtual_lines = true, -- Kickstart alt: under the line (noisier)
+  signs = {
+    text = vim.g.have_nerd_font and {
+      [vim.diagnostic.severity.ERROR] = "󰅚",
+      [vim.diagnostic.severity.WARN] = "󰀪",
+      [vim.diagnostic.severity.INFO] = "󰋽",
+      [vim.diagnostic.severity.HINT] = "󰌶",
+    } or {
+      [vim.diagnostic.severity.ERROR] = "E",
+      [vim.diagnostic.severity.WARN] = "W",
+      [vim.diagnostic.severity.INFO] = "I",
+      [vim.diagnostic.severity.HINT] = "H",
+    },
+  },
+  -- Prefer on_jump over jump float=true (float opt deprecated toward 0.14).
+  jump = {
+    on_jump = function(_, bufnr)
+      vim.diagnostic.open_float({
+        bufnr = bufnr,
+        scope = "cursor",
+        focus = false,
+      })
+    end,
+  },
+})
+
+map("n", "]d", function()
+  vim.diagnostic.jump({ count = 1 })
+end, { desc = "Next diagnostic" })
+map("n", "[d", function()
+  vim.diagnostic.jump({ count = -1 })
+end, { desc = "Previous diagnostic" })
+-- map("n", "]d", vim.diagnostic.goto_next, { desc = "Next diagnostic" }) -- deprecated API
+
+map("n", "<leader>e", vim.diagnostic.open_float, { desc = "Show diagnostic" })
+map("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Diagnostic loclist" })
+-- map("n", "<leader>q", vim.diagnostic.setqflist, { desc = "Diagnostic quickfix" }) -- global qflist
+
 -- --- hjkl training (arrows do not move) ---
 
 map("n", "<left>", '<cmd>echo "Use h to move!"<CR>', { desc = "Remind: use h" })
