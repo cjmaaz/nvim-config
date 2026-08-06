@@ -9,10 +9,12 @@
 
 local chrome = require("config.ui_chrome")
 
--- Noctis Bordo accents; base chrome stays shared with the other panels.
+-- Noctis Bordo accents; statusline layers sit slightly darker than other panels.
 local bordo = {
-  bg = chrome.panel_bg,
-  bg_alt = chrome.separator_fg,
+  bg = "#1F1B1D", -- modest step darker than shared panel_bg (#241F22)
+  -- bg = chrome.panel_bg, -- match which-key / neo-tree / Telescope
+  bg_alt = "#2B2528", -- raised section, still darker than the old Bordo bg1
+  -- bg_alt = chrome.active_bg, -- brighter section contrast
   fg = chrome.panel_fg,
   muted = chrome.muted_fg,
   rose = chrome.border_fg,
@@ -69,21 +71,6 @@ end
 --- Keep unusually long branch names from taking over the left side.
 local function compact_branch(branch)
   return #branch > 24 and branch:sub(1, 21) .. "…" or branch
-end
-
---- Draw a subtle horizontal lower edge without adding another screen row.
-local function apply_statusline_edge()
-  local groups = { "StatusLine", "StatusLineNC" }
-  vim.list_extend(groups, vim.fn.getcompletion("lualine_", "highlight"))
-
-  for _, group in ipairs(groups) do
-    local hl = vim.api.nvim_get_hl(0, { name = group, link = false })
-    if next(hl) then
-      hl.underline = true
-      hl.sp = chrome.divider_fg
-      vim.api.nvim_set_hl(0, group, hl)
-    end
-  end
 end
 
 -- Salesforce org + coverage (CodeOSS ui.lua).
@@ -285,16 +272,5 @@ return {
 
       -- extensions = { "lazy", "fugitive", "nvim-tree", "trouble" }, -- nicer sections inside those UIs
     },
-    config = function(_, opts)
-      require("lualine").setup(opts)
-      apply_statusline_edge()
-
-      vim.api.nvim_create_autocmd("ColorScheme", {
-        group = vim.api.nvim_create_augroup("lualine_bordo_edge", { clear = true }),
-        callback = function()
-          vim.schedule(apply_statusline_edge)
-        end,
-      })
-    end,
   },
 }
