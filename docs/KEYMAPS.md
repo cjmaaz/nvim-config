@@ -105,6 +105,22 @@ Also: Telescope `<leader>sd` searches diagnostics once they exist.
 
 ---
 
+## Treesitter, indent guides, autopairs
+
+No custom leader maps. Behavior comes from plugins:
+
+| Piece | File | What you get |
+| --- | --- | --- |
+| Treesitter | `lua/plugins/treesitter.lua` | Syntax highlight, indentexpr, expr folds (`foldlevel` 99 = open). Parsers include Lua/web, **Java** (`java`, `xml`, `properties`, `groovy`), **Salesforce** (`apex`, `soql`, `sosl`, `sflog`), **rust** / **cpp**. Autotag closes/renames HTML/JSX tags. |
+| Indent guides | `lua/plugins/indent.lua` | Vertical `│` guides + current scope (ibl) |
+| Autopairs | `lua/plugins/autopairs.lua` | Auto-close brackets/quotes in insert; `check_ts` when Treesitter is on |
+
+Host tools: Neovim **0.12+**, `tree-sitter` CLI, C compiler — [TOOLS.md](./TOOLS.md). After install: `:Lazy sync`, then `:checkhealth nvim-treesitter`.
+
+Folds: `za` toggle, `zo`/`zc` open/close — see `:help fold`.
+
+---
+
 ## Git (gitsigns)
 
 Defined in `lua/plugins/git.lua` → `on_attach` (buffer-local; only in files gitsigns attaches to).
@@ -307,6 +323,7 @@ Pairs with `vim.opt.timeoutlen = 300` in `lua/config/options.lua`.
 | neo-tree | `<leader>fe` toggle · `<leader>fE` reveal · `<leader>ge` git status |
 | Telescope | `<leader>sf` files · `<leader>sg` grep · `<leader><leader>` buffers · … |
 | Diagnostics | `]d`/`[d` · `<leader>e` float · `<leader>q` loclist |
+| Treesitter / indent / pairs | Highlight + folds (za/zo/…) · vertical guides · auto `()`/`{}`/`""` |
 | Colorscheme | Set at startup (`noctis_bordo`); change in `lua/plugins/colorscheme.lua` |
 | which-key | `<Space>` then wait — see leader groups above |
 | Plugin manager | `:Lazy` — UI for install/update/profile |

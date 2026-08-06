@@ -33,13 +33,16 @@ nvim-config/
         ├── bufferline.lua # visual buffer bar (not tabpages)
         ├── explorer.lua  # neo-tree file / git explorer
         ├── telescope.lua # fuzzy find / grep / buffers
+        ├── treesitter.lua # parsers, highlight, folds, autotag
+        ├── indent.lua    # indent-blankline (ibl) guides
+        ├── autopairs.lua # auto (), {}, quotes
         ├── git.lua       # gitsigns signs + hunk keymaps
         └── which-key.lua # leader popup / group labels
 ```
 
 ## Quick start
 
-1. Install host tools from [docs/TOOLS.md](docs/TOOLS.md) (Neovim, Git, a Nerd Font, **`rg` + `fd`**).
+1. Install host tools from [docs/TOOLS.md](docs/TOOLS.md) (Neovim **0.12+**, Git, a Nerd Font, **`rg` + `fd`**, **tree-sitter CLI** + C compiler).
 2. Point Neovim at this config (symlink, `NVIM_APPNAME`, or clone as your `~/.config/nvim`).
-3. Open Neovim once — lazy.nvim bootstraps and installs plugins from `lazy-lock.json`.
+3. Open Neovim once — lazy.nvim bootstraps and installs plugins from `lazy-lock.json` (Treesitter may compile parsers on first use).
 4. Skim [docs/KEYMAPS.md](docs/KEYMAPS.md) — start with `<leader>sf` / `<leader>sg` and neo-tree `<leader>fe`.
