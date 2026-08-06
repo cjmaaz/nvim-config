@@ -71,16 +71,19 @@ local function compact_branch(branch)
   return #branch > 24 and branch:sub(1, 21) .. "…" or branch
 end
 
---- Off-white divider that stays inside the existing one-row statusline.
-local function divider(bg)
-  return {
-    function()
-      return "│"
-    end,
-    color = { fg = chrome.divider_fg, bg = bg or bordo.bg },
-    padding = { left = 1, right = 1 },
-    separator = "",
-  }
+--- Draw a subtle horizontal lower edge without adding another screen row.
+local function apply_statusline_edge()
+  local groups = { "StatusLine", "StatusLineNC" }
+  vim.list_extend(groups, vim.fn.getcompletion("lualine_", "highlight"))
+
+  for _, group in ipairs(groups) do
+    local hl = vim.api.nvim_get_hl(0, { name = group, link = false })
+    if next(hl) then
+      hl.underline = true
+      hl.sp = chrome.divider_fg
+      vim.api.nvim_set_hl(0, group, hl)
+    end
+  end
 end
 
 -- Salesforce org + coverage (CodeOSS ui.lua).
@@ -145,9 +148,9 @@ return {
         theme = bordo_theme,
         -- theme = "auto", -- follow the active colorscheme instead
 
-        -- Separators between components / sections.
-        component_separators = { left = "", right = "" }, -- explicit dividers control color
-        -- component_separators = { left = "│", right = "│" }, -- inherit each component color
+        -- Keep component boundaries clean; the horizontal edge separates the bar.
+        component_separators = { left = "", right = "" },
+        -- component_separators = { left = "│", right = "│" }, -- vertical dividers (visually busy)
         section_separators = { left = "", right = "" }, -- clean, no Powerline wedges
         -- component_separators = { left = "", right = "" }, -- Powerline (needs Nerd Font)
         -- section_separators = { left = "", right = "" }, -- Powerline wedges
@@ -179,7 +182,6 @@ return {
             icon = status_icons.branch,
             fmt = compact_branch,
           },
-          divider(bordo.bg_alt),
           {
             "diff", -- +/-/~ counts; richer when gitsigns is loaded
             symbols = status_icons.diff,
@@ -193,7 +195,6 @@ return {
         },
 
         lualine_c = {
-          divider(),
           {
             "filename",
             -- How much of the path to show.
@@ -221,7 +222,6 @@ return {
         },
 
         lualine_x = {
-          divider(),
           {
             salesforce_status,
             color = { fg = bordo.blue, gui = "bold" },
@@ -285,5 +285,16 @@ return {
 
       -- extensions = { "lazy", "fugitive", "nvim-tree", "trouble" }, -- nicer sections inside those UIs
     },
+    config = function(_, opts)
+      require("lualine").setup(opts)
+      apply_statusline_edge()
+
+      vim.api.nvim_create_autocmd("ColorScheme", {
+        group = vim.api.nvim_create_augroup("lualine_bordo_edge", { clear = true }),
+        callback = function()
+          vim.schedule(apply_statusline_edge)
+        end,
+      })
+    end,
   },
 }

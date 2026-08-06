@@ -44,7 +44,7 @@ Defined in `init.lua`.
 
 | Area | How you use it today |
 | --- | --- |
-| Statusline (lualine) | Clean Bordo mode caps + off-white dividers; branch, diff, smart path, diagnostics, LSP, location |
+| Statusline (lualine) | Clean Bordo mode caps + subtle horizontal lower edge; branch, diff, smart path, diagnostics, LSP, location |
 | Bufferline | Matching Bordo active-buffer treatment; cycle with `<S-h>` / `<S-l>` — [core.md](./core.md) |
 | neo-tree | `<leader>fe` · `<leader>fE` · `<leader>ge` — [explorer.md](./explorer.md) |
 | Lazygit | `<leader>gg` · `<leader>gf` — [git.md](./git.md) |
