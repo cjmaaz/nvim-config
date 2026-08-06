@@ -196,26 +196,60 @@ return {
       -- vim.lsp.enable({ "lua_ls", "ts_ls" }) -- enable several at once
 
       -- Install a Mason package if needed, then run on_done (on main loop).
+      -- Single-flight: concurrent FileType (e.g. netrw opening several .cls) must not
+      -- call pkg:install() twice — Mason asserts "Package is already installing."
+      local ensure_pending = {} -- pkg_name → { on_done, … }
+
       local function ensure_mason_package(pkg_name, on_done)
+        if ensure_pending[pkg_name] then
+          table.insert(ensure_pending[pkg_name], on_done)
+          return
+        end
+        ensure_pending[pkg_name] = { on_done }
+
+        local function flush(ok)
+          local cbs = ensure_pending[pkg_name] or {}
+          ensure_pending[pkg_name] = nil
+          if not ok then
+            return
+          end
+          for _, cb in ipairs(cbs) do
+            vim.schedule(cb)
+          end
+        end
+
         local registry = require("mason-registry")
         registry.refresh(function()
           local ok, pkg = pcall(registry.get_package, pkg_name)
           if not ok or not pkg then
             vim.notify("Mason package not found: " .. pkg_name, vim.log.levels.WARN)
+            ensure_pending[pkg_name] = nil
             return
           end
           if pkg:is_installed() then
-            vim.schedule(on_done)
+            flush(true)
             return
           end
-          vim.notify("Installing " .. pkg_name .. " (first open)…", vim.log.levels.INFO)
-          pkg:install():once("closed", function()
+
+          local function on_closed()
             if pkg:is_installed() then
-              vim.schedule(on_done)
+              flush(true)
             else
               vim.notify("Failed to install " .. pkg_name, vim.log.levels.ERROR)
+              ensure_pending[pkg_name] = nil
             end
-          end)
+          end
+
+          -- Another path already kicked off install (or we raced past pending).
+          if pkg:is_installing() then
+            pkg:get_install_handle():if_present(function(handle)
+              handle:once("closed", on_closed)
+            end)
+            return
+          end
+
+          vim.notify("Installing " .. pkg_name .. " (first open)…", vim.log.levels.INFO)
+          pkg:install():once("closed", on_closed)
         end)
       end
 
@@ -278,6 +312,14 @@ return {
 
       -- Apex: install apex-language-server on first apex buffer, then enable.
       local function enable_apex_ls()
+        if enabled_once["apex_ls"] then
+          if vim.uv.fs_stat(apex_jar_path) then
+            vim.lsp.enable("apex_ls")
+          end
+          return
+        end
+        enabled_once["apex_ls"] = true
+
         local function try_enable()
           if vim.uv.fs_stat(apex_jar_path) then
             vim.lsp.enable("apex_ls")
