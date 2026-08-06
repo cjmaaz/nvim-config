@@ -10,8 +10,9 @@ return {
     "nvim-telescope/telescope.nvim",
     event = "VimEnter", -- Kickstart/CodeOSS: available soon after UI
     -- event = "VeryLazy",
-    branch = "0.1.x", -- stable branch (CodeOSS)
-    -- version = "*", -- alternate: release tags
+    -- branch = "0.1.x", -- frozen; breaks preview highlight with treesitter `main` (ft_to_lang nil)
+    branch = "master", -- works with nvim-treesitter main + Nvim 0.12
+    -- version = "*", -- alternate: release tags when they catch up
     dependencies = {
       "nvim-lua/plenary.nvim",
       {
@@ -32,6 +33,8 @@ return {
         defaults = {
           path_display = { "smart" }, -- shorten long paths
           -- path_display = { "truncate" },
+          -- If preview still errors on an old Telescope pin, disable TS highlight there:
+          -- preview = { treesitter = false },
           mappings = {
             i = { -- insert mode inside the picker
               ["<C-j>"] = actions.move_selection_next,

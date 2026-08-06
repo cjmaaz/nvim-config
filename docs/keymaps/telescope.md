@@ -4,6 +4,8 @@ Defined in `lua/plugins/telescope.lua`. Fuzzy UI over files, text, buffers, help
 
 **Host tools:** `rg` (live grep) and `fd` (find files) — see [TOOLS.md](../TOOLS.md). Optional: `make` so `telescope-fzf-native` can compile (faster sorting).
 
+Pinned to Telescope **`master`** (not frozen `0.1.x`) so preview highlighting works with nvim-treesitter **`main`** / Neovim 0.12. Fallback if needed: `defaults.preview.treesitter = false` in `telescope.lua`.
+
 Nav: [index](./README.md) · [core](./core.md) · [git](./git.md) · [explorer](./explorer.md) · [treesitter](./treesitter.md) · [lsp](./lsp.md) · [which-key](./which-key.md)
 
 ---
