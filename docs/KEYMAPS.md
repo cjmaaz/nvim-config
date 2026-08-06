@@ -121,16 +121,38 @@ Commented alternates in config: `<leader>g…` prefix, inline preview (`hi`), di
 
 ---
 
-## UI notes (no custom keys yet)
+## which-key
+
+Defined in `lua/plugins/which-key.lua`. Discovers pending keys after a prefix; does **not** add maps by itself (labels come from each map’s `desc` plus `spec` groups).
+
+| Action | How |
+| --- | --- |
+| See leader groups | Press `<Space>`, wait ~300ms (`delay`) |
+| Open a group | Press the next key (`h` = Git hunk, `b` = Buffer) |
+| Leave the popup | `<Esc>` |
+
+| Group prefix | Label in popup | Maps live in |
+| --- | --- | --- |
+| `<leader>b` | Buffer | `lua/config/keymaps.lua` (`bd`, …) |
+| `<leader>h` | Git hunk | `lua/plugins/git.lua` `on_attach` |
+
+Commented optional: `<leader>?` to show buffer-local maps only; future groups for search/file/toggle/LSP.
+
+Pairs with `vim.opt.timeoutlen = 300` in `lua/config/options.lua`.
+
+---
+
+## UI notes
 
 | Area | How you use it today |
 | --- | --- |
 | Statusline (lualine) | Always visible — mode, branch, diff, filename, diagnostics, location |
 | Colorscheme | Set at startup (`noctis_bordo`); change in `lua/plugins/colorscheme.lua` |
+| which-key | `<Space>` then wait — see leader groups above |
 | Plugin manager | `:Lazy` — UI for install/update/profile |
 
 ---
 
 ## Growing this doc
 
-When you add keymaps in a later slice (bufferline, which-key, telescope, LSP), append a section here in the same table style and link the defining file.
+When you add keymaps in a later slice (bufferline, telescope, LSP), append a section here in the same table style and link the defining file. Uncomment matching `spec` groups in `which-key.lua` when those prefixes exist.

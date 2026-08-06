@@ -6,7 +6,7 @@ From-scratch Neovim config (lazy.nvim). Built one slice at a time.
 
 | Doc | Contents |
 | --- | --- |
-| [docs/KEYMAPS.md](docs/KEYMAPS.md) | Custom shortcuts (leaders, buffers, gitsigns, …) |
+| [docs/KEYMAPS.md](docs/KEYMAPS.md) | Custom shortcuts (leaders, buffers, gitsigns, which-key, …) |
 | [docs/TOOLS.md](docs/TOOLS.md) | Host tools: Neovim, fonts, `rg` / `fd`, … |
 | [docs/COMMITIZEN.md](docs/COMMITIZEN.md) | Optional conventional-commit CLI |
 
@@ -29,7 +29,8 @@ nvim-config/
         ├── init.lua      # empty list; keeps `import = "plugins"` valid
         ├── colorscheme.lua
         ├── statusline.lua
-        └── git.lua       # gitsigns signs + hunk keymaps
+        ├── git.lua       # gitsigns signs + hunk keymaps
+        └── which-key.lua # leader popup / group labels
 ```
 
 ## Quick start
@@ -37,4 +38,4 @@ nvim-config/
 1. Install host tools from [docs/TOOLS.md](docs/TOOLS.md) (Neovim, Git, a Nerd Font; ideally `rg` + `fd`).
 2. Point Neovim at this config (symlink, `NVIM_APPNAME`, or clone as your `~/.config/nvim`).
 3. Open Neovim once — lazy.nvim bootstraps and installs plugins from `lazy-lock.json`.
-4. Skim [docs/KEYMAPS.md](docs/KEYMAPS.md) for `<leader>` (Space), buffer/window maps, and git hunk maps.
+4. Skim [docs/KEYMAPS.md](docs/KEYMAPS.md) for `<leader>` (Space), buffer/window maps, git hunks, and which-key.
