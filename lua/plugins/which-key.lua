@@ -35,8 +35,8 @@ return {
         { "<leader>h", group = "Git hunk", mode = { "n", "v" } }, -- gitsigns <leader>h…
         { "<leader>f", group = "File/Find" }, -- neo-tree <leader>fe / fE
         { "<leader>g", group = "Git" }, -- neo-tree <leader>ge (git_status); expand later
+        { "<leader>s", group = "Search", mode = { "n", "v" } }, -- telescope <leader>s…
         -- Future slices (uncomment when those maps exist):
-        -- { "<leader>s", group = "Search", mode = { "n", "v" } }, -- telescope
         -- { "<leader>t", group = "Toggle" },
         -- { "gr", group = "LSP", mode = { "n" } },
       },

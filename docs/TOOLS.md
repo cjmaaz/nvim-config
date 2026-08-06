@@ -21,15 +21,16 @@ If you skip a Nerd Font, set `vim.g.have_nerd_font = false` in `init.lua` and pr
 
 ---
 
-## Strongly recommended (search / pickers later)
-
-Install these early even before Telescope/fzf — many plugins shell out to them.
+## Strongly recommended (Telescope / search)
 
 | Tool | Why | Check | Install (examples) |
 | --- | --- | --- | --- |
-| **ripgrep** (`rg`) | Fast project search (Telescope / future grep) | `rg --version` | `brew install ripgrep` |
-| **fd** | Fast file find (Telescope / future finders) | `fd --version` | `brew install fd` |
+| **ripgrep** (`rg`) | Telescope live grep (`<leader>sg`, `<leader>sw`) | `rg --version` | `brew install ripgrep` |
+| **fd** | Telescope find files (`<leader>sf`) when available | `fd --version` | `brew install fd` |
+| **make** | Builds `telescope-fzf-native` (faster sorter); optional | `make --version` | Xcode CLT / `brew install make` |
 | **tree-sitter CLI** | Optional; helps when debugging / installing parsers | `tree-sitter --version` | `brew install tree-sitter` |
+
+Without `rg` / `fd`, some Telescope pickers fall back to slower builtins or fail — install both.
 
 ---
 
@@ -49,5 +50,6 @@ Install these early even before Telescope/fzf — many plugins shell out to them
 | `lua/config/lazy.lua` | `git`, network (first clone of lazy.nvim) |
 | `lua/plugins/statusline.lua` | Nerd Font (icons) when `have_nerd_font` |
 | `lua/plugins/git.lua` | `git` repo + Nerd Font signs (or ASCII fallback) |
-| Future: Telescope / fzf | `rg`, `fd` |
+| `lua/plugins/explorer.lua` | Nerd Font icons (optional) |
+| `lua/plugins/telescope.lua` | `rg`, `fd`; optional `make` for fzf-native |
 | Future: Treesitter | parsers (and optionally tree-sitter CLI) |
