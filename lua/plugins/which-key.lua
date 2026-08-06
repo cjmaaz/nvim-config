@@ -49,8 +49,12 @@ return {
       },
 
       layout = {
-        width = { min = 20 },
+        -- Cap so `g` (long preset descs) can use multiple columns; labels ellipsize if longer.
+        width = { min = 20, max = 40 },
+        -- width = { min = 20 }, -- stock: grows to longest row → often 1 column under `g`
+        -- width = { min = 20, max = 50 }, -- less truncation, fewer columns
         spacing = 3,
+        -- spacing = 2,
       },
 
       icons = {
@@ -313,6 +317,9 @@ return {
         { "gb", group = "Comment block", mode = { "n", "v" }, icon = { icon = "󰅺", color = "grey" } },
         { "gs", group = "Flash jump", icon = { icon = "⚡", color = "yellow" } },
         { "s", group = "Split / window", icon = { icon = "", color = "cyan" } },
+        -- Shorten the two stock `g` presets that alone forced 1-column / truncation.
+        { "g,", desc = "Newer change-list pos", icon = { icon = "󰒭", color = "grey" } },
+        { "g;", desc = "Older change-list pos", icon = { icon = "󰒮", color = "grey" } },
       },
     },
 

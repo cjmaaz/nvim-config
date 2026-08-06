@@ -2,7 +2,7 @@
 
 Defined in `lua/plugins/which-key.lua`. Discovers pending keys after a prefix; does **not** add maps by itself (labels come from each map’s `desc` plus `spec` groups).
 
-Popup: **classic** full-width strip with **rounded border**, panel bg from `lua/config/ui_chrome.lua` (Bordo bg0 darkened — shared with neo-tree + Telescope), max height ~45% of the screen, `no_overlap = false`.
+Popup: **classic** full-width strip with **rounded border**, panel bg from `lua/config/ui_chrome.lua` (Bordo bg0 darkened — shared with neo-tree + Telescope), max height ~45% of the screen, `no_overlap = false`. `layout.width.max = 40` keeps `g` multi-column; only the long change-list presets needed shorter labels (`g,` / `g;`).
 
 Icons (when `vim.g.have_nerd_font`): **color = related-action family**, not the whole leader group. Similar/paired maps share a color with different glyphs (e.g. SF tests `a`/`A`/`t`/`T` green; retrieve/metadata azure; `<leader>c` format/lint/action each their own color). `]a`/`A`/`b`/`B` (and `[` twins) are mapped in `keymaps.lua` with buffer=cyan / argument=azure.
 
