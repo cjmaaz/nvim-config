@@ -2,7 +2,7 @@
 -- Explorer: neo-tree (sidebar file tree)
 -- Refs: Kickstart optional neo-tree.lua; CodeOSS parked editor.lua (defaults we keep).
 -- Alts considered: oil.nvim · mini.files · netrw · snacks.explorer — user picked neo-tree.
--- Cheatsheet: docs/KEYMAPS.md → Explorer (neo-tree)
+-- Cheatsheet: docs/keymaps/explorer.md
 --------------------------------------------------------------------------------
 
 return {

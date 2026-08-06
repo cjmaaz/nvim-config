@@ -2,7 +2,7 @@
 -- which-key: discover pending keybinds after a prefix (e.g. <leader>)
 -- Refs: Kickstart (delay 0 + spec groups); CodeOSS ui.lua (delay 300 + groups).
 -- LazyVim ships which-key in the distro; starter repo often has no local spec.
--- Alt: skip and use docs/KEYMAPS.md only · or mini.clue (lighter).
+-- Alt: skip and use docs/keymaps/ only · or mini.clue (lighter).
 --------------------------------------------------------------------------------
 
 return {
@@ -36,8 +36,9 @@ return {
         { "<leader>f", group = "File/Find" }, -- neo-tree <leader>fe / fE
         { "<leader>g", group = "Git" }, -- neo-tree <leader>ge (git_status); expand later
         { "<leader>s", group = "Search", mode = { "n", "v" } }, -- telescope <leader>s…
+        { "<leader>c", group = "Code" }, -- <leader>cf format, <leader>ca action
+        { "<leader>t", group = "Toggle" }, -- <leader>tf FoS, <leader>th inlays
         -- Future slices (uncomment when those maps exist):
-        -- { "<leader>t", group = "Toggle" },
         -- { "gr", group = "LSP", mode = { "n" } },
       },
     },

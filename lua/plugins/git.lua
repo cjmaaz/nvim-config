@@ -1,6 +1,6 @@
 --------------------------------------------------------------------------------
 -- Git signs in the gutter (feeds lualine "diff" / branch context)
--- Hunk navigation + actions live in on_attach (see docs/KEYMAPS.md).
+-- Hunk navigation + actions live in on_attach (see docs/keymaps/git.md).
 --
 -- Alternatives / related tools (don't enable overlapping UIs blindly):
 --   - lualine "branch"/"diff" alone (no gutter) — thinner setup
@@ -78,7 +78,7 @@ return {
       -- preview_config = { border = "single", style = "minimal" }, -- simpler border
 
       -- Buffer-local hunk maps (only in git-backed buffers gitsigns attaches to).
-      -- Cheatsheet: docs/KEYMAPS.md
+      -- Cheatsheet: docs/keymaps/git.md
       on_attach = function(bufnr)
         local gs = require("gitsigns")
 

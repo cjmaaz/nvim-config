@@ -4,7 +4,7 @@ Things outside this repo that make the config work well. Install on the **host**
 
 | Doc | Purpose |
 | --- | --- |
-| [KEYMAPS.md](./KEYMAPS.md) | Shortcuts this config defines |
+| [keymaps/](./keymaps/README.md) | Shortcuts this config defines (split by topic) |
 | [COMMITIZEN.md](./COMMITIZEN.md) | Optional conventional-commit helper (`cz`) |
 
 ---
@@ -42,6 +42,8 @@ Without `tree-sitter` + a C compiler, `:TSUpdate` / parser install will fail.
 | --- | --- | --- |
 | **Commitizen** (`cz`) | Interactive conventional commits | [COMMITIZEN.md](./COMMITIZEN.md) |
 | **lazygit** | Full-screen Git TUI (not wired yet) | [jesseduffield/lazygit](https://github.com/jesseduffield/lazygit) |
+| **Java (JDK)** | Apex language server (`apex_ls`) runs on the JVM | `java -version` / `brew install openjdk` |
+| **Node.js** | Some Mason LSPs / prettierd | `node --version` |
 
 ---
 
@@ -57,3 +59,6 @@ Without `tree-sitter` + a C compiler, `:TSUpdate` / parser install will fail.
 | `lua/plugins/treesitter.lua` | Neovim 0.12+, `tree-sitter` CLI 0.26.1+, C compiler |
 | `lua/plugins/indent.lua` | (none beyond Neovim) |
 | `lua/plugins/autopairs.lua` | Treesitter optional (`check_ts`) |
+| `lua/plugins/lsp.lua` | network (Mason), JDK for Apex; `:Mason` for on-demand servers |
+| `lua/plugins/formatting.lua` | Mason formatters (`stylua` auto; others as needed) |
+| `lua/plugins/completion.lua` | optional `make` for LuaSnip jsregexp |

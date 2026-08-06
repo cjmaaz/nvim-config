@@ -1,6 +1,6 @@
 --------------------------------------------------------------------------------
 -- Core keymaps (non-plugin). Plugin maps stay in their plugin files.
--- Cheatsheet: docs/KEYMAPS.md
+-- Cheatsheet: docs/keymaps/ (see README.md index)
 --
 -- vim.keymap.set(mode, lhs, rhs, opts?)
 --   mode = when it applies (string or list). Common values:
