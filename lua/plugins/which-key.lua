@@ -34,7 +34,7 @@ return {
         { "<leader>b", group = "Buffer" }, -- <leader>bd
         { "<leader>h", group = "Git hunk", mode = { "n", "v" } }, -- gitsigns <leader>h…
         { "<leader>f", group = "File/Find" }, -- neo-tree <leader>fe / fE
-        { "<leader>g", group = "Git" }, -- neo-tree <leader>ge (git_status); expand later
+        { "<leader>g", group = "Git" }, -- ge neo-tree · gg/gf lazygit
         { "<leader>s", group = "Search", mode = { "n", "v" } }, -- telescope <leader>s…
         { "<leader>S", group = "Salesforce", mode = { "n", "x" } }, -- sf.nvim <leader>S… (capital S)
         { "<leader>c", group = "Code" }, -- <leader>cf format, <leader>cl lint, <leader>ca action

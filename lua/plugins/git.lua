@@ -5,7 +5,8 @@
 -- Alternatives / related tools (don't enable overlapping UIs blindly):
 --   - lualine "branch"/"diff" alone (no gutter) — thinner setup
 --   - tpope/vim-fugitive — commands (:Git), not a statusline by itself
---   - Neogit / lazygit.nvim — full TUI clients (later topic)
+--   - lazygit.nvim — full TUI (`lua/plugins/lazygit.lua`, <leader>gg)
+--   - Neogit / fugitive — other full clients (not wired)
 --------------------------------------------------------------------------------
 
 return {

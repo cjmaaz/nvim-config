@@ -49,7 +49,7 @@ Without `tree-sitter` + a C compiler, `:TSUpdate` / parser install will fail.
 | Tool | Why | Check | Install |
 | --- | --- | --- | --- |
 | **Commitizen** (`cz`) | Interactive conventional commits | [COMMITIZEN.md](./COMMITIZEN.md) | `npm i -g commitizen` (same on both; see that doc) |
-| **lazygit** | Full-screen Git TUI (not wired yet) | `lazygit --version` | `brew install lazygit` · `sudo pacman -S lazygit` · [upstream](https://github.com/jesseduffield/lazygit) |
+| **lazygit** | Full-screen Git TUI (`<leader>gg` / `gf`) | `lazygit --version` | `brew install lazygit` · `sudo pacman -S lazygit` · [upstream](https://github.com/jesseduffield/lazygit) |
 | **Java (JDK)** | `apex_ls` / `jdtls` on the JVM | `java -version` | `brew install openjdk` · `sudo pacman -S jdk-openjdk` |
 | **Node.js** | Some Mason LSPs / prettierd / optional `sf` install path | `node --version` | `brew install node` · `sudo pacman -S nodejs npm` |
 | **Salesforce CLI (`sf`)** | `sf.nvim` org/deploy/test/metadata | `sf --version` | [CLI setup](https://developer.salesforce.com/tools/salesforcecli) (npm / installer; not a brew/pacman first-class package on all hosts) |
@@ -64,13 +64,14 @@ Without `tree-sitter` + a C compiler, `:TSUpdate` / parser install will fail.
 | `lua/config/lazy.lua` | `git`, network (first clone of lazy.nvim) |
 | `lua/plugins/statusline.lua` | Nerd Font (icons) when `have_nerd_font` |
 | `lua/plugins/git.lua` | `git` repo + Nerd Font signs (or ASCII fallback) |
+| `lua/plugins/lazygit.lua` | host **`lazygit`** (`brew` / `pacman`) |
 | `lua/plugins/explorer.lua` | Nerd Font icons (optional) |
 | `lua/plugins/telescope.lua` | `rg`, `fd`; optional `make` for fzf-native |
 | `lua/plugins/treesitter.lua` | Neovim 0.12+, `tree-sitter` CLI 0.26.1+, C compiler |
 | `lua/plugins/indent.lua` | (none beyond Neovim) |
 | `lua/plugins/autopairs.lua` | Treesitter optional (`check_ts`) |
 | `lua/plugins/lsp.lua` | network (Mason), JDK for Apex; `:Mason` for on-demand servers |
-| `lua/plugins/formatting.lua` | Mason formatters (`stylua` auto; others as needed) |
+| `lua/plugins/formatting.lua` | Mason formatters (`stylua` + `prettierd` auto; others as needed); FoS allowlist |
 | `lua/plugins/linting.lua` | Mason linters lazy-by-ft (`eslint_d`, `ruff`, …); skip until binary on PATH; npm `min-release-age` can block installs — [quiet.md](./diagnostics/quiet.md#example-no-eslint-diagnostics--mason-eslint_d-failed) |
 | `lua/plugins/completion.lua` | optional `make` for LuaSnip jsregexp |
 | `lua/plugins/salesforce.lua` | `sf` CLI; host **`fzf`** (fzf-lua); `curl` for SObject refresh; optional ctags |

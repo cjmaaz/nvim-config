@@ -183,7 +183,8 @@ return {
         ensure_installed = {
           "lua-language-server", -- package name for lua_ls
           "stylua", -- Lua formatter used by conform
-          -- "prettierd", -- uncomment to always keep prettier ready
+          "prettierd", -- FoS for web/json/yaml (formatting.lua allowlist)
+          -- "ruff", -- optional: always keep Python format/lint ready
           -- "apex-language-server", -- or rely on on-demand Apex FileType hook
         },
         run_on_start = true, -- install missing on Neovim start

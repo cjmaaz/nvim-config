@@ -54,7 +54,7 @@ blink.cmp + LuaSnip. **Accept with `<C-y>`** (Kickstart / `:help ins-completion`
 | `<leader>cf` | n, x | Format buffer (conform; LSP fallback) |
 | `<leader>tf` | n | Toggle format-on-save disable flag |
 
-**Format-on-save is off** until you uncomment filetypes in `formatting.lua` (`java`, `javascript`, `html`, `css`, …). Manual `<leader>cf` always works. Install formatters via `:Mason` (`prettierd`, `google-java-format`, …) as needed — only `stylua` is auto-installed.
+**Format-on-save is on** for an allowlist in `formatting.lua`: `lua`, `python`, JS/TS (+react), `html`/`css`/`scss`, `json`/`jsonc`, `yaml`. Toggle off with `<leader>tf`. Manual `<leader>cf` always works. `stylua` + `prettierd` auto-install via mason-tool-installer; other formatters (`ruff`, `google-java-format`, …) via `:Mason` as needed.
 
 ---
 

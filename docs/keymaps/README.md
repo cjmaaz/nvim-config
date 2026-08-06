@@ -46,6 +46,7 @@ Defined in `init.lua`.
 | Statusline (lualine) | Always visible — mode, branch, diff, filename, diagnostics, location |
 | Bufferline | Top bar of open buffers; cycle with `<S-h>` / `<S-l>` — [core.md](./core.md) |
 | neo-tree | `<leader>fe` · `<leader>fE` · `<leader>ge` — [explorer.md](./explorer.md) |
+| Lazygit | `<leader>gg` · `<leader>gf` — [git.md](./git.md) |
 | Telescope | `<leader>sf` · `<leader>sg` · `<leader><leader>` — [telescope.md](./telescope.md) |
 | Diagnostics | `]d`/`[d` · `<leader>e` · `<leader>q` — [core.md](./core.md#diagnostics) · [diagnostics/](../diagnostics/README.md) |
 | Treesitter / indent / pairs | Highlight, folds, guides, autopairs — [treesitter.md](./treesitter.md) |

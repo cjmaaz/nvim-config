@@ -45,19 +45,23 @@ return {
         if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
           return -- global or buffer toggle off
         end
-        -- FoS off until you uncomment filetypes (Kickstart-style allowlist).
-        -- After uncommenting, <leader>tf can still disable globally.
+        -- Kickstart-style allowlist. <leader>tf still disables FoS globally.
+        -- Skip java/markdown/apex (heavier or taste); uncomment when you want them.
         local enabled_filetypes = {
           -- java = true,
-          -- javascript = true,
-          -- javascriptreact = true,
-          -- typescript = true,
-          -- typescriptreact = true,
-          -- html = true,
-          -- css = true,
-          -- scss = true,
-          -- lua = true,
-          -- python = true,
+          javascript = true,
+          javascriptreact = true,
+          typescript = true,
+          typescriptreact = true,
+          html = true,
+          css = true,
+          scss = true,
+          json = true,
+          jsonc = true,
+          yaml = true,
+          lua = true, -- stylua (auto via mason-tool-installer)
+          python = true, -- ruff_format (Mason on demand / PATH)
+          -- markdown = true,
         }
         -- local enabled_filetypes = { ["*"] = true } -- not supported; list fts explicitly
         if not enabled_filetypes[vim.bo[bufnr].filetype] then

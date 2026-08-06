@@ -1,6 +1,7 @@
-# Git (gitsigns)
+# Git (gitsigns + lazygit)
 
-Defined in `lua/plugins/git.lua` → `on_attach` (buffer-local; only in files gitsigns attaches to).
+Gitsigns: `lua/plugins/git.lua` → `on_attach` (buffer-local).  
+Lazygit: `lua/plugins/lazygit.lua` (needs host `lazygit`).
 
 Nav: [index](./README.md) · [core](./core.md) · [explorer](./explorer.md) · [telescope](./telescope.md) · [treesitter](./treesitter.md) · [lsp](./lsp.md) · [which-key](./which-key.md)
 
@@ -36,6 +37,19 @@ Commented alternates in config: `<leader>g…` prefix, inline preview (`hi`), di
 which-key group: **Git hunk** under `<leader>h` — [which-key.md](./which-key.md).
 
 Git status tree: [`<leader>ge`](./explorer.md) (neo-tree).
+
+---
+
+## Lazygit (`lua/plugins/lazygit.lua`)
+
+Needs host **`lazygit`** — [TOOLS.md](../TOOLS.md).
+
+| Key | Mode | Action |
+| --- | --- | --- |
+| `<leader>gg` | n | Open LazyGit (float) |
+| `<leader>gf` | n | LazyGit filtered to the current file |
+
+`:LazyGit` / `:LazyGitCurrentFile` also work. Hunk maps above stay for in-buffer work; LazyGit is the full TUI.
 
 ---
 
