@@ -19,8 +19,8 @@ Nav: [index](./README.md) · [core](./core.md) · [git](./git.md) · [explorer](
 | `<leader>f` | File/Find | `lua/plugins/explorer.lua` (`fe`, `fE`) | [explorer.md](./explorer.md) |
 | `<leader>g` | Git | `lua/plugins/explorer.lua` (`ge`); expand later | [explorer.md](./explorer.md) |
 | `<leader>s` | Search | `lua/plugins/telescope.lua` (`sf`, `sg`, …) | [telescope.md](./telescope.md) |
-| `<leader>c` | Code | `formatting.lua` (`cf`); LSP `ca` | [lsp.md](./lsp.md) |
-| `<leader>t` | Toggle | `formatting.lua` (`tf`); LSP `th` inlays | [lsp.md](./lsp.md) |
+| `<leader>c` | Code | `formatting.lua` (`cf`); `linting.lua` (`cl`); LSP `ca` | [lsp.md](./lsp.md) |
+| `<leader>t` | Toggle | `formatting.lua` (`tf`); `linting.lua` (`tl`); LSP `th` inlays | [lsp.md](./lsp.md) |
 
 Commented optional: `<leader>?` to show buffer-local maps only.
 

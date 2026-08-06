@@ -20,7 +20,7 @@ Only maps we actually set are listed. Built-in Vim/Neovim keys (`hjkl`, `:w`, `g
 | Explorer (neo-tree) | [explorer.md](./explorer.md) |
 | Telescope | [telescope.md](./telescope.md) |
 | Treesitter / indent / autopairs | [treesitter.md](./treesitter.md) |
-| LSP / completion / formatting | [lsp.md](./lsp.md) |
+| LSP / completion / formatting / lint | [lsp.md](./lsp.md) |
 | which-key | [which-key.md](./which-key.md) |
 | UI cheat sheet | [below](#ui-notes) |
 
@@ -48,6 +48,7 @@ Defined in `init.lua`.
 | Diagnostics | `]d`/`[d` · `<leader>e` · `<leader>q` — [core.md](./core.md#diagnostics) |
 | Treesitter / indent / pairs | Highlight, folds, guides, autopairs — [treesitter.md](./treesitter.md) |
 | LSP / format / blink | `gd`/`K`/`gr` · `<leader>cf` · `<C-y>` — [lsp.md](./lsp.md) |
+| Lint (nvim-lint) | `<leader>cl` · `<leader>tl` toggle auto · lazy Mason — [lsp.md](./lsp.md#linting-luapluginslintinglua) |
 | Colorscheme | `noctis_bordo` — `lua/plugins/colorscheme.lua` |
 | which-key | `<Space>` then wait — [which-key.md](./which-key.md) |
 | Plugin manager | `:Lazy` |

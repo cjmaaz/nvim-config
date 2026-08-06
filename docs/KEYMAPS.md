@@ -10,7 +10,7 @@ The keymap cheatsheet lives in **[`docs/keymaps/`](./keymaps/README.md)** (split
 | [keymaps/explorer.md](./keymaps/explorer.md) | neo-tree |
 | [keymaps/telescope.md](./keymaps/telescope.md) | Search pickers |
 | [keymaps/treesitter.md](./keymaps/treesitter.md) | Highlight / folds / pairs |
-| [keymaps/lsp.md](./keymaps/lsp.md) | LSP, blink, format |
+| [keymaps/lsp.md](./keymaps/lsp.md) | LSP, blink, format, lint |
 | [keymaps/which-key.md](./keymaps/which-key.md) | Leader groups |
 
 This file is a stub so old links to `docs/KEYMAPS.md` still resolve.

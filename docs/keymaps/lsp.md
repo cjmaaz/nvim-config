@@ -1,4 +1,4 @@
-# LSP, completion, formatting
+# LSP, completion, formatting, linting
 
 Nav: [index](./README.md) · [core](./core.md) · [git](./git.md) · [explorer](./explorer.md) · [telescope](./telescope.md) · [treesitter](./treesitter.md) · [which-key](./which-key.md)
 
@@ -55,6 +55,21 @@ blink.cmp + LuaSnip. **Accept with `<C-y>`** (Kickstart / `:help ins-completion`
 | `<leader>tf` | n | Toggle format-on-save disable flag |
 
 **Format-on-save is off** until you uncomment filetypes in `formatting.lua` (`java`, `javascript`, `html`, `css`, …). Manual `<leader>cf` always works. Install formatters via `:Mason` (`prettierd`, `google-java-format`, …) as needed — only `stylua` is auto-installed.
+
+---
+
+## Linting (`lua/plugins/linting.lua`)
+
+External linters (ESLint, Ruff, …) → same diagnostic UI as LSP (`]d`, `<leader>e`).
+
+| Key | Mode | Action |
+| --- | --- | --- |
+| `<leader>cl` | n | Lint current buffer now |
+| `<leader>tl` | n | Toggle **auto**-lint (BufEnter / save / InsertLeave) |
+
+**Auto-lint is on** by default. If it’s noisy or slow: `<leader>tl`, or comment the autocmd in `linting.lua` and use `<leader>cl` only.
+
+**Lazy Mason:** first time you open a matching filetype, Neovim installs the tool (`eslint_d`, `ruff`, `sqlfluff`, `shellcheck`, `stylelint`, `markdownlint`, …). Disable a language by commenting its line in `linters_by_ft` (same style as statusline options).
 
 ---
 

@@ -36,8 +36,8 @@ return {
         { "<leader>f", group = "File/Find" }, -- neo-tree <leader>fe / fE
         { "<leader>g", group = "Git" }, -- neo-tree <leader>ge (git_status); expand later
         { "<leader>s", group = "Search", mode = { "n", "v" } }, -- telescope <leader>s…
-        { "<leader>c", group = "Code" }, -- <leader>cf format, <leader>ca action
-        { "<leader>t", group = "Toggle" }, -- <leader>tf FoS, <leader>th inlays
+        { "<leader>c", group = "Code" }, -- <leader>cf format, <leader>cl lint, <leader>ca action
+        { "<leader>t", group = "Toggle" }, -- <leader>tf FoS, <leader>tl autolint, <leader>th inlays
         -- Future slices (uncomment when those maps exist):
         -- { "gr", group = "LSP", mode = { "n" } },
       },

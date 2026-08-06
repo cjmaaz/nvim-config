@@ -22,7 +22,7 @@ nvim-config/
 │   │   ├── explorer.md
 │   │   ├── telescope.md
 │   │   ├── treesitter.md
-│   │   ├── lsp.md
+│   │   ├── lsp.md        # LSP, blink, format, lint
 │   │   └── which-key.md
 │   ├── KEYMAPS.md        # stub → docs/keymaps/ (old links)
 │   ├── TOOLS.md          # external prerequisites / optional tools
@@ -48,6 +48,7 @@ nvim-config/
         ├── lsp.lua       # Mason + language servers (lua always; others on demand)
         ├── completion.lua # blink.cmp + LuaSnip
         ├── formatting.lua # conform; <leader>cf / tf
+        ├── linting.lua   # nvim-lint; <leader>cl / tl; lazy Mason
         ├── git.lua       # gitsigns signs + hunk keymaps
         └── which-key.lua # leader popup / group labels
 ```
