@@ -54,7 +54,7 @@ Defined in `init.lua`.
 | LSP / format / blink | `gd`/`K`/`gr` · `<leader>cf` · `<C-y>` — [lsp.md](./lsp.md) |
 | Lint (nvim-lint) | `<leader>cl` · `<leader>tl` toggle auto · lazy Mason — [lsp.md](./lsp.md#linting-luapluginslintinglua) |
 | Salesforce | `<leader>S…` (capital S) · deploy `<leader>Sp` · cancel `<leader>Sx` — [salesforce.md](./salesforce.md) |
-| Comment / TODO / crumbs | `gcc` · `]t`/`[t` · `<leader>st` · navic in statusline — [comment.md](./comment.md) |
+| Comment / TODO / crumbs | `gcc` · `]t`/`[t` · `<leader>st` · dropbar `<leader>;` — [comment.md](./comment.md) |
 | QoL | sessions · Trouble · surround · flash · undotree · yanky · dial · rainbow · colorizer · space dots — [qol.md](./qol.md) |
 | Colorscheme | `noctis_bordo` — `lua/plugins/colorscheme.lua` |
 | which-key | `<Space>` then wait — [which-key.md](./which-key.md) |

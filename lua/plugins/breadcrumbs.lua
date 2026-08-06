@@ -1,24 +1,95 @@
 --------------------------------------------------------------------------------
--- Breadcrumbs — LSP document symbols in the statusline (nvim-navic)
--- Refs: common LazyVim-era pattern; none of our four refs ship this today.
--- Needs: an LSP that supports textDocument/documentSymbol (lua_ls, ts_ls, …).
--- Alts: Bekaboo/dropbar.nvim (clickable winbar) · winbar-only navic · skip.
+-- Breadcrumbs — clickable path + symbol navigation in the winbar (dropbar.nvim)
+-- Sources: path plus LSP / Treesitter / Markdown fallbacks, chosen automatically.
+-- Needs: Neovim 0.11+; icons and fzf-native are optional enhancements.
+-- Alts: nvim-navic in lualine (revert block below) · barbecue.nvim · skip.
 --------------------------------------------------------------------------------
+
+--- Bordo winbar/menu chrome, shared with which-key / neo-tree / Telescope.
+local function apply_dropbar_hl()
+  local chrome = require("config.ui_chrome")
+  local bg, fg = chrome.panel_bg, chrome.panel_fg
+  local selected_bg = chrome.separator_fg
+
+  -- Keep the bar part of the editor plane; only dropdown menus use panel_bg.
+  vim.api.nvim_set_hl(0, "WinBar", { fg = fg, bg = "NONE" })
+  vim.api.nvim_set_hl(0, "WinBarNC", { link = "Comment" })
+  vim.api.nvim_set_hl(0, "DropBarMenuNormalFloat", { fg = fg, bg = bg })
+  vim.api.nvim_set_hl(0, "DropBarMenuFloatBorder", { fg = chrome.border_fg, bg = bg })
+
+  for _, group in ipairs({
+    "DropBarCurrentContext",
+    "DropBarHover",
+    "DropBarMenuCurrentContext",
+    "DropBarMenuHoverEntry",
+    "DropBarPreview",
+  }) do
+    vim.api.nvim_set_hl(0, group, { fg = fg, bg = selected_bg })
+  end
+  vim.api.nvim_set_hl(0, "DropBarCurrentContextIcon", { link = "DropBarCurrentContext" })
+  vim.api.nvim_set_hl(0, "DropBarCurrentContextName", { link = "DropBarCurrentContext" })
+  vim.api.nvim_set_hl(0, "DropBarMenuHoverIcon", { fg = fg, bg = selected_bg })
+  vim.api.nvim_set_hl(0, "DropBarMenuHoverSymbol", { fg = fg, bg = selected_bg, bold = true })
+
+  vim.api.nvim_set_hl(0, "DropBarIconUISeparator", { link = "Comment" })
+  vim.api.nvim_set_hl(0, "DropBarIconUISeparatorMenu", { link = "DropBarIconUISeparator" })
+  vim.api.nvim_set_hl(0, "DropBarIconUIPickPivot", { fg = chrome.title_fg, bold = true })
+  vim.api.nvim_set_hl(0, "DropBarFzfMatch", { fg = chrome.title_fg, bold = true })
+  -- Previous/default chrome: remove this helper + its ColorScheme autocmd.
+end
 
 return {
   {
-    "SmiteshP/nvim-navic",
-    lazy = true, -- pulled in when an LSP attaches (or via lualine require)
-    opts = {
-      lsp = {
-        auto_attach = true, -- attach to clients that support documentSymbol
-        -- preference = { "clangd", "tsserver" }, -- prefer these when several attach
+    "Bekaboo/dropbar.nvim",
+    -- The plugin's startup file installs lightweight lazy autocmds itself.
+    lazy = false,
+    dependencies = {
+      {
+        "nvim-tree/nvim-web-devicons",
+        enabled = vim.g.have_nerd_font,
       },
-      highlight = true, -- colored icons/text when the colorscheme defines Navic*
-      separator = " › ",
-      depth_limit = 5, -- truncate deep nests
-      -- depth_limit = 0, -- unlimited
-      click = false, -- navic click-to-jump needs newer APIs; leave off
+      {
+        "nvim-telescope/telescope-fzf-native.nvim",
+        build = "make",
+        cond = function()
+          return vim.fn.executable("make") == 1
+        end,
+      },
     },
+    config = function()
+      local dropbar = require("dropbar.api")
+
+      vim.o.mousemoveevent = true -- hover + preview for winbar/menu symbols
+      vim.keymap.set("n", "<leader>;", dropbar.pick, { desc = "Pick symbols in winbar" })
+      vim.keymap.set("n", "[;", dropbar.goto_context_start, { desc = "Go to start of current context" })
+      vim.keymap.set("n", "];", dropbar.select_next_context, { desc = "Select next context" })
+
+      apply_dropbar_hl()
+      local hl_group = vim.api.nvim_create_augroup("dropbar_bordo_hl", { clear = true })
+      vim.api.nvim_create_autocmd("ColorScheme", {
+        group = hl_group,
+        callback = apply_dropbar_hl,
+      })
+      -- dropbar defines its default groups on the first FileType; reapply after it.
+      vim.api.nvim_create_autocmd("FileType", {
+        group = hl_group,
+        once = true,
+        callback = function()
+          vim.schedule(apply_dropbar_hl)
+        end,
+      })
+    end,
   },
+
+  -- Previous breadcrumbs (navic): replace the active spec above with this block,
+  -- then uncomment the matching dependency/component in statusline.lua.
+  -- {
+  --   "SmiteshP/nvim-navic",
+  --   opts = {
+  --     lsp = { auto_attach = true },
+  --     highlight = true,
+  --     separator = " › ",
+  --     depth_limit = 5,
+  --   },
+  -- },
 }

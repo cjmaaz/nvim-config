@@ -63,7 +63,7 @@ nvim-config/
         ├── salesforce.lua # sf.nvim + fzf-lua; <leader>S… (Sp push, Sx cancel)
         ├── comment.lua   # Comment.nvim + context-commentstring
         ├── todo-comments.lua # TODO/FIXME highlight + ]t / <leader>st
-        ├── breadcrumbs.lua # nvim-navic (lualine crumbs)
+        ├── breadcrumbs.lua # dropbar clickable winbar + symbol menus
         ├── git.lua       # gitsigns signs + hunk keymaps
         └── which-key.lua # leader popup / group labels
 ```

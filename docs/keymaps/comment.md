@@ -1,12 +1,12 @@
 # Comment / TODO / breadcrumbs
 
-Polish: toggle comments, highlight TODO-style notes, LSP path in the statusline.
+Polish: toggle comments, highlight TODO-style notes, and navigate a clickable winbar.
 
 | Plugin | File |
 | --- | --- |
 | Comment.nvim (+ context-commentstring) | `lua/plugins/comment.lua` |
 | todo-comments.nvim | `lua/plugins/todo-comments.lua` |
-| nvim-navic (breadcrumbs) | `lua/plugins/breadcrumbs.lua` + lualine in `statusline.lua` |
+| dropbar.nvim (breadcrumbs) | `lua/plugins/breadcrumbs.lua` |
 
 Nav: [index](./README.md) · [telescope](./telescope.md) · [lsp](./lsp.md) · [which-key](./which-key.md)
 
@@ -42,11 +42,17 @@ Also: `:TodoQuickFix` · `:TodoLocList` · `:TodoTelescope`.
 
 ---
 
-## Breadcrumbs (nvim-navic)
+## Breadcrumbs (dropbar.nvim)
 
-Shows the LSP symbol path (e.g. `Class › method`) in **lualine** after the filename when a server supports `documentSymbol`.
+Shows the file path and current symbol chain (e.g. `Class › method`) in the **winbar**. Symbols come from LSP, Treesitter, or Markdown; path navigation works without an LSP.
 
-No extra keys — move with normal LSP/`gd`. Empty until an LSP attaches. Heavier clickable winbar alternative: `dropbar.nvim` (not wired).
+| Key | Mode | Action |
+| --- | --- | --- |
+| `<leader>;` | n | Enter pick mode, then press the displayed key for a winbar component |
+| `[;` | n | Go to the start of the current symbol context |
+| `];` | n | Select the next symbol context |
+
+Click a winbar component to open its sibling menu; click an entry to jump. In a menu, `i` starts fuzzy filtering, `<CR>` selects, and `q` / `<Esc>` closes it. Hover previews are enabled, and menu chrome follows the shared Bordo panel palette.
 
 ---
 

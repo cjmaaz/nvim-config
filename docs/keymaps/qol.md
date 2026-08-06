@@ -1,6 +1,6 @@
 # QoL polish
 
-Extra quality-of-life beyond the core edit/LSP loop. **Dropbar** stays parked (navic already in the statusline).
+Extra quality-of-life beyond the core edit/LSP loop. Breadcrumb navigation now lives in **dropbar** — see [comment.md](./comment.md#breadcrumbs-dropbarnvim).
 
 Nav: [index](./README.md) · [core](./core.md) · [git](./git.md) · [telescope](./telescope.md) · [which-key](./which-key.md)
 

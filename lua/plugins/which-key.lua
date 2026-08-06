@@ -156,6 +156,9 @@ return {
           { pattern = "lsp: workspace symbols", icon = "󰒓", color = "purple" },
           { pattern = "toggle inlay", icon = "󰔢", color = "yellow" },
           { pattern = "lsp:", icon = "", color = "purple" },
+          { pattern = "pick symbols in winbar", icon = "󰒓", color = "cyan" },
+          { pattern = "go to start of current context", icon = "󰁍", color = "azure" },
+          { pattern = "select next context", icon = "󰁔", color = "azure" },
 
           ------------------------------------------------------------------- Git
           { pattern = "lazygit %(current file%)", icon = "󰈙", color = "orange" },
