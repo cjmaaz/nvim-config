@@ -2,7 +2,7 @@
 
 Nav: [index](./README.md) · [core](./core.md) · [git](./git.md) · [explorer](./explorer.md) · [telescope](./telescope.md) · [treesitter](./treesitter.md) · [which-key](./which-key.md)
 
-Related: diagnostics without a server — [core.md](./core.md#diagnostics). Host tools (JDK for Apex, Mason) — [TOOLS.md](../TOOLS.md).
+Related: diagnostics without a server — [core.md](./core.md#diagnostics). Full guide — [diagnostics/](../diagnostics/README.md). Host tools (JDK for Apex/Java, Mason) — [TOOLS.md](../TOOLS.md).
 
 ---
 

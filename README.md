@@ -7,6 +7,7 @@ From-scratch Neovim config (lazy.nvim). Built one slice at a time.
 | Doc | Contents |
 | --- | --- |
 | [docs/keymaps/](docs/keymaps/README.md) | Custom shortcuts (split by topic; start at README) |
+| [docs/diagnostics/](docs/diagnostics/README.md) | Diagnostic UI, settings, Java non-project FAQ |
 | [docs/TOOLS.md](docs/TOOLS.md) | Host tools: Neovim, fonts, `rg` / `fd`, … |
 | [docs/COMMITIZEN.md](docs/COMMITIZEN.md) | Optional conventional-commit CLI |
 
@@ -17,14 +18,22 @@ nvim-config/
 ├── docs/
 │   ├── keymaps/          # shortcut cheatsheets (interlinked)
 │   │   ├── README.md     # index, leaders, UI notes
-│   │   ├── core.md       # buffers, windows, diagnostics, …
+│   │   ├── core.md       # buffers, windows, diagnostics keys, …
 │   │   ├── git.md
 │   │   ├── explorer.md
 │   │   ├── telescope.md
 │   │   ├── treesitter.md
 │   │   ├── lsp.md        # LSP, blink, format, lint
 │   │   └── which-key.md
-│   ├── KEYMAPS.md        # stub → docs/keymaps/ (old links)
+│   ├── diagnostics/      # where diagnostics show + settings + Java FAQ
+│   │   ├── README.md
+│   │   ├── display.md
+│   │   ├── quiet.md
+│   │   └── java.md
+│   ├── examples/
+│   │   └── java-maven-minimal/  # sample Maven tree for jdtls
+│   ├── KEYMAPS.md        # stub → docs/keymaps/
+│   ├── DIAGNOSTICS.md    # stub → docs/diagnostics/
 │   ├── TOOLS.md          # external prerequisites / optional tools
 │   └── COMMITIZEN.md     # optional cz helper
 ├── init.lua              # entry: loader, leaders, require config.*

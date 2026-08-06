@@ -4,7 +4,10 @@ Things outside this repo that make the config work well. Install on the **host**
 
 | Doc | Purpose |
 | --- | --- |
+| Doc | Purpose |
+| --- | --- |
 | [keymaps/](./keymaps/README.md) | Shortcuts this config defines (split by topic) |
+| [diagnostics/](./diagnostics/README.md) | Where diagnostics show, settings, Java FAQ + [example](./examples/java-maven-minimal/) |
 | [COMMITIZEN.md](./COMMITIZEN.md) | Optional conventional-commit helper (`cz`) |
 
 ---

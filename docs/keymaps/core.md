@@ -102,6 +102,8 @@ Defined in `lua/config/keymaps.lua` (`vim.diagnostic.config` + maps). Works befo
 
 Display: virtual text on, underline from WARN+, severity-sorted, Nerd Font / ASCII signs. Commented alts in config: `virtual_lines`, full underline, `setqflist` instead of loclist.
 
+**Deeper guide** (display settings, quieting noise, Java non-project): [diagnostics/](../diagnostics/README.md).
+
 Also: Telescope [`<leader>sd`](./telescope.md) searches diagnostics once they exist. LSP attach maps: [lsp.md](./lsp.md).
 
 ---

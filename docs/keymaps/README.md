@@ -6,7 +6,7 @@ Only maps we actually set are listed. Built-in Vim/Neovim keys (`hjkl`, `:w`, `g
 
 `vim.keymap.set(mode, lhs, rhs, opts?)` — **mode** = when (`n` normal, `i` insert, `v` visual, `t` terminal, …); **lhs** = keys you press; **rhs** = action; **opts** = usually `{ desc = "…" }`.
 
-**Also:** [TOOLS.md](../TOOLS.md) · [COMMITIZEN.md](../COMMITIZEN.md) · [repo README](../../README.md)
+**Also:** [TOOLS.md](../TOOLS.md) · [diagnostics/](../diagnostics/README.md) · [COMMITIZEN.md](../COMMITIZEN.md) · [repo README](../../README.md)
 
 ---
 
@@ -45,7 +45,7 @@ Defined in `init.lua`.
 | Bufferline | Top bar of open buffers; cycle with `<S-h>` / `<S-l>` — [core.md](./core.md) |
 | neo-tree | `<leader>fe` · `<leader>fE` · `<leader>ge` — [explorer.md](./explorer.md) |
 | Telescope | `<leader>sf` · `<leader>sg` · `<leader><leader>` — [telescope.md](./telescope.md) |
-| Diagnostics | `]d`/`[d` · `<leader>e` · `<leader>q` — [core.md](./core.md#diagnostics) |
+| Diagnostics | `]d`/`[d` · `<leader>e` · `<leader>q` — [core.md](./core.md#diagnostics) · [diagnostics/](../diagnostics/README.md) |
 | Treesitter / indent / pairs | Highlight, folds, guides, autopairs — [treesitter.md](./treesitter.md) |
 | LSP / format / blink | `gd`/`K`/`gr` · `<leader>cf` · `<C-y>` — [lsp.md](./lsp.md) |
 | Lint (nvim-lint) | `<leader>cl` · `<leader>tl` toggle auto · lazy Mason — [lsp.md](./lsp.md#linting-luapluginslintinglua) |
