@@ -70,6 +70,10 @@ Without `tree-sitter` + a C compiler, `:TSUpdate` / parser install will fail.
 | `lua/plugins/surround.lua` | (none) |
 | `lua/plugins/flash.lua` | (none) |
 | `lua/plugins/undotree.lua` | `undofile` on (already in `options.lua`) |
+| `lua/plugins/yanky.lua` | (none; uses ShaDa for ring) |
+| `lua/plugins/dial.lua` | (none) |
+| `lua/plugins/rainbow.lua` | treesitter parsers for the language |
+| `lua/plugins/colorizer.lua` | (none) |
 | `lua/plugins/explorer.lua` | Nerd Font icons (optional) |
 | `lua/plugins/telescope.lua` | `rg`, `fd`; optional `make` for fzf-native |
 | `lua/plugins/treesitter.lua` | Neovim 0.12+, `tree-sitter` CLI 0.26.1+, C compiler |

@@ -30,10 +30,26 @@ Optional later: enable `diagnostics = "nvim_lsp"` after LSP; Craftzdog-style `mo
 
 | Key | Mode | Action |
 | --- | --- | --- |
-| `<C-h>` | n | Focus left window |
-| `<C-l>` | n | Focus right window |
-| `<C-j>` | n | Focus lower window |
-| `<C-k>` | n | Focus upper window |
+| `<C-h>` / `<C-l>` / `<C-j>` / `<C-k>` | n | Focus left / right / lower / upper |
+| `ss` | n | **Horizontal** split |
+| `sv` | n | **Vertical** split |
+| `sh` / `sl` / `sj` / `sk` | n | Focus left / right / lower / upper (Craftzdog letters) |
+
+`<C-hjkl>` and `s`+hjkl do the same focus — pick one muscle memory. `ss`/`sv` may delay one-key `s` (substitute) by `timeoutlen` (300 ms).
+
+---
+
+## Black-hole delete
+
+Deletes that **don’t** overwrite the default yank register (`"_`).
+
+| Key | Mode | Action |
+| --- | --- | --- |
+| `x` | n | Delete char → black hole |
+| `<leader>d` | n, v | Delete → black hole |
+| `<leader>D` | n | Delete to EOL → black hole |
+
+Stock `d`/`c` still use registers. Yank history: [qol.md](./qol.md#yank-history-luapluginsyankylua).
 
 ---
 

@@ -41,6 +41,30 @@ map("n", "<C-l>", "<C-w>l", { desc = "Focus right window" })
 map("n", "<C-j>", "<C-w>j", { desc = "Focus lower window" })
 map("n", "<C-k>", "<C-w>k", { desc = "Focus upper window" })
 
+-- Craftzdog-style split create / focus (also keep <C-hjkl> above).
+-- Note: chords start with `s`, so after timeoutlen which-key may list them;
+-- stock one-key `s` (substitute) still works if you type the replacement quickly.
+map("n", "ss", "<cmd>split<CR>", { desc = "Split horizontal" })
+map("n", "sv", "<cmd>vsplit<CR>", { desc = "Split vertical" })
+-- map("n", "ss", "<C-w>s", { desc = "Split horizontal" }) -- same via Ctrl-w
+-- map("n", "sv", "<C-w>v", { desc = "Split vertical" })
+map("n", "sh", "<C-w>h", { desc = "Focus left window" })
+map("n", "sl", "<C-w>l", { desc = "Focus right window" })
+map("n", "sj", "<C-w>j", { desc = "Focus lower window" })
+map("n", "sk", "<C-w>k", { desc = "Focus upper window" })
+-- map("n", "te", "<cmd>tabedit<CR>", { desc = "New tabpage" }) -- Craftzdog; we prefer buffers
+
+-- --- Black-hole deletes (don’t clobber the default yank register) ---
+-- Refs: Craftzdog keymaps.lua. Skip <leader>c* — that prefix is Code (cf/cl/ca).
+map("n", "x", '"_x', { desc = "Delete char (black hole)" })
+-- map("n", "x", "x", { desc = "Delete char (into register)" }) -- stock
+map({ "n", "v" }, "<leader>d", '"_d', { desc = "Delete (black hole)" })
+map("n", "<leader>D", '"_D', { desc = "Delete to EOL (black hole)" })
+-- map({ "n", "v" }, "<leader>d", "d", { desc = "Delete (into register)" }) -- stock d under leader
+-- Paste from yank register 0 after a black-hole delete (Craftzdog <leader>p):
+-- map({ "n", "v" }, "<leader>p", '"0p', { desc = "Paste from yank register" })
+-- map("n", "<leader>P", '"0P', { desc = "Paste before from yank register" })
+
 -- --- Motion comfort (keep cursor centered) ---
 
 -- Search next/prev, then recenter + open folds if needed.

@@ -18,6 +18,7 @@ Nav: [index](./README.md) · [core](./core.md) · [git](./git.md) · [explorer](
 | `<leader>h` | Git hunk | `lua/plugins/git.lua` `on_attach` | [git.md](./git.md) |
 | `<leader>f` | File/Find | `lua/plugins/explorer.lua` (`fe`, `fE`) | [explorer.md](./explorer.md) |
 | `<leader>g` | Git | `explorer.lua` (`ge`); `lazygit.lua` (`gg`, `gf`) | [explorer.md](./explorer.md) · [git.md](./git.md) |
+| `<leader>d` | Delete (black hole) | `keymaps.lua` (`d`, `D`); `x` also black-hole | [core.md](./core.md) |
 | `<leader>s` | Search | `telescope.lua` (`sf`, `sg`, …); `todo-comments` (`st`) | [telescope.md](./telescope.md) · [comment.md](./comment.md) |
 | `<leader>S` | Salesforce | `lua/plugins/salesforce.lua` (`Sp`, `Sx`, …) | [salesforce.md](./salesforce.md) |
 | `<leader>c` | Code | `formatting.lua` (`cf`); `linting.lua` (`cl`); LSP `ca` | [lsp.md](./lsp.md) |
@@ -27,6 +28,7 @@ Nav: [index](./README.md) · [core](./core.md) · [git](./git.md) · [explorer](
 | `<leader>u` | Undotree | `undotree.lua` | [qol.md](./qol.md) |
 | `gc` / `gb` | Comment line / block | `lua/plugins/comment.lua` | [comment.md](./comment.md) |
 | `gs` / `gS` | Flash jump / treesitter | `lua/plugins/flash.lua` | [qol.md](./qol.md) |
+| `s` | Split / window | `ss`/`sv` · `sh`/`sj`/`sk`/`sl` | [core.md](./core.md) |
 
 Commented optional: `<leader>?` to show buffer-local maps only.
 

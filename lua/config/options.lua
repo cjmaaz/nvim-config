@@ -143,11 +143,22 @@ opt.linebreak = true
 
 -- Show otherwise-invisible characters using listchars below.
 opt.list = true
--- opt.list = false -- hide tabs / trailing spaces / nbsp markers
+-- opt.list = false -- hide tabs / trailing spaces / nbsp / space markers
 
--- Glyphs used when list is on.
-opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" }
--- opt.listchars = { tab = "> ", trail = "-", nbsp = "+" } -- ASCII-only fallback
+-- Glyphs used when list is on (Kickstart-style trail/nbsp; we also mark plain spaces).
+-- Space dots use highlight group Whitespace — keep it very dim (see autocmds.lua).
+opt.listchars = {
+  tab = "» ", -- tabs (should be rare with expandtab)
+  trail = "·", -- trailing spaces on a line
+  nbsp = "␣", -- non-breaking space
+  space = "·", -- every space (very light via Whitespace hl)
+  -- extends = "…", -- char when line continues past the window (wrap off)
+  -- precedes = "…", -- char when line starts left of the window
+  -- eol = "¬", -- end-of-line mark (noisy for code)
+}
+-- opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" } -- Kickstart: no per-space dots
+-- opt.listchars = { tab = "> ", trail = "-", nbsp = "+", space = "." } -- ASCII-only fallback
+-- opt.listchars = { tab = "» ", trail = "·", nbsp = "␣", space = "⋅" } -- lighter middot variant
 
 -- --- Command-line / completion UI (before a dedicated completion plugin) ---
 

@@ -1,6 +1,6 @@
-# QoL polish (sessions, Trouble, surround, flash, undotree)
+# QoL polish
 
-Extra quality-of-life plugins beyond the core edit/LSP loop. Dropbar stays parked (navic already in the statusline).
+Extra quality-of-life beyond the core edit/LSP loop. **Dropbar** stays parked (navic already in the statusline).
 
 Nav: [index](./README.md) · [core](./core.md) · [git](./git.md) · [telescope](./telescope.md) · [which-key](./which-key.md)
 
@@ -54,7 +54,7 @@ Float at cursor remains [`<leader>e`](./core.md#diagnostics); Telescope [`<leade
 
 ## Flash (`lua/plugins/flash.lua`)
 
-Label-jump (`folke/flash.nvim`). Mapped on **`gs`/`gS`** so stock `s` (substitute) and neo-tree `s` (vsplit) stay free.
+Label-jump (`folke/flash.nvim`). Mapped on **`gs`/`gS`** so stock `s` (substitute) stays usable; neo-tree’s own `s` (vsplit) is buffer-local.
 
 | Key | Mode | Action |
 | --- | --- | --- |
@@ -76,12 +76,56 @@ Visual undo history. Needs `opt.undofile = true` (already on in `options.lua`).
 
 ---
 
-## Related (not in this file)
+## Yank history (`lua/plugins/yanky.lua`)
+
+Remembers past yanks; `p`/`P` put from the ring (`gbprod/yanky.nvim`).
+
+| Key | Mode | Action |
+| --- | --- | --- |
+| `p` / `P` | n, x | Put after / before (Yanky) |
+| `gp` / `gP` | n, x | Put and leave cursor after |
+| `<C-p>` / `<C-n>` | n | Cycle **previous** / **next** ring entry after a put |
+
+---
+
+## Dial (`lua/plugins/dial.lua`)
+
+Smarter `<C-a>` / `<C-x>`: numbers, dates (`YYYY-MM-DD`), bools, `and`/`or`, `&&`/`||`, `let`/`const`.
+
+| Key | Mode | Action |
+| --- | --- | --- |
+| `<C-a>` / `<C-x>` | n, v | Increment / decrement |
+| `g<C-a>` / `g<C-x>` | v | Additive sequence across a visual block |
+
+---
+
+## Rainbow brackets (`lua/plugins/rainbow.lua`)
+
+`rainbow-delimiters.nvim` — **10** high-contrast nesting colors (custom palette, reapplied on `ColorScheme`). Needs treesitter parsers.
+
+---
+
+## Color highlighter (`lua/plugins/colorizer.lua`)
+
+Paints `#hex` / `rgb()` / `hsl()` / Tailwind-ish classes in-buffer (`nvim-highlight-colors`).
+
+---
+
+## Space / listchars dots
+
+In `lua/config/options.lua`: `list` + `listchars.space = "·"` (plus tab/trail/nbsp). Highlight `Whitespace` is dimmed in `autocmds.lua` so dots stay **very light**.
+
+Toggle off: `vim.opt.list = false` or remove `space` from `listchars`.
+
+---
+
+## Related
 
 | Feature | Where |
 | --- | --- |
+| Split / black-hole maps | [core.md](./core.md) |
 | Inline **git blame** toggle | [`<leader>tb`](./git.md) |
-| SF **org/coverage** in statusline | [salesforce.md](./salesforce.md) · `statusline.lua` |
+| SF **org/coverage** in statusline | [salesforce.md](./salesforce.md) |
 | Telescope **ignore** globs | [telescope.md](./telescope.md) |
 
 ---

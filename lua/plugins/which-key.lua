@@ -38,6 +38,7 @@ return {
         { "<leader>s", group = "Search", mode = { "n", "v" } }, -- telescope <leader>s…
         { "<leader>S", group = "Salesforce", mode = { "n", "x" } }, -- sf.nvim <leader>S… (capital S)
         { "<leader>c", group = "Code" }, -- <leader>cf format, <leader>cl lint, <leader>ca action
+        { "<leader>d", group = "Delete (black hole)", mode = { "n", "v" } }, -- "_d / "_D
         { "<leader>t", group = "Toggle" }, -- tf FoS · tl autolint · th inlays · tb blame
         { "<leader>q", group = "Session" }, -- persistence qs/qS/ql/qd
         { "<leader>x", group = "Trouble" }, -- diagnostics / lists panel
@@ -45,6 +46,7 @@ return {
         { "gc", group = "Comment line", mode = { "n", "v" } }, -- Comment.nvim
         { "gb", group = "Comment block", mode = { "n", "v" } }, -- Comment.nvim
         { "gs", group = "Flash jump" }, -- flash.nvim (gS = treesitter)
+        { "s", group = "Split / window" }, -- ss/sv splits · sh/sj/sk/sl focus
         -- { "gr", group = "LSP", mode = { "n" } },
       },
     },

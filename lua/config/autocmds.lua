@@ -18,6 +18,22 @@ api.nvim_create_autocmd("TextYankPost", {
   end,
 })
 
+-- Dim listchars space/trail dots so they stay visible but quiet (Kickstart-ish list).
+-- Whitespace = space/trail listchars; NonText often used for eol/extends.
+local function apply_listchar_highlights()
+  -- Very light gray — readable on noctis_bordo / dark themes without shouting.
+  vim.api.nvim_set_hl(0, "Whitespace", { fg = "#3d3a45", nocombine = true })
+  -- vim.api.nvim_set_hl(0, "Whitespace", { fg = "#2a2830", nocombine = true }) -- even dimmer
+  -- vim.api.nvim_set_hl(0, "Whitespace", { fg = "#5c5866", nocombine = true }) -- stronger dots
+  -- vim.api.nvim_set_hl(0, "Whitespace", { link = "Comment" }) -- follow theme comments
+end
+apply_listchar_highlights()
+api.nvim_create_autocmd("ColorScheme", {
+  group = group,
+  desc = "Keep listchars space dots dim after colorscheme load",
+  callback = apply_listchar_highlights,
+})
+
 -- If a file changed on disk (git checkout, formatter outside nvim), reload it.
 api.nvim_create_autocmd({ "FocusGained", "TermClose", "TermLeave" }, {
   group = group,
