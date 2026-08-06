@@ -60,7 +60,7 @@ Focus must be **in** the tree (click it or move with `<C-h>` if it’s on the le
 
 | Key | Action |
 | --- | --- |
-| `H` | Toggle **hidden** / filtered items |
+| `H` | Toggle **hidden** / filtered items (dotfiles + gitignored) — shown dimmed when on |
 | `/` | Fuzzy find files in the tree |
 | `D` | Fuzzy find **directories** |
 | `R` | Refresh the tree from disk |
@@ -77,7 +77,7 @@ Focus must be **in** the tree (click it or move with `<C-h>` if it’s on the le
 | `hijack_netrw_behavior` | `open_default` | Opening a directory uses neo-tree instead of netrw |
 | `follow_current_file` | on | Tree tracks the file you’re editing |
 | `use_libuv_file_watcher` | on | Auto-refresh when files change outside Neovim |
-| `hide_dotfiles` / `hide_gitignored` | false | SF / tooling often needs dotfiles visible; use `H` to tidy |
+| `hide_dotfiles` / `hide_gitignored` | **true** | Dotfiles & gitignored are filtered by default; **`H`** shows them (dimmed). Always-show: `.gitignore`, `.forceignore`, `.sfdx`, `.sf`. `never_show`: `.DS_Store` / `thumbs.db` (H won’t reveal those). |
 | `window.mappings["<space>"]` | `none` | Space is `<leader>` — don’t toggle nodes with Space |
 | Width | 34 | Comfortable sidebar without eating the editor |
 

@@ -87,20 +87,32 @@ return {
         -- use_libuv_file_watcher = false,
 
         filtered_items = {
-          visible = false, -- hide filtered items unless you toggle them (H)
-          -- visible = true, -- show greyed-out filtered items
-          hide_dotfiles = false, -- show .env / .gitignored-looking dots (SF / tooling)
-          -- hide_dotfiles = true,
-          hide_gitignored = false, -- still list ignored files (toggle with I / filtered UI)
-          -- hide_gitignored = true,
+          -- `H` toggles `visible` only — it does **not** flip hide_dotfiles.
+          -- If hide_dotfiles/hide_gitignored are already false, almost nothing is
+          -- filtered, so H logs “Toggling hidden…” but the tree looks unchanged.
+          visible = false, -- filtered items hidden until you press H (then shown dimmed)
+          -- visible = true, -- always show filtered items (dimmed) without pressing H
+          hide_dotfiles = true, -- filter `.env`, `.git`, … so H has something to toggle
+          -- hide_dotfiles = false, -- always show dotfiles as normal (H becomes a no-op for them)
+          hide_gitignored = true, -- filter gitignored paths; H shows them when visible
+          -- hide_gitignored = false, -- always list ignored files
           hide_by_name = {
-            -- ".git",
             -- "node_modules",
           },
-          never_show = {
+          always_show = { -- stay visible even when hide_dotfiles is on
+            ".gitignore",
+            ".forceignore",
+            ".sfdx", -- Salesforce DX / SObject stubs
+            ".sf",
+          },
+          -- always_show_by_pattern = { ".env*" }, -- keep local env files visible
+          never_show = { -- never listed, even after H
             ".DS_Store",
             "thumbs.db",
           },
+          -- never_show_by_pattern = { "*.o", "*.pyc" },
+          show_hidden_count = true, -- “x hidden” footer in folders
+          -- show_hidden_count = false,
         },
 
         window = {

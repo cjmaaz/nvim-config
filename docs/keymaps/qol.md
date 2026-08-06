@@ -101,7 +101,13 @@ Smarter `<C-a>` / `<C-x>`: numbers, dates (`YYYY-MM-DD`), bools, `and`/`or`, `&&
 
 ## Rainbow brackets (`lua/plugins/rainbow.lua`)
 
-`rainbow-delimiters.nvim` — **10** high-contrast nesting colors (custom palette, reapplied on `ColorScheme`). Needs treesitter parsers.
+`rainbow-delimiters.nvim` — **10** high-contrast nesting colors. Shared palette: `lua/config/rainbow_palette.lua` (also drives the **indent scope** bar so brackets and the reverse-L line match by depth).
+
+---
+
+## Indent scope / reverse-L (`lua/plugins/indent.lua`)
+
+Passive guides stay **dim**; the current treesitter scope uses the rainbow color for that depth, with `show_start` + `show_end` underlines (reverse-L). Comment those flags or set `scope.highlight = "IblScope"` for a single color — see comments in `indent.lua`.
 
 ---
 
