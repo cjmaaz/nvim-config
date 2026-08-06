@@ -57,15 +57,15 @@ return {
         indent = {
           -- Keep indent.char and scope.char on the same left/right bias so the
           -- column doesn’t jump when the bright scope replaces a dim guide.
-          char = "▎", -- U+258E left quarter — slight right of ▏, still left of │
-          -- char = "▏", -- U+258F left eighth (more gutter-left)
+          char = "▏", -- U+258F left eighth — thinnest solid guide
+          -- char = "▎", -- previous: thicker left quarter
           -- char = "▍", -- U+258D left three-eighths (nudge further right)
           -- char = "│", -- centered box-drawing
           -- char = "┊", -- lighter dotted guide
           -- char = "¦",
           -- char = " ", -- invisible passive guides (scope-only mode)
           -- char = "▕", -- right edge of the indent cell
-          tab_char = "▎", -- same glyph as spaces (keep in sync with char)
+          tab_char = "▏", -- same thin glyph as spaces (keep in sync with char)
           -- tab_char = "│",
           -- tab_char = "┊",
           -- tab_char = "→",
@@ -84,10 +84,10 @@ return {
           enabled = true, -- highlight the treesitter scope under the cursor
           -- enabled = false, -- guides only, no current-block emphasis
 
-          -- Match indent.char. ▎ = small nudge right from ▏ without the │ overshoot.
-          char = "▎", -- U+258E left quarter block
-          -- char = "▏", -- more left (previous)
-          -- char = "▍", -- slightly more right than ▎
+          -- Match indent.char so the active color changes without a width jump.
+          char = "▏", -- U+258F left eighth keeps the active scope thin
+          -- char = "▎", -- previous: thicker left quarter
+          -- char = "▍", -- thicker still
           -- char = "│", -- centered (felt too far right before)
           -- char = "┃", -- heavy centered bar
           -- char = "▌", -- full left half block (very obvious)
@@ -111,10 +111,13 @@ return {
           -- highlight = "IblScope", -- single bright color instead of rainbow
           -- highlight = { "IblScope" },
 
-          -- ibl only ships scope node maps for some langs (JS/Lua/Java/…). Apex is
-          -- missing upstream — register nodes here (from apex locals.scm / grammar).
+          -- ibl's ECMA map omits class_body, so the outer class scope disappears.
+          -- Apex is also missing upstream; register both gaps explicitly.
           include = {
             node_type = {
+              javascript = { "class_body" },
+              typescript = { "class_body" },
+              tsx = { "class_body" },
               apex = {
                 "block",
                 "class_body",

@@ -1,11 +1,75 @@
 --------------------------------------------------------------------------------
--- Statusline: lualine + file icons
+-- Statusline: clean Bordo lualine + file icons
 -- Refs: CodeOSS ui.lua (standalone lualine + SF org/coverage); Craftzdog/LazyVim
 --   only tweak LazyVim's. Alternatives to lualine (pick one ecosystem):
 --   - echasnovski/mini.statusline  (lighter, mini.nvim family)
 --   - rebelot/heirline.nvim        (max control, more code)
 --   - built-in 'statusline' string (no plugin; weak icons/git unless you script it)
 --------------------------------------------------------------------------------
+
+local chrome = require("config.ui_chrome")
+
+-- Noctis Bordo accents; base chrome stays shared with the other panels.
+local bordo = {
+  bg = chrome.panel_bg,
+  bg_alt = chrome.separator_fg,
+  fg = chrome.panel_fg,
+  muted = "#87757C",
+  rose = chrome.border_fg,
+  orange = "#C5663F",
+  yellow = chrome.title_fg,
+  green = "#7BE6AB",
+  cyan = "#4CA1B3",
+  blue = "#64AAE4",
+  purple = "#7060EB",
+}
+
+-- Flat sections with a mode-colored cap on both ends.
+local bordo_theme = {
+  normal = {
+    a = { fg = bordo.bg, bg = bordo.blue, gui = "bold" },
+    b = { fg = bordo.fg, bg = bordo.bg_alt },
+    c = { fg = bordo.fg, bg = bordo.bg },
+  },
+  insert = { a = { fg = bordo.bg, bg = bordo.green, gui = "bold" } },
+  visual = { a = { fg = bordo.bg, bg = bordo.purple, gui = "bold" } },
+  replace = { a = { fg = bordo.bg, bg = bordo.rose, gui = "bold" } },
+  command = { a = { fg = bordo.bg, bg = bordo.yellow, gui = "bold" } },
+  terminal = { a = { fg = bordo.bg, bg = bordo.orange, gui = "bold" } },
+  inactive = {
+    a = { fg = bordo.muted, bg = bordo.bg, gui = "bold" },
+    b = { fg = bordo.muted, bg = bordo.bg },
+    c = { fg = bordo.muted, bg = bordo.bg },
+  },
+}
+
+local status_icons = vim.g.have_nerd_font
+    and {
+      branch = "",
+      diff = { added = " ", modified = " ", removed = " " },
+      diagnostics = { error = " ", warn = " ", info = " ", hint = "󰌵 " },
+      lsp = "",
+      readonly = "",
+    }
+  or {
+    branch = "git:",
+    diff = { added = "+", modified = "~", removed = "-" },
+    diagnostics = { error = "E:", warn = "W:", info = "I:", hint = "H:" },
+    lsp = "LSP:",
+    readonly = "RO",
+  }
+
+--- Hide secondary components before they crowd the filename.
+local function min_columns(width)
+  return function()
+    return vim.o.columns >= width
+  end
+end
+
+--- Keep unusually long branch names from taking over the left side.
+local function compact_branch(branch)
+  return #branch > 24 and branch:sub(1, 21) .. "…" or branch
+end
 
 -- Salesforce org + coverage (CodeOSS ui.lua).
 -- package.loaded avoids requiring sf.nvim on every statusline refresh — the
@@ -65,14 +129,13 @@ return {
     },
     opts = {
       options = {
-        -- Color theme for the bar.
-        theme = "auto", -- follow the active colorscheme
-        -- theme = "codedark", -- built-in named theme (:help lualine-themes)
-        -- theme = "nightfly", -- another built-in; or pass a custom table
+        -- Bordo palette with a mode-colored cap.
+        theme = bordo_theme,
+        -- theme = "auto", -- follow the active colorscheme instead
 
         -- Separators between components / sections.
-        component_separators = { left = "│", right = "│" }, -- thin ASCII-friendly
-        section_separators = { left = "", right = "" }, -- flat sections
+        component_separators = { left = "│", right = "│" }, -- subtle flat dividers
+        section_separators = { left = "", right = "" }, -- clean, no Powerline wedges
         -- component_separators = { left = "", right = "" }, -- Powerline (needs Nerd Font)
         -- section_separators = { left = "", right = "" }, -- Powerline wedges
 
@@ -82,8 +145,9 @@ return {
 
         -- disabled_filetypes = { statusline = { "alpha", "dashboard" } }, -- hide on splash screens
         -- ignore_focus = { "NvimTree", "neo-tree" }, -- keep showing "last" file in sidebars
-        -- always_divide_middle = true, -- force left/right sections to stay split
-        -- icons_enabled = true, -- false = text-only even when an icon plugin is present
+        always_divide_middle = true, -- protect the filename from right-side growth
+        -- always_divide_middle = false, -- let sections consume all available width
+        icons_enabled = vim.g.have_nerd_font, -- avoid tofu when the host font lacks icons
         -- icons_enabled = false, -- force text-only components
       },
       sections = {
@@ -91,28 +155,49 @@ return {
         -- Inactive windows use `inactive_sections` if you define it.
 
         -- Mode indicator (NORMAL / INSERT / …).
-        lualine_a = { "mode" }, -- full mode name
+        lualine_a = {
+          { "mode", padding = { left = 1, right = 1 } }, -- full mode name in colored cap
+        },
         -- lualine_a = { { "mode", fmt = function(s) return s:sub(1, 1) end } }, -- first letter only
 
         lualine_b = {
-          "branch", -- git branch; empty outside a repo
-          -- { "branch", icon = "" }, -- custom branch icon
-          "diff", -- +/-/~ counts; richer when gitsigns is loaded
-          -- { "diff", symbols = { added = "+", modified = "~", removed = "-" } }, -- ASCII diff symbols
+          {
+            "branch", -- git branch; empty outside a repo
+            icon = status_icons.branch,
+            fmt = compact_branch,
+          },
+          {
+            "diff", -- +/-/~ counts; richer when gitsigns is loaded
+            symbols = status_icons.diff,
+            diff_color = {
+              added = { fg = bordo.green },
+              modified = { fg = bordo.yellow },
+              removed = { fg = bordo.rose },
+            },
+          },
+          -- { "diff", symbols = { added = "+", modified = "~", removed = "-" } }, -- ASCII-only
         },
 
         lualine_c = {
           {
             "filename",
             -- How much of the path to show.
-            path = 0, -- filename only; dropbar carries the path in the winbar
-            -- path = 1, -- previous: relative to cwd
+            path = 1, -- relative to cwd, as before dropbar
+            -- path = 0, -- filename only (dropbar already carries the path above)
             -- path = 2, -- absolute
             -- path = 3, -- absolute with ~ for home
             -- file_status = true, -- show [+] modified, [-] readonly, etc. (default on)
-            -- newfile_status = true, -- flag buffers not yet on disk
-            -- shorting_target = 40, -- shorten long paths to keep the bar readable
-            -- symbols = { modified = "●", readonly = "", unnamed = "[No Name]" },
+            newfile_status = true, -- flag buffers not yet written
+            -- newfile_status = false, -- show no distinct new-file marker
+            -- Reserve room for the other sections; shorten parent directories first.
+            shorting_target = 40, -- e.g. very/long/path/file.lua → v/l/p/file.lua
+            -- shorting_target = 0, -- never shorten the displayed path
+            symbols = {
+              modified = "●",
+              readonly = status_icons.readonly,
+              unnamed = "[No Name]",
+              newfile = "[New]",
+            },
           },
           -- Previous breadcrumbs (navic); uncomment after restoring breadcrumbs.lua:
           -- { "navic", color_correction = "dynamic", navic_opts = { highlight = true } },
@@ -123,28 +208,51 @@ return {
         lualine_x = {
           {
             salesforce_status,
-            -- Only paint when sf.nvim has been required at least once.
+            color = { fg = bordo.blue, gui = "bold" },
+            -- Only paint when sf.nvim is loaded and the screen has room.
             cond = function()
-              return package.loaded.sf ~= nil
+              return package.loaded.sf ~= nil and vim.o.columns >= 100
             end,
-            -- cond = function() return true end, -- always reserve space (shows empty string)
+            -- cond = function() return package.loaded.sf ~= nil end, -- show at every width
             -- icon = "󰢎", -- lualine can prefix an icon separately if you prefer
           },
           -- { salesforce_status }, -- no cond: still returns "" when unloaded
-          "diagnostics", -- LSP/Vim diagnostics; empty until an LSP attaches
-          -- { "diagnostics", sources = { "nvim_diagnostic" }, sections = { "error", "warn" } },
-          "encoding", -- e.g. utf-8; omit this entry if you always use utf-8
-          "fileformat", -- unix / dos / mac line endings
-          "filetype", -- name + icon when web-devicons / mini.icons is present
-          -- "lsp_status", -- Neovim 0.10+ LSP client names (instead of / besides filetype)
+          {
+            "diagnostics", -- counts by severity
+            sources = { "nvim_diagnostic" },
+            symbols = status_icons.diagnostics,
+            diagnostics_color = {
+              error = { fg = bordo.rose },
+              warn = { fg = bordo.yellow },
+              info = { fg = bordo.blue },
+              hint = { fg = bordo.cyan },
+            },
+          },
+          {
+            "lsp_status", -- active client names + progress
+            icon = status_icons.lsp,
+            color = { fg = bordo.cyan },
+            cond = min_columns(120),
+          },
+          {
+            "filetype", -- name + devicon
+            color = { fg = bordo.yellow },
+            cond = min_columns(90),
+          },
+          -- { "encoding", cond = min_columns(140) }, -- show utf-8 on very wide screens
+          -- { "fileformat", cond = min_columns(130) }, -- show unix/dos/mac
         },
 
         -- Progress through the buffer.
-        lualine_y = { "progress" }, -- percent through file
+        lualine_y = {
+          { "progress", cond = min_columns(80) }, -- percent through file
+        },
         -- lualine_y = { "selectioncount" }, -- visual-selection size instead
 
         -- Cursor position.
-        lualine_z = { "location" }, -- line:col
+        lualine_z = {
+          { "location", padding = { left = 1, right = 1 } }, -- line:col in mode cap
+        },
         -- lualine_z = { { "location", padding = { left = 0, right = 1 } } }, -- tighter padding
       },
 
