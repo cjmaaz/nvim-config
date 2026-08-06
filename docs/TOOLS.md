@@ -4,8 +4,6 @@ Things outside this repo that make the config work well. Install on the **host**
 
 | Doc | Purpose |
 | --- | --- |
-| Doc | Purpose |
-| --- | --- |
 | [keymaps/](./keymaps/README.md) | Shortcuts this config defines (split by topic) |
 | [diagnostics/](./diagnostics/README.md) | Where diagnostics show, settings, Java FAQ + [example](./examples/java-maven-minimal/) |
 | [COMMITIZEN.md](./COMMITIZEN.md) | Optional conventional-commit helper (`cz`) |
@@ -41,12 +39,14 @@ Without `tree-sitter` + a C compiler, `:TSUpdate` / parser install will fail.
 
 ## Optional
 
-| Tool | Why | Doc |
+| Tool | Why | Doc / check |
 | --- | --- | --- |
 | **Commitizen** (`cz`) | Interactive conventional commits | [COMMITIZEN.md](./COMMITIZEN.md) |
 | **lazygit** | Full-screen Git TUI (not wired yet) | [jesseduffield/lazygit](https://github.com/jesseduffield/lazygit) |
-| **Java (JDK)** | Apex language server (`apex_ls`) runs on the JVM | `java -version` / `brew install openjdk` |
+| **Java (JDK)** | `apex_ls` / `jdtls` on the JVM | `java -version` / `brew install openjdk` |
 | **Node.js** | Some Mason LSPs / prettierd | `node --version` |
+| **Salesforce CLI (`sf`)** | `sf.nvim` org/deploy/test/metadata | `sf --version` · [CLI setup](https://developer.salesforce.com/tools/salesforcecli) |
+| **universal-ctags** | Optional Apex jump enhancement (`<leader>Sc`) | `ctags --version` / `brew install universal-ctags` |
 
 ---
 
@@ -66,3 +66,4 @@ Without `tree-sitter` + a C compiler, `:TSUpdate` / parser install will fail.
 | `lua/plugins/formatting.lua` | Mason formatters (`stylua` auto; others as needed) |
 | `lua/plugins/linting.lua` | Mason linters lazy-by-ft (`eslint_d`, `ruff`, …) |
 | `lua/plugins/completion.lua` | optional `make` for LuaSnip jsregexp |
+| `lua/plugins/salesforce.lua` | `sf` CLI; optional ctags; fzf-lua for metadata lists |
