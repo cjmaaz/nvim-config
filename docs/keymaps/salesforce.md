@@ -57,6 +57,7 @@ Also: `:SF` then Tab for command categories.
 ## Notes
 
 - **Org flow:** `<leader>SF` (fetch) → then `<leader>So` / `SO` (pick target). Upstream’s “No orgs…” error wrongly says `:SF org list`; the real command is **`:SF org fetchList`** / `<leader>SF`.
+- **SFTerm** (float after deploy/retrieve/metadata): stays open so you can read output. **`Esc`** / **`q`** / `<leader>Se` only **hide** the float (job keeps running; float may reappear when the job finishes). **Cancel** with `<leader>Sx` or **`<C-c>`** while focused in SFTerm. Avoid `:q` on the float — that can quit Neovim if it’s the only window.
 - **fzf-lua** is installed for metadata pickers only; everyday file search remains **Telescope** (`<leader>sf` / `sg`). Needs host **`fzf`** (`brew install fzf` · `sudo pacman -S fzf`) — see [TOOLS.md](../TOOLS.md).
 - Coverage signs appear after a **coverage** test run (`ST` / `SA`) when `auto_display_code_sign` is on.
 - Cancel (`<leader>Sx`) aborts the in-flight sf.nvim terminal job (deploy, retrieve, tests, …).

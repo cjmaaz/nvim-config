@@ -143,6 +143,26 @@ return {
         -- auto_display_code_sign = false, -- only via <leader>Sv
       })
 
+      -- SFTerm stays open after the job exits so you can read output. Hide with Esc / q
+      -- (or <leader>Se). Esc must NOT cancel — cancel is <leader>Sx and SFTerm <C-c>.
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = "SFTerm",
+        callback = function(event)
+          local hide = function()
+            require("sf").toggle_term() -- closes/opens the float; job keeps running
+          end
+          local opts = { buffer = event.buf, silent = true, desc = "SF: hide terminal" }
+          vim.keymap.set("n", "<Esc>", hide, opts)
+          vim.keymap.set("n", "q", hide, opts)
+          -- While the job is running you're often in terminal-mode; still hide, don't cancel.
+          vim.keymap.set("t", "<Esc>", function()
+            vim.cmd.stopinsert()
+            hide()
+          end, opts)
+          -- Upstream also maps <C-c> → cancel on this buffer; leave that alone.
+        end,
+      })
+
       -- Upstream maps every *.log → sflog. Limit that to SF cache / tooling dirs
       -- so unrelated app logs stay filetype "log".
       vim.filetype.add({
