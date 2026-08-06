@@ -1,6 +1,6 @@
 # Explorer (neo-tree)
 
-Defined in `lua/plugins/explorer.lua`. Sidebar file tree (not netrw / oil). Focus stays on learning the keys below; press `?` inside the tree for neo-tree’s own help. Panel bg is darkened Bordo (`config.ui_chrome`); swap hex there to retune which-key / Telescope too.
+Defined in `lua/plugins/explorer.lua`. Sidebar file tree (not netrw / oil). Focus stays on learning the keys below; press `?` inside the tree for neo-tree’s own help. Shared Bordo chrome (`config.ui_chrome`) gives it a soft-white edge, raised active row, and the same accents as bufferline, dropbar, which-key, and Telescope.
 
 Nav: [index](./README.md) · [core](./core.md) · [git](./git.md) · [telescope](./telescope.md) · [treesitter](./treesitter.md) · [lsp](./lsp.md) · [which-key](./which-key.md)
 

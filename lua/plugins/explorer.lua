@@ -10,14 +10,26 @@ local function apply_neo_tree_hl()
   local chrome = require("config.ui_chrome")
   local bg, fg = chrome.panel_bg, chrome.panel_fg
   vim.api.nvim_set_hl(0, "NeoTreeNormal", { fg = fg, bg = bg })
-  vim.api.nvim_set_hl(0, "NeoTreeNormalNC", { fg = fg, bg = bg })
+  vim.api.nvim_set_hl(0, "NeoTreeNormalNC", { fg = chrome.muted_fg, bg = bg })
   vim.api.nvim_set_hl(0, "NeoTreeEndOfBuffer", { fg = bg, bg = bg }) -- hide ~ filler
-  vim.api.nvim_set_hl(0, "NeoTreeWinSeparator", { fg = chrome.separator_fg, bg = bg })
-  -- vim.api.nvim_set_hl(0, "NeoTreeWinSeparator", { link = "WinSeparator" })
+  vim.api.nvim_set_hl(0, "NeoTreeWinSeparator", { fg = chrome.divider_fg, bg = bg })
+  -- vim.api.nvim_set_hl(0, "NeoTreeWinSeparator", { fg = chrome.separator_fg, bg = bg }) -- softer edge
   vim.api.nvim_set_hl(0, "NeoTreeFloatNormal", { fg = fg, bg = bg })
-  vim.api.nvim_set_hl(0, "NeoTreeFloatBorder", { fg = chrome.border_fg, bg = bg })
-  -- vim.api.nvim_set_hl(0, "NeoTreeFloatBorder", { link = "FloatBorder" })
+  vim.api.nvim_set_hl(0, "NeoTreeFloatBorder", { fg = chrome.divider_fg, bg = bg })
+  -- vim.api.nvim_set_hl(0, "NeoTreeFloatBorder", { fg = chrome.border_fg, bg = bg }) -- rose border
   vim.api.nvim_set_hl(0, "NeoTreeTitleBar", { fg = chrome.title_fg, bg = bg, bold = true })
+  vim.api.nvim_set_hl(0, "NeoTreeCursorLine", { fg = chrome.divider_fg, bg = chrome.active_bg })
+  vim.api.nvim_set_hl(0, "NeoTreeFileNameOpened", { fg = chrome.border_fg, bg = bg, bold = true })
+  vim.api.nvim_set_hl(0, "NeoTreeDirectoryName", { fg = chrome.panel_fg, bg = bg, bold = true })
+  vim.api.nvim_set_hl(0, "NeoTreeRootName", { fg = chrome.title_fg, bg = bg, bold = true })
+  vim.api.nvim_set_hl(0, "NeoTreeModified", { fg = chrome.title_fg, bg = bg })
+  vim.api.nvim_set_hl(0, "NeoTreeDimText", { fg = chrome.muted_fg, bg = bg })
+  vim.api.nvim_set_hl(0, "NeoTreeIndentMarker", { fg = chrome.muted_fg, bg = bg })
+  vim.api.nvim_set_hl(0, "NeoTreeExpander", { fg = chrome.divider_fg, bg = bg })
+  vim.api.nvim_set_hl(0, "NeoTreeTabActive", { fg = chrome.divider_fg, bg = chrome.active_bg, bold = true })
+  vim.api.nvim_set_hl(0, "NeoTreeTabInactive", { fg = chrome.muted_fg, bg = bg })
+  vim.api.nvim_set_hl(0, "NeoTreeStatusLine", { fg = fg, bg = chrome.active_bg })
+  vim.api.nvim_set_hl(0, "NeoTreeStatusLineNC", { fg = chrome.muted_fg, bg = bg })
 end
 
 return {

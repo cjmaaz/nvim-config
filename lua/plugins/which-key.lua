@@ -11,10 +11,15 @@ local function apply_which_key_hl()
   local bg, fg = chrome.panel_bg, chrome.panel_fg
   vim.api.nvim_set_hl(0, "WhichKeyNormal", { fg = fg, bg = bg })
   -- vim.api.nvim_set_hl(0, "WhichKeyNormal", { link = "NormalFloat" }) -- blend with floats
-  vim.api.nvim_set_hl(0, "WhichKeyBorder", { fg = chrome.border_fg, bg = bg })
-  -- vim.api.nvim_set_hl(0, "WhichKeyBorder", { link = "FloatBorder" })
+  vim.api.nvim_set_hl(0, "WhichKeyBorder", { fg = chrome.divider_fg, bg = bg })
+  -- vim.api.nvim_set_hl(0, "WhichKeyBorder", { fg = chrome.border_fg, bg = bg }) -- rose border
   vim.api.nvim_set_hl(0, "WhichKeyTitle", { fg = chrome.title_fg, bg = bg, bold = true })
   -- vim.api.nvim_set_hl(0, "WhichKeyTitle", { link = "FloatTitle" })
+  vim.api.nvim_set_hl(0, "WhichKey", { fg = chrome.divider_fg, bg = bg, bold = true })
+  vim.api.nvim_set_hl(0, "WhichKeyGroup", { fg = chrome.border_fg, bg = bg, bold = true })
+  vim.api.nvim_set_hl(0, "WhichKeyDesc", { fg = fg, bg = bg })
+  vim.api.nvim_set_hl(0, "WhichKeySeparator", { fg = chrome.muted_fg, bg = bg })
+  vim.api.nvim_set_hl(0, "WhichKeyValue", { fg = chrome.muted_fg, bg = bg })
 end
 
 return {

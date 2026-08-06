@@ -49,8 +49,8 @@ nvim-config/
     └── plugins/          # one plugin (or small family) per file
         ├── init.lua      # empty list; keeps `import = "plugins"` valid
         ├── colorscheme.lua # noctis_bordo + highlight overlays
-        ├── statusline.lua  # lualine + web-devicons
-        ├── bufferline.lua # visual buffer bar (not tabpages)
+        ├── statusline.lua  # responsive Bordo lualine + icons
+        ├── bufferline.lua # matching buffer bar (not tabpages)
         ├── explorer.lua  # neo-tree file / git explorer
         ├── telescope.lua # fuzzy find / grep / buffers
         ├── treesitter.lua # parsers, highlight, folds, autotag

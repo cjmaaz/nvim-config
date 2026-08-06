@@ -5,6 +5,8 @@
 -- Alts: skip · barbar.nvim · mini.tabline
 --------------------------------------------------------------------------------
 
+local chrome = require("config.ui_chrome")
+
 return {
   {
     "akinsho/bufferline.nvim",
@@ -33,9 +35,40 @@ return {
         show_close_icon = false,
         -- show_close_icon = true,
 
+        -- Thin rose marker reinforces the selected buffer without adding height.
+        indicator = { icon = "▏", style = "icon" },
+        -- indicator = { style = "underline" }, -- bottom edge instead of a side marker
+
         diagnostics = false, -- turn on after LSP: "nvim_lsp"
         -- diagnostics = "nvim_lsp",
       },
+      -- Same flat Bordo layers as lualine; active buffer gets the bright divider.
+      highlights = {
+        fill = { fg = chrome.muted_fg, bg = chrome.panel_bg },
+        background = { fg = chrome.muted_fg, bg = chrome.panel_bg },
+        buffer_visible = { fg = chrome.panel_fg, bg = chrome.panel_bg },
+        buffer_selected = {
+          fg = chrome.divider_fg,
+          bg = chrome.active_bg,
+          bold = true,
+          italic = false,
+        },
+        indicator_selected = { fg = chrome.border_fg, bg = chrome.active_bg },
+        separator = { fg = chrome.active_bg, bg = chrome.panel_bg },
+        separator_visible = { fg = chrome.active_bg, bg = chrome.panel_bg },
+        separator_selected = { fg = chrome.divider_fg, bg = chrome.active_bg },
+        modified = { fg = chrome.title_fg, bg = chrome.panel_bg },
+        modified_visible = { fg = chrome.title_fg, bg = chrome.panel_bg },
+        modified_selected = { fg = chrome.title_fg, bg = chrome.active_bg },
+        duplicate = { fg = chrome.muted_fg, bg = chrome.panel_bg, italic = true },
+        duplicate_visible = { fg = chrome.muted_fg, bg = chrome.panel_bg, italic = true },
+        duplicate_selected = { fg = chrome.panel_fg, bg = chrome.active_bg, italic = true },
+        tab = { fg = chrome.muted_fg, bg = chrome.panel_bg },
+        tab_selected = { fg = chrome.divider_fg, bg = chrome.active_bg, bold = true },
+        tab_separator = { fg = chrome.active_bg, bg = chrome.panel_bg },
+        tab_separator_selected = { fg = chrome.divider_fg, bg = chrome.active_bg },
+      },
+      -- highlights = {}, -- let bufferline derive everything from the colorscheme
     },
     -- Optional: click-cycle via bufferline (we already have <S-h/l>).
     -- keys = {

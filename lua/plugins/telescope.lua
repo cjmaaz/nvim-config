@@ -61,12 +61,17 @@ return {
           "TelescopeResultsBorder",
           "TelescopePreviewBorder",
         }) do
-          vim.api.nvim_set_hl(0, group, { fg = border, bg = bg })
+          vim.api.nvim_set_hl(0, group, { fg = chrome.divider_fg, bg = bg })
         end
+        -- Use `border` instead of `chrome.divider_fg` above for rose borders.
         vim.api.nvim_set_hl(0, "TelescopePromptTitle", { fg = chrome.title_fg, bg = bg, bold = true })
         vim.api.nvim_set_hl(0, "TelescopeResultsTitle", { fg = chrome.title_fg, bg = bg })
         vim.api.nvim_set_hl(0, "TelescopePreviewTitle", { fg = chrome.title_fg, bg = bg })
-        vim.api.nvim_set_hl(0, "TelescopeSelection", { fg = fg, bg = chrome.separator_fg, bold = true })
+        vim.api.nvim_set_hl(0, "TelescopeSelection", { fg = chrome.divider_fg, bg = chrome.active_bg, bold = true })
+        vim.api.nvim_set_hl(0, "TelescopeSelectionCaret", { fg = border, bg = chrome.active_bg, bold = true })
+        vim.api.nvim_set_hl(0, "TelescopeMultiSelection", { fg = chrome.title_fg, bg = chrome.active_bg })
+        vim.api.nvim_set_hl(0, "TelescopeMatching", { fg = chrome.title_fg, bold = true })
+        vim.api.nvim_set_hl(0, "TelescopePromptPrefix", { fg = border, bg = bg, bold = true })
         -- vim.api.nvim_set_hl(0, "TelescopeNormal", { link = "NormalFloat" }) -- theme default floats
       end
 

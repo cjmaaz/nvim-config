@@ -14,7 +14,7 @@ local bordo = {
   bg = chrome.panel_bg,
   bg_alt = chrome.separator_fg,
   fg = chrome.panel_fg,
-  muted = "#87757C",
+  muted = chrome.muted_fg,
   rose = chrome.border_fg,
   orange = "#C5663F",
   yellow = chrome.title_fg,
@@ -69,6 +69,18 @@ end
 --- Keep unusually long branch names from taking over the left side.
 local function compact_branch(branch)
   return #branch > 24 and branch:sub(1, 21) .. "…" or branch
+end
+
+--- Off-white divider that stays inside the existing one-row statusline.
+local function divider(bg)
+  return {
+    function()
+      return "│"
+    end,
+    color = { fg = chrome.divider_fg, bg = bg or bordo.bg },
+    padding = { left = 1, right = 1 },
+    separator = "",
+  }
 end
 
 -- Salesforce org + coverage (CodeOSS ui.lua).
@@ -134,7 +146,8 @@ return {
         -- theme = "auto", -- follow the active colorscheme instead
 
         -- Separators between components / sections.
-        component_separators = { left = "│", right = "│" }, -- subtle flat dividers
+        component_separators = { left = "", right = "" }, -- explicit dividers control color
+        -- component_separators = { left = "│", right = "│" }, -- inherit each component color
         section_separators = { left = "", right = "" }, -- clean, no Powerline wedges
         -- component_separators = { left = "", right = "" }, -- Powerline (needs Nerd Font)
         -- section_separators = { left = "", right = "" }, -- Powerline wedges
@@ -166,6 +179,7 @@ return {
             icon = status_icons.branch,
             fmt = compact_branch,
           },
+          divider(bordo.bg_alt),
           {
             "diff", -- +/-/~ counts; richer when gitsigns is loaded
             symbols = status_icons.diff,
@@ -179,6 +193,7 @@ return {
         },
 
         lualine_c = {
+          divider(),
           {
             "filename",
             -- How much of the path to show.
@@ -206,6 +221,7 @@ return {
         },
 
         lualine_x = {
+          divider(),
           {
             salesforce_status,
             color = { fg = bordo.blue, gui = "bold" },
