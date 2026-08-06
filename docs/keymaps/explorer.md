@@ -1,6 +1,6 @@
 # Explorer (neo-tree)
 
-Defined in `lua/plugins/explorer.lua`. Sidebar file tree (not netrw / oil). Focus stays on learning the keys below; press `?` inside the tree for neo-tree’s own help. Shared Bordo chrome (`config.ui_chrome`) gives it a soft-white edge, raised active row, and the same accents as bufferline, dropbar, which-key, and Telescope.
+Defined in `lua/plugins/explorer.lua`. Sidebar file tree (not netrw / oil), with clickable **Files / Buffers / Git** source tabs and auto-expanding width for long names. Press `?` inside the tree for neo-tree’s own help. Shared Bordo chrome (`config.ui_chrome`) gives it a soft-white edge, raised active row, and the same accents as bufferline, dropbar, which-key, and Telescope.
 
 Nav: [index](./README.md) · [core](./core.md) · [git](./git.md) · [telescope](./telescope.md) · [treesitter](./treesitter.md) · [lsp](./lsp.md) · [which-key](./which-key.md)
 
@@ -31,6 +31,8 @@ Focus must be **in** the tree (click it or move with `<C-h>` if it’s on the le
 | `j` / `k` | Move down / up |
 | `h` or `C` | Collapse folder / close node |
 | `l` or `<CR>` | Expand folder **or** open file in the last used editor window |
+| `<BS>` | Move the tree root **up one directory** |
+| `.` | Set the selected directory as the new tree **root** |
 | `za`-style: expander glyphs | Click / toggle via open |
 | `z` | Close all nodes |
 | `S` | Open file in a **horizontal** split |
@@ -63,10 +65,13 @@ Focus must be **in** the tree (click it or move with `<C-h>` if it’s on the le
 | `H` | Toggle **hidden** / filtered items (dotfiles + gitignored) — shown dimmed when on |
 | `/` | Fuzzy find files in the tree |
 | `D` | Fuzzy find **directories** |
+| `[g` / `]g` | Previous / next **Git-modified** file |
+| `o` | Open the **order-by** menu (`on` name, `om` modified, `og` Git status, …) |
+| `e` | Toggle automatic width expansion; off returns to the base width |
 | `R` | Refresh the tree from disk |
 | `i` | Show file details |
 | `?` | Show neo-tree help (mapping list) |
-| `<` / `>` | Previous / next neo-tree **source** (filesystem, buffers, git_status, …) |
+| `<` / `>` | Previous / next source (same destinations as the clickable source tabs) |
 
 ---
 
@@ -77,9 +82,13 @@ Focus must be **in** the tree (click it or move with `<C-h>` if it’s on the le
 | `hijack_netrw_behavior` | `open_default` | Opening a directory uses neo-tree instead of netrw |
 | `follow_current_file` | on | Tree tracks the file you’re editing |
 | `use_libuv_file_watcher` | on | Auto-refresh when files change outside Neovim |
+| Source selector | winbar | Click **Files / Buffers / Git**, or use `<` / `>` |
+| Opened-file markers | all | Files represented by open buffers use `NeoTreeFileNameOpened` styling |
+| Fuzzy filter reset | on file open | Reopening the tree does not retain a stale `/` filter |
+| `git_status_scope_to_path` | **true** | Faster when a monorepo worktree is above the displayed root; set the commented `false` alternate in `explorer.lua` if scoped results do not suit you |
 | `hide_dotfiles` / `hide_gitignored` | **true** | Dotfiles & gitignored are filtered by default; **`H`** shows them (dimmed). Always-show: `.gitignore`, `.forceignore`, `.sfdx`, `.sf`. `never_show`: `.DS_Store` / `thumbs.db` (H won’t reveal those). |
 | `window.mappings["<space>"]` | `none` | Space is `<leader>` — don’t toggle nodes with Space |
-| Width | 34 | Comfortable sidebar without eating the editor |
+| Width | 34 base + auto-expand | Long visible names grow the sidebar instead of fading; `e` toggles back to the base width |
 
 Full option reference: `:help neo-tree` and `:help neo-tree-mappings`.
 

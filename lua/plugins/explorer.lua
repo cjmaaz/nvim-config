@@ -28,6 +28,8 @@ local function apply_neo_tree_hl()
   vim.api.nvim_set_hl(0, "NeoTreeExpander", { fg = chrome.divider_fg, bg = bg })
   vim.api.nvim_set_hl(0, "NeoTreeTabActive", { fg = chrome.divider_fg, bg = chrome.active_bg, bold = true })
   vim.api.nvim_set_hl(0, "NeoTreeTabInactive", { fg = chrome.muted_fg, bg = bg })
+  vim.api.nvim_set_hl(0, "NeoTreeTabSeparatorActive", { fg = chrome.divider_fg, bg = chrome.active_bg })
+  vim.api.nvim_set_hl(0, "NeoTreeTabSeparatorInactive", { fg = chrome.active_bg, bg = bg })
   vim.api.nvim_set_hl(0, "NeoTreeStatusLine", { fg = fg, bg = chrome.active_bg })
   vim.api.nvim_set_hl(0, "NeoTreeStatusLineNC", { fg = chrome.muted_fg, bg = bg })
 end
@@ -67,6 +69,21 @@ return {
       close_if_last_window = true,
       -- close_if_last_window = false,
 
+      -- Clickable Files / Buffers / Git tabs inside Neo-tree's own winbar.
+      source_selector = {
+        winbar = true,
+        -- winbar = false, -- hide tabs; switch sources only with < / >
+        statusline = false, -- lualine owns the global statusline
+        sources = {
+          { source = "filesystem", display_name = "Files" },
+          { source = "buffers", display_name = "Buffers" },
+          { source = "git_status", display_name = "Git" },
+        },
+        content_layout = "center",
+        tabs_layout = "equal",
+        padding = 1,
+      },
+
       -- Popup border for confirms / prompts inside neo-tree.
       popup_border_style = "rounded",
       -- popup_border_style = "single",
@@ -76,11 +93,34 @@ return {
       -- enable_git_status = false,
       enable_diagnostics = true, -- LSP diagnostics when an LSP is attached later
       -- enable_diagnostics = false,
+      enable_opened_markers = true, -- track files represented by open buffers
+      -- enable_opened_markers = false,
+
+      -- Limit `git status` to the displayed subtree (faster in monorepos).
+      git_status_scope_to_path = true,
+      -- git_status_scope_to_path = false, -- full worktree status if scoped results feel incomplete
 
       default_component_configs = {
         indent = {
           with_expanders = true, -- nicer folder expand/collapse glyphs
           -- with_expanders = false,
+        },
+        name = {
+          highlight_opened_files = "all", -- rose/bold NeoTreeFileNameOpened for open files
+          -- highlight_opened_files = false, -- do not distinguish open files
+        },
+      },
+
+      event_handlers = {
+        {
+          event = "file_opened",
+          handler = function()
+            local manager = require("neo-tree.sources.manager")
+            local state = manager.get_state("filesystem")
+            if state and state.search_pattern then
+              require("neo-tree.sources.filesystem").reset_search(state, true)
+            end
+          end,
         },
       },
 
@@ -88,8 +128,10 @@ return {
         position = "left", -- sidebar
         -- position = "right",
         -- position = "float",
-        width = 34, -- CodeOSS-ish
+        width = 34, -- base width; restored when auto-expand is toggled off
         -- width = 40,
+        auto_expand_width = true, -- grow to the longest visible node instead of truncating
+        -- auto_expand_width = false, -- fixed width; long names fade/truncate (press e to toggle)
         mappings = {
           -- Space is our global leader — don't let neo-tree steal it for toggle_node.
           ["<space>"] = "none",
