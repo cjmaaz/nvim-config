@@ -25,6 +25,7 @@ nvim-config/
 │   │   ├── treesitter.md
 │   │   ├── lsp.md        # LSP, blink, format, lint
 │   │   ├── salesforce.md # sf.nvim <leader>S…
+│   │   ├── comment.md    # Comment / TODO / breadcrumbs
 │   │   └── which-key.md
 │   ├── diagnostics/      # where diagnostics show + settings + Java FAQ
 │   │   ├── README.md
@@ -60,6 +61,9 @@ nvim-config/
         ├── formatting.lua # conform; <leader>cf / tf
         ├── linting.lua   # nvim-lint; <leader>cl / tl; lazy Mason
         ├── salesforce.lua # sf.nvim + fzf-lua; <leader>S… (Sp push, Sx cancel)
+        ├── comment.lua   # Comment.nvim + context-commentstring
+        ├── todo-comments.lua # TODO/FIXME highlight + ]t / <leader>st
+        ├── breadcrumbs.lua # nvim-navic (lualine crumbs)
         ├── git.lua       # gitsigns signs + hunk keymaps
         └── which-key.lua # leader popup / group labels
 ```

@@ -22,6 +22,7 @@ Only maps we actually set are listed. Built-in Vim/Neovim keys (`hjkl`, `:w`, `g
 | Treesitter / indent / autopairs | [treesitter.md](./treesitter.md) |
 | LSP / completion / formatting / lint | [lsp.md](./lsp.md) |
 | Salesforce (sf.nvim) | [salesforce.md](./salesforce.md) |
+| Comment / TODO / breadcrumbs | [comment.md](./comment.md) |
 | which-key | [which-key.md](./which-key.md) |
 | UI cheat sheet | [below](#ui-notes) |
 
@@ -51,6 +52,7 @@ Defined in `init.lua`.
 | LSP / format / blink | `gd`/`K`/`gr` · `<leader>cf` · `<C-y>` — [lsp.md](./lsp.md) |
 | Lint (nvim-lint) | `<leader>cl` · `<leader>tl` toggle auto · lazy Mason — [lsp.md](./lsp.md#linting-luapluginslintinglua) |
 | Salesforce | `<leader>S…` (capital S) · deploy `<leader>Sp` · cancel `<leader>Sx` — [salesforce.md](./salesforce.md) |
+| Comment / TODO / crumbs | `gcc` · `]t`/`[t` · `<leader>st` · navic in statusline — [comment.md](./comment.md) |
 | Colorscheme | `noctis_bordo` — `lua/plugins/colorscheme.lua` |
 | which-key | `<Space>` then wait — [which-key.md](./which-key.md) |
 | Plugin manager | `:Lazy` |
@@ -67,4 +69,4 @@ When you add keymaps in a later slice:
 
 ---
 
-Nav: [core](./core.md) · [git](./git.md) · [explorer](./explorer.md) · [telescope](./telescope.md) · [treesitter](./treesitter.md) · [lsp](./lsp.md) · [salesforce](./salesforce.md) · [which-key](./which-key.md)
+Nav: [core](./core.md) · [git](./git.md) · [explorer](./explorer.md) · [telescope](./telescope.md) · [treesitter](./treesitter.md) · [lsp](./lsp.md) · [salesforce](./salesforce.md) · [comment](./comment.md) · [which-key](./which-key.md)

@@ -12,6 +12,7 @@ The keymap cheatsheet lives in **[`docs/keymaps/`](./keymaps/README.md)** (split
 | [keymaps/treesitter.md](./keymaps/treesitter.md) | Highlight / folds / pairs |
 | [keymaps/lsp.md](./keymaps/lsp.md) | LSP, blink, format, lint |
 | [keymaps/salesforce.md](./keymaps/salesforce.md) | sf.nvim (`<leader>S…`) |
+| [keymaps/comment.md](./keymaps/comment.md) | Comment, TODO, breadcrumbs |
 | [keymaps/which-key.md](./keymaps/which-key.md) | Leader groups |
 
 This file is a stub so old links to `docs/KEYMAPS.md` still resolve.

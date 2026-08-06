@@ -24,6 +24,7 @@ return {
         -- enabled = true, -- always try icons (may show tofu boxes without a Nerd Font)
         -- enabled = false, -- text-only statusline components
       },
+      "SmiteshP/nvim-navic", -- breadcrumbs component in lualine_c (see breadcrumbs.lua opts)
     },
     opts = {
       options = {
@@ -75,6 +76,12 @@ return {
             -- newfile_status = true, -- flag buffers not yet on disk
             -- shorting_target = 40, -- shorten long paths to keep the bar readable
             -- symbols = { modified = "●", readonly = "", unnamed = "[No Name]" },
+          },
+          {
+            "navic", -- LSP breadcrumbs (nvim-navic); empty until a supporting LSP attaches
+            color_correction = "dynamic",
+            navic_opts = { highlight = true },
+            -- cond = function() return require("nvim-navic").is_available() end, -- hide when empty
           },
           -- "filesize", -- optional mid component
           -- { "searchcount", maxcount = 999 }, -- match count while searching

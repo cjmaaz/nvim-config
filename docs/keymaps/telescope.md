@@ -26,6 +26,7 @@ Nav: [index](./README.md) · [core](./core.md) · [git](./git.md) · [explorer](
 | `<leader>sc` | n | Search **Ex commands** |
 | `<leader>ss` | n | List **Telescope builtins** (meta-picker) |
 | `<leader>sd` | n | Search **diagnostics** (useful once LSP is on; empty before that) |
+| `<leader>st` | n | Search **TODO / FIXME** comments (todo-comments) |
 | `<leader>sr` | n | **Resume** the last Telescope picker |
 | `<leader>sn` | n | Find files under your **Neovim config** dir (`stdpath("config")`) |
 

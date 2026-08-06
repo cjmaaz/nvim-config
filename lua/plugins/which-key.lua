@@ -39,6 +39,8 @@ return {
         { "<leader>S", group = "Salesforce", mode = { "n", "x" } }, -- sf.nvim <leader>S… (capital S)
         { "<leader>c", group = "Code" }, -- <leader>cf format, <leader>cl lint, <leader>ca action
         { "<leader>t", group = "Toggle" }, -- <leader>tf FoS, <leader>tl autolint, <leader>th inlays
+        { "gc", group = "Comment line", mode = { "n", "v" } }, -- Comment.nvim
+        { "gb", group = "Comment block", mode = { "n", "v" } }, -- Comment.nvim
         -- Future slices (uncomment when those maps exist):
         -- { "gr", group = "LSP", mode = { "n" } },
       },
