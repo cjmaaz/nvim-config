@@ -33,6 +33,12 @@ Defined in `lua/config/keymaps.lua`. **Buffers ≠ tabpages** — `gt` / `gT` st
 
 Commented alternates in config: `]b`/`[b`, force delete (`bdelete!`), `<leader>c`, wipeout.
 
+### Bufferline (UI)
+
+Defined in `lua/plugins/bufferline.lua`. Visual bar of **buffers** (`mode = "buffers"`). Cycle still uses `<S-h>` / `<S-l>` above — not `gt` / `gT` (those remain tabpages). Close with `<leader>bd` (close icons are off).
+
+Optional later: enable `diagnostics = "nvim_lsp"` after LSP; Craftzdog-style `mode = "tabs"` is intentionally not used.
+
 ### Windows (splits)
 
 | Key | Mode | Action |
@@ -147,6 +153,7 @@ Pairs with `vim.opt.timeoutlen = 300` in `lua/config/options.lua`.
 | Area | How you use it today |
 | --- | --- |
 | Statusline (lualine) | Always visible — mode, branch, diff, filename, diagnostics, location |
+| Bufferline | Top bar of open buffers; cycle with `<S-h>` / `<S-l>` |
 | Colorscheme | Set at startup (`noctis_bordo`); change in `lua/plugins/colorscheme.lua` |
 | which-key | `<Space>` then wait — see leader groups above |
 | Plugin manager | `:Lazy` — UI for install/update/profile |
@@ -155,4 +162,4 @@ Pairs with `vim.opt.timeoutlen = 300` in `lua/config/options.lua`.
 
 ## Growing this doc
 
-When you add keymaps in a later slice (bufferline, telescope, LSP), append a section here in the same table style and link the defining file. Uncomment matching `spec` groups in `which-key.lua` when those prefixes exist.
+When you add keymaps in a later slice (telescope, LSP, explorer), append a section here in the same table style and link the defining file. Uncomment matching `spec` groups in `which-key.lua` when those prefixes exist.

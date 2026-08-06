@@ -30,6 +30,7 @@ nvim-config/
         ├── init.lua      # empty list; keeps `import = "plugins"` valid
         ├── colorscheme.lua
         ├── statusline.lua
+        ├── bufferline.lua # visual buffer bar (not tabpages)
         ├── git.lua       # gitsigns signs + hunk keymaps
         └── which-key.lua # leader popup / group labels
 ```
@@ -39,4 +40,4 @@ nvim-config/
 1. Install host tools from [docs/TOOLS.md](docs/TOOLS.md) (Neovim, Git, a Nerd Font; ideally `rg` + `fd`).
 2. Point Neovim at this config (symlink, `NVIM_APPNAME`, or clone as your `~/.config/nvim`).
 3. Open Neovim once — lazy.nvim bootstraps and installs plugins from `lazy-lock.json`.
-4. Skim [docs/KEYMAPS.md](docs/KEYMAPS.md) for `<leader>` (Space), buffer/window maps, git hunks, and which-key.
+4. Skim [docs/KEYMAPS.md](docs/KEYMAPS.md) for `<leader>` (Space), buffers/bufferline, git hunks, and which-key.
