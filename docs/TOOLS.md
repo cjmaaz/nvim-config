@@ -62,9 +62,14 @@ Without `tree-sitter` + a C compiler, `:TSUpdate` / parser install will fail.
 | Config area | Relies on |
 | --- | --- |
 | `lua/config/lazy.lua` | `git`, network (first clone of lazy.nvim) |
-| `lua/plugins/statusline.lua` | Nerd Font (icons) when `have_nerd_font` |
+| `lua/plugins/statusline.lua` | Nerd Font (icons) when `have_nerd_font`; SF org once sf.nvim loaded |
 | `lua/plugins/git.lua` | `git` repo + Nerd Font signs (or ASCII fallback) |
 | `lua/plugins/lazygit.lua` | host **`lazygit`** (`brew` / `pacman`) |
+| `lua/plugins/persistence.lua` | (none beyond Neovim state dir) |
+| `lua/plugins/trouble.lua` | (none) |
+| `lua/plugins/surround.lua` | (none) |
+| `lua/plugins/flash.lua` | (none) |
+| `lua/plugins/undotree.lua` | `undofile` on (already in `options.lua`) |
 | `lua/plugins/explorer.lua` | Nerd Font icons (optional) |
 | `lua/plugins/telescope.lua` | `rg`, `fd`; optional `make` for fzf-native |
 | `lua/plugins/treesitter.lua` | Neovim 0.12+, `tree-sitter` CLI 0.26.1+, C compiler |

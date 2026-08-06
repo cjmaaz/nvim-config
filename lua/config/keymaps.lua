@@ -117,8 +117,14 @@ end, { desc = "Previous diagnostic" })
 -- map("n", "]d", vim.diagnostic.goto_next, { desc = "Next diagnostic" }) -- deprecated API
 
 map("n", "<leader>e", vim.diagnostic.open_float, { desc = "Show diagnostic" })
-map("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Diagnostic loclist" })
+-- Diagnostic **lists** live in Trouble now (`lua/plugins/trouble.lua`):
+--   <leader>xx  workspace diagnostics
+--   <leader>xX  buffer diagnostics
+--   <leader>xl  location list
+--   <leader>xq  quickfix
+-- map("n", "<leader>q", vim.diagnostic.setloclist, { desc = "Diagnostic loclist" }) -- old; clashes with sessions
 -- map("n", "<leader>q", vim.diagnostic.setqflist, { desc = "Diagnostic quickfix" }) -- global qflist
+-- <leader>q… → persistence sessions (`lua/plugins/persistence.lua`).
 
 -- --- hjkl training (arrows do not move) ---
 

@@ -42,17 +42,52 @@ return {
 
       telescope.setup({
         defaults = {
-          path_display = { "smart" }, -- shorten long paths
-          -- path_display = { "truncate" },
+          path_display = { "smart" }, -- shorten long paths intelligently
+          -- path_display = { "truncate" }, -- cut the middle of long paths
+          -- path_display = { "absolute" }, -- full paths (noisy in big monorepos)
+          -- path_display = { "hidden" }, -- hide path column (filename focus)
+
           -- If preview still errors on an old Telescope pin, disable TS highlight there:
           -- preview = { treesitter = false },
+          -- preview = { hide_on_startup = true }, -- open pickers without preview until toggled
+
+          -- Extra ignore globs on top of `.gitignore` (Lua patterns; `%` escapes magic chars).
+          -- rg/fd already skip gitignored files — these catch lockfiles, build dirs, SF metadata, …
+          -- To search inside an ignored path once: Telescope find_files no_ignore=true (or clear a line).
+          file_ignore_patterns = {
+            "node_modules/", -- JS/TS deps
+            -- "node_modules", -- without trailing slash also matches files named node_modules
+            "%.git/", -- git objects / metadata (Telescope sometimes still walks them)
+            "%.sfdx/", -- Salesforce DX cache / tools (SObject stubs, …)
+            "%.sf/", -- modern SF CLI state under the project
+            "target/", -- Maven / Rust-ish build output
+            "dist/", -- frontend build
+            "build/", -- generic build dir
+            -- "coverage/", -- test coverage reports (uncomment if noisy)
+            -- "%.next/", -- Next.js build
+            "%.class", -- Java bytecode
+            "%.jar", -- Java archives
+            "package%-lock%.json", -- npm lock (huge / low signal in pickers)
+            "yarn%.lock",
+            "pnpm%-lock%.yaml",
+            -- "Cargo%.lock", -- Rust lockfile
+            "%.min%.js", -- minified bundles
+            "%.min%.css",
+            -- "%.map", -- source maps
+          },
+          -- file_ignore_patterns = {}, -- honor only .gitignore / fd defaults
+
           mappings = {
             i = { -- insert mode inside the picker
               ["<C-j>"] = actions.move_selection_next,
               ["<C-k>"] = actions.move_selection_previous,
               -- ["<C-n>"] = actions.move_selection_next, -- stock-ish
               -- ["<C-p>"] = actions.move_selection_previous,
+              -- ["<C-q>"] = actions.send_to_qflist + actions.open_qflist, -- classic Telescope → qflist
             },
+            -- n = { -- normal mode inside the picker
+            --   ["q"] = actions.close,
+            -- },
           },
         },
         extensions = {

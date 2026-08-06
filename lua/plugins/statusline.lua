@@ -1,11 +1,47 @@
 --------------------------------------------------------------------------------
 -- Statusline: lualine + file icons
--- Refs: CodeOSS ui.lua (standalone lualine); Craftzdog/LazyVim only tweak LazyVim's.
--- Alternatives to lualine (pick one ecosystem — don't enable two bars):
+-- Refs: CodeOSS ui.lua (standalone lualine + SF org/coverage); Craftzdog/LazyVim
+--   only tweak LazyVim's. Alternatives to lualine (pick one ecosystem):
 --   - echasnovski/mini.statusline  (lighter, mini.nvim family)
 --   - rebelot/heirline.nvim        (max control, more code)
 --   - built-in 'statusline' string (no plugin; weak icons/git unless you script it)
 --------------------------------------------------------------------------------
+
+-- Salesforce org + coverage (CodeOSS ui.lua).
+-- package.loaded avoids requiring sf.nvim on every statusline refresh — the
+-- component stays empty until a Salesforce command/file loads the plugin.
+-- Alts: always `require("sf")` (forces load) · hardcode alias · skip entirely.
+local function salesforce_status()
+  local sf = package.loaded.sf
+  if not sf then
+    return "" -- plugin not loaded yet → hide component
+    -- return "SF:—", -- show a placeholder instead
+  end
+
+  local parts = {}
+
+  -- Target org alias (set via <leader>So / SF org fetch).
+  local ok_org, org = pcall(sf.get_target_org)
+  if ok_org and org and org ~= "" then
+    table.insert(parts, (vim.g.have_nerd_font and "󰢎 " or "SF:") .. org)
+    -- table.insert(parts, org) -- text only, no prefix
+  end
+  -- if not ok_org then … end -- ignore errors (org unset is normal)
+
+  -- Apex test coverage % after a coverage run (ST / SA); empty until then.
+  local ok_coverage, coverage = pcall(sf.covered_percent)
+  if ok_coverage and coverage and tostring(coverage) ~= "" then
+    local coverage_text = tostring(coverage)
+    if not coverage_text:match("%%$") then
+      coverage_text = coverage_text .. "%"
+    end
+    table.insert(parts, (vim.g.have_nerd_font and "󰄬 " or "Cov:") .. coverage_text)
+    -- table.insert(parts, "cov " .. coverage_text) -- ASCII-only label
+  end
+
+  return table.concat(parts, " ")
+  -- return table.concat(parts, " · ") -- different separator
+end
 
 return {
   {
@@ -88,6 +124,16 @@ return {
         },
 
         lualine_x = {
+          {
+            salesforce_status,
+            -- Only paint when sf.nvim has been required at least once.
+            cond = function()
+              return package.loaded.sf ~= nil
+            end,
+            -- cond = function() return true end, -- always reserve space (shows empty string)
+            -- icon = "󰢎", -- lualine can prefix an icon separately if you prefer
+          },
+          -- { salesforce_status }, -- no cond: still returns "" when unloaded
           "diagnostics", -- LSP/Vim diagnostics; empty until an LSP attaches
           -- { "diagnostics", sources = { "nvim_diagnostic" }, sections = { "error", "warn" } },
           "encoding", -- e.g. utf-8; omit this entry if you always use utf-8
@@ -116,7 +162,7 @@ return {
       -- winbar = {},
       -- inactive_winbar = {},
 
-      -- extensions = { "lazy", "fugitive", "nvim-tree" }, -- nicer sections inside those UIs
+      -- extensions = { "lazy", "fugitive", "nvim-tree", "trouble" }, -- nicer sections inside those UIs
     },
   },
 }

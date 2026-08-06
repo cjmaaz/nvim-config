@@ -59,15 +59,19 @@ return {
       -- attach_to_untracked = false, -- skip untracked files
 
       -- Virtual-text blame on the cursor line.
-      current_line_blame = false, -- off for now (add later if you like inline blame)
-      -- current_line_blame = true, -- show author/date at EOL (or see opts below)
+      current_line_blame = false, -- off by default; toggle with <leader>tb when you need it
+      -- current_line_blame = true, -- always-on EOL blame (noisy in busy files)
       -- current_line_blame_opts = {
       --   delay = 500, -- ms before blame appears
       --   -- delay = 1000, -- slower / less distracting
+      --   -- delay = 0, -- immediate
       --   virt_text_pos = "eol", -- strongest default: end of line
       --   -- virt_text_pos = "overlay", -- over the buffer text
       --   -- virt_text_pos = "right_align", -- right edge of the window
+      --   -- virt_text_priority = 100,
       -- },
+      -- current_line_blame_formatter = "<author>, <author_time:%Y-%m-%d> - <summary>",
+      -- current_line_blame_formatter = "<author> · <summary>", -- shorter
 
       -- Follow renames inside the repo when watching .git.
       -- watch_gitdir = { follow_files = true }, -- default-ish; enable if you rename often
@@ -136,11 +140,15 @@ return {
         map("n", "<leader>hd", gs.diffthis, "Diff against index")
         -- map("n", "<leader>hD", function() gs.diffthis("~") end, "Diff against previous commit")
 
-        -- Optional extras (enable when you want them):
+        -- Toggle extras (live under <leader>t… with FoS/lint/inlays).
+        map("n", "<leader>tb", gs.toggle_current_line_blame, "Toggle line blame")
+        -- map("n", "<leader>tb", function() gs.toggle_current_line_blame() end, "…") -- same
+        -- map("n", "<leader>tw", gs.toggle_word_diff, "Toggle word diff")
+        -- map("n", "<leader>td", gs.toggle_deleted, "Toggle deleted lines") -- show removed lines as virtual text
+
+        -- Optional quickfix exports:
         -- map("n", "<leader>hq", gs.setqflist, "Quickfix current-file changes")
         -- map("n", "<leader>hQ", function() gs.setqflist("all") end, "Quickfix all repo changes")
-        -- map("n", "<leader>tb", gs.toggle_current_line_blame, "Toggle line blame")
-        -- map("n", "<leader>tw", gs.toggle_word_diff, "Toggle word diff")
 
         -- Text object: operator/visual around the hunk under the cursor (e.g. cih, vah).
         map({ "o", "x" }, "ih", gs.select_hunk, "Select git hunk")

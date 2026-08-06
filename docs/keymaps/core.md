@@ -98,9 +98,10 @@ Defined in `lua/config/keymaps.lua` (`vim.diagnostic.config` + maps). Works befo
 | `]d` | n | Next diagnostic (float on jump) |
 | `[d` | n | Previous diagnostic (float on jump) |
 | `<leader>e` | n | Show diagnostic float at cursor |
-| `<leader>q` | n | Fill **location list** with buffer diagnostics (`:lopen` / `:lclose`) |
 
-Display: virtual text on, underline from WARN+, severity-sorted, Nerd Font / ASCII signs. Commented alts in config: `virtual_lines`, full underline, `setqflist` instead of loclist.
+**Lists:** use [Trouble](./qol.md#trouble-luapluginstroublelua) (`<leader>xx` / `xX` / `xl`) instead of the old `<leader>q` loclist. `<leader>q…` is now [sessions](./qol.md#sessions-luapluginspersistencelua).
+
+Display: virtual text on, underline from WARN+, severity-sorted, Nerd Font / ASCII signs. Commented alts in config: `virtual_lines`, full underline.
 
 **Deeper guide** (display settings, quieting noise, Java non-project): [diagnostics/](../diagnostics/README.md).
 
@@ -108,4 +109,4 @@ Also: Telescope [`<leader>sd`](./telescope.md) searches diagnostics once they ex
 
 ---
 
-Nav: [index](./README.md) · [git](./git.md) · [explorer](./explorer.md) · [telescope](./telescope.md) · [treesitter](./treesitter.md) · [lsp](./lsp.md) · [which-key](./which-key.md)
+Nav: [index](./README.md) · [git](./git.md) · [explorer](./explorer.md) · [telescope](./telescope.md) · [treesitter](./treesitter.md) · [lsp](./lsp.md) · [qol](./qol.md) · [which-key](./which-key.md)

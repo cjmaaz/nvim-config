@@ -8,7 +8,9 @@ Pinned to Telescope **`master`** (not frozen `0.1.x`) so preview highlighting wo
 
 Config also shims `telescope.utils.if_nil` when missing (Nvim 0.12 + Telescope master can leave it nil, which breaks `vim.ui.select` / org picker via ui-select).
 
-Nav: [index](./README.md) · [core](./core.md) · [git](./git.md) · [explorer](./explorer.md) · [treesitter](./treesitter.md) · [lsp](./lsp.md) · [which-key](./which-key.md)
+**Ignore globs** (extra noise beyond `.gitignore`): `node_modules/`, `.git/`, `.sfdx/`, `.sf/`, `target/`, `dist/`, `build/`, `*.class`/`*.jar`, lockfiles, `*.min.js`/`*.min.css` — see `file_ignore_patterns` in `telescope.lua`.
+
+Nav: [index](./README.md) · [core](./core.md) · [git](./git.md) · [explorer](./explorer.md) · [treesitter](./treesitter.md) · [lsp](./lsp.md) · [qol](./qol.md) · [which-key](./which-key.md)
 
 ---
 

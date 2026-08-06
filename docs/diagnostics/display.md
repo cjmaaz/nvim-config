@@ -19,7 +19,7 @@ Appearance (colors, icon glyphs) comes from your **theme** + Nerd Font / ASCII f
 └───────────────────────┘  └─────────────────────────────────────────┘
          │
          ├─ float popup ……… <leader>e or after ]d / [d
-         ├─ location list … <leader>q → :lopen
+         ├─ Trouble panel …… <leader>xx (workspace) / xX (buffer) / xl (loclist)
          ├─ Telescope ……… <leader>sd
          └─ statusline ……… lualine diagnostics counts
 ```
@@ -31,7 +31,7 @@ Appearance (colors, icon glyphs) comes from your **theme** + Nerd Font / ASCII f
 | **virtual_text** | End of the **same** line as the issue | Short message (+ optional source/prefix) | `true` (all severities that exist) |
 | **virtual_lines** | Extra screen line(s) **under** the code | Full-ish message | Off (commented alt) |
 | **float** | Floating window | Message, source, code, related info | On jump + `<leader>e` |
-| **loclist** | Location-list window | One entry per diagnostic in buffer | Via `<leader>q` |
+| **Trouble** | Sticky side/bottom panel | Filterable diagnostics / lists | Via `<leader>xx` — [qol.md](../keymaps/qol.md) |
 | **Telescope** | Picker UI | Searchable list (often workspace/buffer) | Via `<leader>sd` |
 | **statusline** | lualine (usually right side) | Counts by severity | On |
 

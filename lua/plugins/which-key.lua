@@ -38,10 +38,13 @@ return {
         { "<leader>s", group = "Search", mode = { "n", "v" } }, -- telescope <leader>s…
         { "<leader>S", group = "Salesforce", mode = { "n", "x" } }, -- sf.nvim <leader>S… (capital S)
         { "<leader>c", group = "Code" }, -- <leader>cf format, <leader>cl lint, <leader>ca action
-        { "<leader>t", group = "Toggle" }, -- <leader>tf FoS, <leader>tl autolint, <leader>th inlays
+        { "<leader>t", group = "Toggle" }, -- tf FoS · tl autolint · th inlays · tb blame
+        { "<leader>q", group = "Session" }, -- persistence qs/qS/ql/qd
+        { "<leader>x", group = "Trouble" }, -- diagnostics / lists panel
+        { "<leader>u", group = "Undotree" }, -- undotree toggle
         { "gc", group = "Comment line", mode = { "n", "v" } }, -- Comment.nvim
         { "gb", group = "Comment block", mode = { "n", "v" } }, -- Comment.nvim
-        -- Future slices (uncomment when those maps exist):
+        { "gs", group = "Flash jump" }, -- flash.nvim (gS = treesitter)
         -- { "gr", group = "LSP", mode = { "n" } },
       },
     },

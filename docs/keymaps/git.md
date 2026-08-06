@@ -31,10 +31,11 @@ Commented alternate in config: `]h` / `[h` if you want to leave `]c`/`[c` for di
 | `<leader>hp` | n | Preview hunk (float) |
 | `<leader>hb` | n | Blame line (full) |
 | `<leader>hd` | n | Diff this file against the index |
+| `<leader>tb` | n | Toggle **inline** current-line blame |
 
-Commented alternates in config: `<leader>g…` prefix, inline preview (`hi`), diff vs `~` (`hD`), quickfix (`hq`/`hQ`), toggle blame/word-diff (`tb`/`tw`).
+Commented alternates in config: `<leader>g…` prefix, inline preview (`hi`), diff vs `~` (`hD`), quickfix (`hq`/`hQ`), toggle word-diff (`tw`).
 
-which-key group: **Git hunk** under `<leader>h` — [which-key.md](./which-key.md).
+which-key group: **Git hunk** under `<leader>h` — [which-key.md](./which-key.md). Toggle group also lists `tb`.
 
 Git status tree: [`<leader>ge`](./explorer.md) (neo-tree).
 
