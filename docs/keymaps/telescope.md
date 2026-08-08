@@ -84,7 +84,7 @@ Content mode:
 2. Type **two spaces**, then a **glob** (or a one-letter shortcut).
 3. Results update live via `rg -e pattern -g glob`.
 
-File mode starts the prompt with **two spaces**, followed by one ripgrep path glob. It uses `rg --files -g glob`; no file contents are searched.
+File mode starts the prompt with **two spaces**, followed by one ripgrep path glob. It uses `rg --files`; no file contents are searched. Globs follow smart case: all lowercase uses case-insensitive `--iglob`, while any uppercase letter switches to case-sensitive `-g`.
 
 Examples:
 
@@ -95,7 +95,8 @@ Examples:
 | `TODO  l` | Shortcut `l` → `*.lua` |
 | `Account  a` | Shortcut `a` → `*.{cls,trigger,apex}` |
 | `useState  j` | Shortcut `j` → `*.{js,jsx,ts,tsx}` |
-| `  *xyz*` | Files whose names contain `xyz`, at any depth |
+| `  *xyz*` | Files containing any case of `xyz` / `XYZ`, at any depth |
+| `  *Xyz*` | Files containing the exact-case spelling `Xyz` |
 | `  **/abc/**/*xyz*` | Matching files beneath any directory named `abc` |
 | `  force-app/**/*.cls` | Apex class files below `force-app` |
 

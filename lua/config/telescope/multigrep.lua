@@ -75,7 +75,10 @@ function M.file_args(parsed)
   if parsed.mode ~= "files" or not parsed.glob or parsed.glob == "" then
     return nil
   end
-  return { "rg", "--files", "--color=never", "--null", "-g", parsed.glob }
+
+  -- Match search smart-case: lowercase glob is insensitive; uppercase opts in.
+  local glob_flag = parsed.glob:find("%u") and "-g" or "--iglob"
+  return { "rg", "--files", "--color=never", "--null", glob_flag, parsed.glob }
 end
 
 local function new_grep_finder(opts)
@@ -132,7 +135,7 @@ function M.open(opts)
   pickers
     .new(opts, {
       debounce = 100,
-      prompt_title = "Multi Grep  (text  glob | two-spaces file-glob)",
+      prompt_title = "Live Multi Grep  (pattern  glob)",
       finder = grep_finder,
       previewer = conf.grep_previewer(opts),
       sorter = require("telescope.sorters").empty(), -- rg already ordered
