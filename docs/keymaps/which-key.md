@@ -2,7 +2,7 @@
 
 Defined in `lua/plugins/which-key.lua`. Discovers pending keys after a prefix; does **not** add maps by itself (labels come from each map’s `desc` plus `spec` groups).
 
-Popup: **classic** full-width strip with a rounded soft-white border and dark Bordo bg from `lua/config/ui_chrome.lua` (shared across bars and panels), max height ~45% of the screen, `no_overlap = false`. `layout.width.max = 40` keeps `g` multi-column; only the long change-list presets needed shorter labels (`g,` / `g;`).
+Popup: **classic** full-width strip with a rounded soft-white border and dark Bordo bg from `lua/config/ui_chrome.lua` (shared across bars and panels), max height **50%** of the screen, `no_overlap = false`. Columns have no forced maximum width, so long descriptions stay intact rather than being ellipsized.
 
 Icons (when `vim.g.have_nerd_font`): **color = related-action family**, not the whole leader group. Similar/paired maps share a color with different glyphs (e.g. SF tests `a`/`A`/`t`/`T` green; retrieve/metadata azure; `<leader>c` format/lint/action each their own color). `]a`/`A`/`b`/`B` (and `[` twins) are mapped in `keymaps.lua` with buffer=cyan / argument=azure.
 
@@ -14,7 +14,7 @@ Nav: [index](./README.md) · [core](./core.md) · [git](./git.md) · [explorer](
 | --- | --- |
 | See leader groups | Press `<Space>`, wait ~300ms (`delay`) |
 | Open a group | Press the next key (`h` = Git hunk, `b` = Buffer, `f` = File/Find, …) |
-| Scroll popup | `Ctrl-d` / `Ctrl-u` (less needed with taller `win.height`) |
+| Scroll popup | `Ctrl-d` / `Ctrl-u`; those mappings are filtered from which-key’s tree but still recenter-scroll normal buffers when the popup is closed |
 | Leave the popup | `<Esc>` |
 
 | Group prefix | Label in popup | Maps live in | Doc |

@@ -32,6 +32,20 @@ return {
       delay = 300,
       -- delay = 0,
 
+      -- Hide the normal-buffer half-page maps from which-key's tree so its
+      -- popup state can consume the same keys for scrolling.
+      filter = function(mapping)
+        local lhs = (mapping.lhs or ""):upper()
+        return lhs ~= "<C-D>" and lhs ~= "<C-U>"
+      end,
+      -- filter = function() return true end, -- show every mapping (C-d/u then close the popup)
+
+      keys = {
+        scroll_down = "<c-d>",
+        scroll_up = "<c-u>",
+      },
+      -- keys = { scroll_down = "<c-f>", scroll_up = "<c-b>" }, -- alternate with no tree filtering
+
       preset = "classic",
       -- preset = "modern",
       -- preset = "helix",
@@ -44,7 +58,8 @@ return {
         -- border = "none",
         title = true,
         title_pos = "center",
-        height = { min = 6, max = 0.45 },
+        height = { min = 6, max = 0.50 },
+        -- height = { min = 6, max = 0.45 }, -- slightly shorter popup
         -- height = { min = 4, max = 25 },
         padding = { 1, 2 },
         wo = {
@@ -54,9 +69,9 @@ return {
       },
 
       layout = {
-        -- Cap so `g` (long preset descs) can use multiple columns; labels ellipsize if longer.
-        width = { min = 20, max = 40 },
-        -- width = { min = 20 }, -- stock: grows to longest row → often 1 column under `g`
+        -- Let columns fit their longest label so descriptions are not ellipsized.
+        width = { min = 20 },
+        -- width = { min = 20, max = 40 }, -- more columns, but long labels truncate
         -- width = { min = 20, max = 50 }, -- less truncation, fewer columns
         spacing = 3,
         -- spacing = 2,
