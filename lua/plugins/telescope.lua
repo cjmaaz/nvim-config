@@ -144,7 +144,7 @@ return {
       pcall(telescope.load_extension, "ui-select")
 
       local builtin = require("telescope.builtin")
-      local live_multigrep = require("config.telescope.multigrep")
+      local live_multigrep = require("config.telescope.multigrep").open
 
       -- Search family (<leader>s…)
       vim.keymap.set("n", "<leader>sh", builtin.help_tags, { desc = "Search help" })
@@ -153,7 +153,7 @@ return {
       vim.keymap.set("n", "<leader>ss", builtin.builtin, { desc = "Search select Telescope" })
       vim.keymap.set({ "n", "x" }, "<leader>sw", builtin.grep_string, { desc = "Search current word" })
       vim.keymap.set("n", "<leader>sg", builtin.live_grep, { desc = "Search by grep" })
-      -- TJ multi-grep: `pattern<space><space>glob` (or shortcut: l→*.lua, a→*.cls, …)
+      -- `pattern  glob` searches content; leading `  glob` lists matching files.
       vim.keymap.set("n", "<leader>sm", live_multigrep, { desc = "Search multi-grep" })
       vim.keymap.set("n", "<leader>sd", builtin.diagnostics, { desc = "Search diagnostics" })
       vim.keymap.set("n", "<leader>sr", builtin.resume, { desc = "Search resume" })

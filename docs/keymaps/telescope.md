@@ -78,9 +78,13 @@ Tip: `<leader>sr` reopens whatever you just closed — handy after a mis-click.
 
 Custom picker from [TJ’s Advanced Telescope scripting](https://www.youtube.com/watch?v=xdXE1tOT-qg) — `lua/config/telescope/multigrep.lua`.
 
+Content mode:
+
 1. Type a ripgrep **pattern** (can include spaces).
 2. Type **two spaces**, then a **glob** (or a one-letter shortcut).
 3. Results update live via `rg -e pattern -g glob`.
+
+File mode starts the prompt with **two spaces**, followed by one ripgrep path glob. It uses `rg --files -g glob`; no file contents are searched.
 
 Examples:
 
@@ -91,8 +95,11 @@ Examples:
 | `TODO  l` | Shortcut `l` → `*.lua` |
 | `Account  a` | Shortcut `a` → `*.{cls,trigger,apex}` |
 | `useState  j` | Shortcut `j` → `*.{js,jsx,ts,tsx}` |
+| `  *xyz*` | Files whose names contain `xyz`, at any depth |
+| `  **/abc/**/*xyz*` | Matching files beneath any directory named `abc` |
+| `  force-app/**/*.cls` | Apex class files below `force-app` |
 
-Shortcuts (`l` `v` `n` `c` `r` `g` `j` `a` `h` `p` `m`) live in `multigrep.lua` — edit the table there. Stock `<leader>sg` stays plain live_grep.
+The two leading spaces in file-mode examples are significant. File mode expects an explicit glob, not a fuzzy query; shell characters are passed as an argv value rather than evaluated by a shell. Content shortcuts (`l` `v` `n` `c` `r` `g` `j` `a` `h` `p` `m`) live in `multigrep.lua` and do not expand in file mode. Stock `<leader>sg` stays plain live_grep.
 
 ---
 

@@ -81,12 +81,14 @@ return {
           { pattern = "sf: open org in browser", icon = "󰖟", color = "blue" },
           { pattern = "sf: open current metadata", icon = "󰈙", color = "blue" },
 
-          -- Retrieve / metadata inventory (Sr Sm SM Sk SK) → azure
+          -- Retrieve / metadata inventory (Sr Sm SM Sk SK Su SU) → azure
           { pattern = "sf: retrieve", icon = "󰇚", color = "azure" },
           { pattern = "sf: pull metadata inventory", icon = "󰉓", color = "azure" },
           { pattern = "sf: list metadata to retrieve", icon = "󰉓", color = "azure" },
           { pattern = "sf: pull metadata types", icon = "󰀫", color = "azure" },
           { pattern = "sf: list metadata types", icon = "󰀫", color = "azure" },
+          { pattern = "sf: browse metadata", icon = "󰉓", color = "azure" },
+          { pattern = "sf: update metadata browser", icon = "󰓅", color = "azure" },
 
           -- Tests / coverage (St ST Sa SA SR Sv ]v [v) → green
           { pattern = "sf: test under cursor %+ coverage", icon = "󰝖", color = "green" },

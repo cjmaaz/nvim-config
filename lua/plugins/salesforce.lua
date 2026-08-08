@@ -14,6 +14,56 @@ local function sf_action(method, ...)
   end
 end
 
+local function sf_metadata()
+  return require("config.salesforce.metadata")
+end
+
+local function sf_term_windows()
+  local wins = {}
+  for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+    local buf = vim.api.nvim_win_get_buf(win)
+    local config = vim.api.nvim_win_get_config(win)
+    if vim.bo[buf].filetype == "SFTerm" and config.relative ~= "" then
+      wins[#wins + 1] = win
+    end
+  end
+  return wins
+end
+
+--- Hide SFTerm floats without touching their terminal jobs.
+local function hide_visible_sf_terms()
+  local wins = sf_term_windows()
+  for _, win in ipairs(wins) do
+    pcall(vim.api.nvim_win_close, win, false)
+  end
+  return #wins > 0
+end
+
+--- Cancel SF terminal jobs and background inventory regardless of window focus.
+local function cancel_sf_actions()
+  local cancelled = sf_metadata().cancel_background()
+
+  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+    if vim.api.nvim_buf_is_loaded(buf) and vim.bo[buf].filetype == "SFTerm" and vim.bo[buf].buftype == "terminal" then
+      local channel = vim.bo[buf].channel
+      if channel and channel > 0 and vim.fn.jobwait({ channel }, 0)[1] == -1 then
+        local ok = pcall(vim.api.nvim_chan_send, channel, "\003")
+        if ok then
+          cancelled = cancelled + 1
+        end
+      end
+    end
+  end
+
+  if cancelled == 0 then
+    vim.notify("No running Salesforce action to cancel.", vim.log.levels.INFO, { title = "sf.nvim" })
+  else
+    vim.notify(string.format("Cancellation requested for %d Salesforce action(s).", cancelled), vim.log.levels.WARN, {
+      title = "sf.nvim",
+    })
+  end
+end
+
 -- Modern `sf org display --json` redacts accessToken ("[REDACTED] Use 'sf org auth
 -- show-access-token'…"). sf.nvim still feeds that into curl → HTTP 401 on
 -- <leader>Ss even when retrieve/deploy work. Intercept display --json and splice
@@ -119,10 +169,29 @@ return {
       },
     },
     keys = {
-      -- Org (fetch with <leader>SF before set_target / set_global)
-      { "<leader>SF", sf_action("fetch_org_list"), desc = "SF: fetch orgs" },
-      { "<leader>So", sf_action("set_target_org"), desc = "SF: set target org" },
-      { "<leader>SO", sf_action("set_global_target_org"), desc = "SF: set global org" },
+      -- Local org fetch/set refreshes the common project-local metadata inventory.
+      {
+        "<leader>SF",
+        function()
+          sf_metadata().fetch_orgs_and_refresh_common()
+        end,
+        desc = "SF: fetch orgs + metadata",
+      },
+      {
+        "<leader>So",
+        function()
+          sf_metadata().select_target_and_refresh_common()
+        end,
+        desc = "SF: set target org + metadata",
+      },
+      -- Global target stays selection-only (no automatic inventory refresh).
+      {
+        "<leader>SO",
+        function()
+          sf_metadata().select_global_target()
+        end,
+        desc = "SF: set global org",
+      },
       { "<leader>Sb", sf_action("org_open"), desc = "SF: open org in browser" },
       { "<leader>SB", sf_action("org_open_current_file"), desc = "SF: open current metadata in org" },
 
@@ -131,7 +200,7 @@ return {
       { "<leader>Sd", sf_action("diff_in_target_org"), desc = "SF: diff with target org" },
       { "<leader>Sl", sf_action("pull_log"), desc = "SF: pull debug log" },
       { "<leader>Se", sf_action("toggle_term"), desc = "SF: toggle terminal" },
-      { "<leader>Sx", sf_action("cancel"), desc = "SF: cancel running command (e.g. deploy)" },
+      { "<leader>Sx", cancel_sf_actions, desc = "SF: cancel active actions" },
 
       -- Deploy (save + push current file)
       { "<leader>Sp", sf_action("save_and_push"), desc = "SF: save and deploy current file" },
@@ -160,10 +229,30 @@ return {
       },
 
       -- Metadata (needs fzf-lua for list pickers)
-      { "<leader>SM", sf_action("pull_md_json"), desc = "SF: pull metadata inventory" },
+      {
+        "<leader>SM",
+        function()
+          sf_metadata().refresh_common()
+        end,
+        desc = "SF: pull metadata inventory",
+      },
       { "<leader>Sm", sf_action("list_md_to_retrieve"), desc = "SF: list metadata to retrieve" },
       { "<leader>SK", sf_action("pull_md_type_json"), desc = "SF: pull metadata types" },
       { "<leader>Sk", sf_action("list_md_type_to_retrieve"), desc = "SF: list metadata types" },
+      {
+        "<leader>SU",
+        function()
+          sf_metadata().prompt_refresh()
+        end,
+        desc = "SF: update metadata browser",
+      },
+      {
+        "<leader>Su",
+        function()
+          require("config.salesforce.browser").open()
+        end,
+        desc = "SF: browse metadata",
+      },
 
       -- sObjects for apex_ls completion
       {
@@ -222,23 +311,33 @@ return {
         -- auto_display_code_sign = false, -- only via <leader>Sv
       })
 
-      -- SFTerm stays open after the job exits so you can read output. Hide with Esc / q
-      -- (or <leader>Se). Esc must NOT cancel — cancel is <leader>Sx and SFTerm <C-c>.
+      -- sf.nvim leaves SFTerm visible but restores focus to the source window.
+      -- Dispatch Esc globally only while that non-focused float exists.
+      vim.keymap.set("n", "<Esc>", function()
+        if not hide_visible_sf_terms() then
+          vim.cmd("nohlsearch")
+        end
+      end, { silent = true, desc = "SF: hide terminal / clear search" })
+
+      -- SFTerm stays open after the job exits so output remains readable. Esc/q hide;
+      -- <leader>Sx (or normal-mode <C-c> here) cancels regardless of focus.
       vim.api.nvim_create_autocmd("FileType", {
         pattern = "SFTerm",
         callback = function(event)
-          local hide = function()
-            require("sf").toggle_term() -- closes/opens the float; job keeps running
-          end
           local opts = { buffer = event.buf, silent = true, desc = "SF: hide terminal" }
-          vim.keymap.set("n", "<Esc>", hide, opts)
-          vim.keymap.set("n", "q", hide, opts)
+          vim.keymap.set("n", "<Esc>", hide_visible_sf_terms, opts)
+          vim.keymap.set("n", "q", hide_visible_sf_terms, opts)
+          vim.keymap.set("n", "<C-c>", cancel_sf_actions, {
+            buffer = event.buf,
+            silent = true,
+            desc = "SF: cancel active actions",
+          })
           -- While the job is running you're often in terminal-mode; still hide, don't cancel.
           vim.keymap.set("t", "<Esc>", function()
             vim.cmd.stopinsert()
-            hide()
+            hide_visible_sf_terms()
           end, opts)
-          -- Upstream also maps <C-c> → cancel on this buffer; leave that alone.
+          -- Terminal-mode <C-c> remains the terminal's native interrupt.
         end,
       })
 

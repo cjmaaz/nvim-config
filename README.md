@@ -45,7 +45,12 @@ nvim-config/
     │   ├── options.lua   # everyday editing options
     │   ├── keymaps.lua   # non-plugin maps (buffers, windows, diagnostics, …)
     │   ├── autocmds.lua  # yank, trim, final newline (Apex exempt), filetypes
-    │   └── lazy.lua      # bootstrap lazy.nvim + import plugins/
+    │   ├── lazy.lua      # bootstrap lazy.nvim + import plugins/
+    │   ├── telescope/
+    │   │   └── multigrep.lua # content grep + raw file-glob mode
+    │   └── salesforce/
+    │       ├── metadata.lua # org inventory, sf_cache, manifests, actions
+    │       └── browser.lua # fzf metadata hierarchy + multi-select
     └── plugins/          # one plugin (or small family) per file
         ├── init.lua      # empty list; keeps `import = "plugins"` valid
         ├── colorscheme.lua # noctis_bordo + highlight overlays
