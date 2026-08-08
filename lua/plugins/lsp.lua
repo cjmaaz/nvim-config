@@ -141,7 +141,15 @@ return {
           },
         },
         rust_analyzer = {}, -- Rust
-        ts_ls = {}, -- JS / TS (alt: vtsls = {} like CodeOSS)
+        -- TypeScript server can lose open-file sync in large LWC workspaces and
+        -- throw getEncodedSemanticClassifications "Could not find source file".
+        -- Treesitter still provides syntax colors; disable only LSP semantic tokens.
+        ts_ls = {
+          on_init = function(client)
+            client.server_capabilities.semanticTokensProvider = nil
+          end,
+        },
+        -- ts_ls = {}, -- enable tsserver semantic tokens (richer, but triggers the upstream error here)
         -- vtsls = {},
         yamlls = {
           settings = {

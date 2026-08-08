@@ -132,7 +132,7 @@ function M.open(opts)
   pickers
     .new(opts, {
       debounce = 100,
-      prompt_title = "Multi Grep  (text  glob | ␠␠file-glob)",
+      prompt_title = "Multi Grep  (text  glob | two-spaces file-glob)",
       finder = grep_finder,
       previewer = conf.grep_previewer(opts),
       sorter = require("telescope.sorters").empty(), -- rg already ordered
@@ -150,12 +150,12 @@ function M.open(opts)
           current_mode = "grep"
           grep_finder = new_grep_finder(opts)
           return {
-            prompt = parsed.pattern or "",
+            prompt = prompt, -- grep finder must receive `pattern  glob`, not only pattern
             updated_finder = grep_finder,
           }
         end
 
-        return { prompt = parsed.pattern or "" }
+        return {} -- preserve the full grep prompt so command_generator sees its glob
       end,
     })
     :find()
