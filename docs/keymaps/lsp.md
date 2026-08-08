@@ -24,6 +24,8 @@ Buffer-local maps appear only after a language server attaches (`LspAttach`).
 | `<leader>ws` | n | Workspace symbols (Telescope) |
 | `<leader>th` | n | Toggle inlay hints (if server supports) |
 
+**Inlay hints** are non-editing virtual text supplied by the attached LSP: inferred types, parameter names, return types, and similar context. `<leader>th` toggles them only for the current buffer and never changes the file. If nothing appears, that server/file has no enabled hints. This is separate from `ts_ls` semantic-token highlighting.
+
 **Always on:** `lua_ls` (+ `stylua` via Mason).
 
 **On demand:** first time you open a matching filetype, Mason installs the server then enables it — Python (`basedpyright`), JS/TS (`ts_ls`), HTML/CSS, Java (`jdtls`), Rust, C/C++ (`clangd`), JSON/YAML, **Apex** (`apex_ls` / `apex-language-server`). Needs **Java** on PATH for Apex. Optional: `$APEX_LS_JAR`.
