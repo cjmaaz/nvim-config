@@ -42,6 +42,13 @@ function M.parse_prompt(prompt)
   return { mode = "grep", pattern = before, glob = after }
 end
 
+--- Globs use the same smart-case rule as search text.
+---@param glob string
+---@return string
+function M.glob_flag(glob)
+  return glob:find("%u") and "-g" or "--iglob"
+end
+
 ---@param parsed table
 ---@param opts table
 ---@return string[]|nil
@@ -53,7 +60,7 @@ function M.grep_args(parsed, opts)
   local args = { "rg", "-e", parsed.pattern }
   if parsed.glob and parsed.glob ~= "" then
     local glob = opts.shortcuts[parsed.glob] or parsed.glob
-    vim.list_extend(args, { "-g", string.format(opts.pattern, glob) })
+    vim.list_extend(args, { M.glob_flag(glob), string.format(opts.pattern, glob) })
   end
 
   return flatten({
@@ -76,9 +83,7 @@ function M.file_args(parsed)
     return nil
   end
 
-  -- Match search smart-case: lowercase glob is insensitive; uppercase opts in.
-  local glob_flag = parsed.glob:find("%u") and "-g" or "--iglob"
-  return { "rg", "--files", "--color=never", "--null", glob_flag, parsed.glob }
+  return { "rg", "--files", "--color=never", "--null", M.glob_flag(parsed.glob), parsed.glob }
 end
 
 local function new_grep_finder(opts)
