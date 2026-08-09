@@ -38,18 +38,12 @@ local function build_entries(inventory, expanded)
   for _, metadata_type in ipairs(types) do
     local type_data = inventory.types[metadata_type]
     local members = type_data.members
-    local suffix
-    if members then
-      suffix = string.format("%d cached", #members)
-    elseif type_data.error then
-      suffix = "error — Ctrl-U to retry"
-    else
-      suffix = "not cached — Ctrl-E to fetch"
-    end
 
     local is_expanded = expanded[metadata_type] == true
     local marker = is_expanded and "▾" or "▸"
-    add("type", string.format("%s %s / [%s]", marker, metadata_type, suffix), {
+    -- Keep the row ending at `/`: an exact `Type /` query then ranks this
+    -- category above all of its members for quick collapse/selection.
+    add("type", string.format("%s %s /", marker, metadata_type), {
       type = metadata_type,
       descriptor = type_data.descriptor,
       error = type_data.error,
