@@ -114,8 +114,8 @@ local function preview_lines(selected, lookup, inventory)
   local entry = entries[1]
   if not entry then
     return {
-      "Tab toggles selection · Ctrl-A toggles all",
-      "Ctrl-E expand · <CR> retrieve · Ctrl-G package.xml · Ctrl-D deploy · Ctrl-X delete · Ctrl-U refresh",
+      "Tab toggles selection · ^A toggles all · <CR> retrieves",
+      "^G package.xml · ^E expand · ^D deploy · ^X delete · ^U refresh",
     }
   end
 
@@ -441,7 +441,7 @@ function M.open()
 
   require("fzf-lua").fzf_exec(contents, {
     prompt = string.format("Metadata [%s]> ", inventory.context.org),
-    header = "Tab select | <CR> retrieve | Ctrl-G package.xml | Ctrl-E expand | Ctrl-D deploy | Ctrl-X delete | Ctrl-U refresh",
+    header = "Tab select | <CR> retrieve | ^G package.xml | ^E expand\n^D deploy | ^X delete | ^U refresh",
     fzf_opts = {
       ["--multi"] = true,
       ["--delimiter"] = "\t",

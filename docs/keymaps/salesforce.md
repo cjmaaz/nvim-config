@@ -76,6 +76,8 @@ The browser starts with collapsed metadata categories. Expand only the types you
 
 On macOS, `<C-…>` means **Control (`⌃`)**, not Command (`⌘`). Terminal applications generally intercept Command themselves and do not send it to Neovim, so these browser actions use portable Control keys.
 
+The in-picker two-line header uses compact caret notation (`^G` = `Ctrl-G`, `^E` = `Ctrl-E`, etc.) to avoid truncation on narrower windows.
+
 Category-wide selection applies to retrieval and package generation. Deploy and remote delete intentionally require explicit member selections. Deploy never adds ignore-conflict/error/warning flags automatically. Remote delete uses temporary `package.xml` / `destructiveChangesPost.xml` files below `sf_cache/metadata-browser/`, preserves local source, and does not purge the org recycle bin.
 
 `Ctrl-G` prompts for a filename, strips a supplied `.xml` suffix, and writes `manifest/shard/<name>_YYYYMMDD_HHMMSS.xml` using the project API version. Empty names, path traversal, and separators are rejected.

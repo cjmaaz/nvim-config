@@ -62,7 +62,7 @@ function M.open()
 
   require("fzf-lua").fzf_exec(files, {
     prompt = string.format("Manifests [%s]> ", ctx.org),
-    header = "<CR> retrieve | Ctrl-D deploy",
+    header = "<CR> retrieve | ^D deploy",
     cwd = dir,
     fzf_opts = {
       ["--no-multi"] = true,
