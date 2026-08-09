@@ -50,7 +50,8 @@ nvim-config/
     │   │   └── multigrep.lua # content grep + raw file-glob mode
     │   └── salesforce/
     │       ├── metadata.lua # org inventory, sf_cache, manifests, actions
-    │       └── browser.lua # fzf metadata hierarchy + multi-select
+    │       ├── browser.lua # fzf metadata hierarchy + multi-select
+    │       └── manifests.lua # search/retrieve/deploy project manifests
     └── plugins/          # one plugin (or small family) per file
         ├── init.lua      # empty list; keeps `import = "plugins"` valid
         ├── colorscheme.lua # noctis_bordo + highlight overlays

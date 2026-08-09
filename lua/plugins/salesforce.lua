@@ -40,7 +40,8 @@ local function hide_visible_sf_terms()
 end
 
 --- Cancel SF terminal jobs and background inventory regardless of window focus.
-local function cancel_sf_actions()
+local function cancel_sf_actions(opts)
+  opts = opts or {}
   local cancelled = sf_metadata().cancel_background()
 
   for _, buf in ipairs(vim.api.nvim_list_bufs()) do
@@ -55,12 +56,19 @@ local function cancel_sf_actions()
     end
   end
 
-  if cancelled == 0 then
+  if cancelled == 0 and not opts.quiet then
     vim.notify("No running Salesforce action to cancel.", vim.log.levels.INFO, { title = "sf.nvim" })
-  else
+  elseif cancelled > 0 then
     vim.notify(string.format("Cancellation requested for %d Salesforce action(s).", cancelled), vim.log.levels.WARN, {
       title = "sf.nvim",
     })
+  end
+  return cancelled
+end
+
+local function cancel_sf_or_clear_search()
+  if cancel_sf_actions({ quiet = true }) == 0 then
+    vim.cmd("nohlsearch")
   end
 end
 
@@ -253,6 +261,13 @@ return {
         end,
         desc = "SF: browse metadata",
       },
+      {
+        "<leader>SP",
+        function()
+          require("config.salesforce.manifests").open()
+        end,
+        desc = "SF: browse package manifests",
+      },
 
       -- sObjects for apex_ls completion
       {
@@ -311,32 +326,33 @@ return {
         -- auto_display_code_sign = false, -- only via <leader>Sv
       })
 
-      -- sf.nvim leaves SFTerm visible but restores focus to the source window.
-      -- Dispatch Esc globally only while that non-focused float exists.
-      vim.keymap.set("n", "<Esc>", function()
-        if not hide_visible_sf_terms() then
-          vim.cmd("nohlsearch")
-        end
-      end, { silent = true, desc = "SF: hide terminal / clear search" })
+      -- SFTerm visibility belongs to <leader>Se (q also hides when focused).
+      -- Esc cancels any foreground/background SF action; otherwise it clears search.
+      vim.keymap.set("n", "<Esc>", cancel_sf_or_clear_search, {
+        silent = true,
+        desc = "SF: cancel active actions / clear search",
+      })
 
-      -- SFTerm stays open after the job exits so output remains readable. Esc/q hide;
-      -- <leader>Sx (or normal-mode <C-c> here) cancels regardless of focus.
       vim.api.nvim_create_autocmd("FileType", {
         pattern = "SFTerm",
         callback = function(event)
           local opts = { buffer = event.buf, silent = true, desc = "SF: hide terminal" }
-          vim.keymap.set("n", "<Esc>", hide_visible_sf_terms, opts)
           vim.keymap.set("n", "q", hide_visible_sf_terms, opts)
+          vim.keymap.set("n", "<Esc>", cancel_sf_actions, {
+            buffer = event.buf,
+            silent = true,
+            desc = "SF: cancel active actions",
+          })
           vim.keymap.set("n", "<C-c>", cancel_sf_actions, {
             buffer = event.buf,
             silent = true,
             desc = "SF: cancel active actions",
           })
-          -- While the job is running you're often in terminal-mode; still hide, don't cancel.
-          vim.keymap.set("t", "<Esc>", function()
-            vim.cmd.stopinsert()
-            hide_visible_sf_terms()
-          end, opts)
+          vim.keymap.set("t", "<Esc>", cancel_sf_actions, {
+            buffer = event.buf,
+            silent = true,
+            desc = "SF: cancel active actions",
+          })
           -- Terminal-mode <C-c> remains the terminal's native interrupt.
         end,
       })

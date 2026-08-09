@@ -104,6 +104,7 @@ return {
           { pattern = "sf: list metadata types", icon = "󰀫", color = "azure" },
           { pattern = "sf: browse metadata", icon = "󰉓", color = "azure" },
           { pattern = "sf: update metadata browser", icon = "󰓅", color = "azure" },
+          { pattern = "sf: browse package manifests", icon = "󰈙", color = "azure" },
 
           -- Tests / coverage (St ST Sa SA SR Sv ]v [v) → green
           { pattern = "sf: test under cursor %+ coverage", icon = "󰝖", color = "green" },

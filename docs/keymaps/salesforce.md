@@ -51,6 +51,7 @@ Also: `:SF` then Tab for command categories.
 | `<leader>Sk` | n | List metadata types (fzf-lua) |
 | `<leader>Su` | n | Open the cached multi-select metadata browser |
 | `<leader>SU` | n | Update **Common** or **All** metadata inventory |
+| `<leader>SP` | n | Search package manifests under `manifest/` and its subdirectories |
 | `<leader>Ss` | n | Refresh SObject definitions (helps `apex_ls`) |
 | `<leader>Sc` | n | Create Apex ctags (needs `universal-ctags`) |
 
@@ -68,23 +69,39 @@ The browser starts with collapsed metadata categories. Expand only the types you
 | `<C-a>` | `⌃A` (Control-A) | Toggle all filtered entries |
 | `<C-e>` | `⌃E` (Control-E) | Expand / collapse the current category; uncached categories fetch first |
 | `<CR>` | `Return` | Retrieve selected members; a selected category retrieves all its cached members |
+| `<C-g>` | `⌃G` (Control-G) | Generate `package.xml` from selected members/categories |
 | `<C-d>` | `⌃D` (Control-D) | Deploy matching local metadata after confirmation |
 | `<C-x>` | `⌃X` (Control-X) | Remote-only delete: dry-run, typed `DELETE`, then final confirmation |
 | `<C-u>` | `⌃U` (Control-U) | Refresh the current metadata type |
 
 On macOS, `<C-…>` means **Control (`⌃`)**, not Command (`⌘`). Terminal applications generally intercept Command themselves and do not send it to Neovim, so these browser actions use portable Control keys.
 
-Category-wide selection applies to retrieval. Deploy and remote delete intentionally require explicit member selections. Deploy never adds ignore-conflict/error/warning flags automatically. Remote delete uses temporary `package.xml` / `destructiveChangesPost.xml` files below `sf_cache/metadata-browser/`, preserves local source, and does not purge the org recycle bin.
+Category-wide selection applies to retrieval and package generation. Deploy and remote delete intentionally require explicit member selections. Deploy never adds ignore-conflict/error/warning flags automatically. Remote delete uses temporary `package.xml` / `destructiveChangesPost.xml` files below `sf_cache/metadata-browser/`, preserves local source, and does not purge the org recycle bin.
+
+`Ctrl-G` prompts for a filename, strips a supplied `.xml` suffix, and writes `manifest/shard/<name>_YYYYMMDD_HHMMSS.xml` using the project API version. Empty names, path traversal, and separators are rejected.
 
 `sf_cache/` is generated project data. Add it to each Salesforce project’s `.gitignore`; this config deliberately does not modify arbitrary project repositories.
+
+---
+
+## Package manifest picker (`<leader>SP`)
+
+Opens a single-select fzf search over XML files anywhere beneath `manifest/` (including `manifest/shard/` and other subdirectories), with the manifest content in the preview.
+
+| Key | macOS key | Action |
+| --- | --- | --- |
+| `<CR>` | `Return` | Retrieve the selected manifest from the target org |
+| `<C-d>` | `⌃D` (Control-D) | Confirm, then deploy the selected manifest to the target org |
+
+Both actions run in SFTerm. Toggle the float with `<leader>Se`; cancel with `Esc` or focus-independent `<leader>Sx`.
 
 ---
 
 ## Notes
 
 - **Org flow:** `<leader>SF` refreshes orgs and common metadata for the CLI-default target. `<leader>So` selects a local target and then refreshes common metadata. `<leader>SO` changes only the global target.
-- **SFTerm** (float after deploy/retrieve/metadata): stays open so you can read output. **`Esc`** hides it even when focus was restored to the source window; focused `q` and `<leader>Se` also hide it. The job keeps running and the float may reappear when it finishes.
-- **Cancel:** `<leader>Sx` sends Ctrl-C to running SFTerm channels and stops background inventory processes without requiring `<C-w>w`. Focused terminal-mode `<C-c>` remains native. Cancellation is best-effort after Salesforce has accepted a server-side deploy job.
+- **SFTerm** (float after deploy/retrieve/metadata): stays open so you can read output. `<leader>Se` toggles it; focused `q` also hides it. `Esc` is a cancel key, not a visibility toggle.
+- **Cancel:** `Esc` and `<leader>Sx` send Ctrl-C to running SFTerm channels and stop background inventory processes without requiring `<C-w>w`, whether the float is focused, unfocused, hidden, or absent. With nothing running, normal-mode `Esc` still clears search highlighting. Focused terminal-mode `<C-c>` remains native. Cancellation is best-effort after Salesforce has accepted a server-side deploy job.
 - **fzf-lua** is installed for metadata pickers only; everyday file search remains **Telescope** (`<leader>sf` / `sg`). Needs host **`fzf`** (`brew install fzf` · `sudo pacman -S fzf`) — see [TOOLS.md](../TOOLS.md).
 - Coverage signs appear after a **coverage** test run (`ST` / `SA`) when `auto_display_code_sign` is on.
 - Optional statusline: target org + coverage appear in lualine once `sf.nvim` is loaded (`statusline.lua` / CodeOSS-style).

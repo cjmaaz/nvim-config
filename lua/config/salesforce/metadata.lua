@@ -72,6 +72,22 @@ local function atomic_write_json(path, value)
   return true
 end
 
+local function atomic_write_lines(path, lines)
+  vim.fn.mkdir(vim.fs.dirname(path), "p")
+  local tmp = string.format("%s.tmp.%s", path, (vim.uv or vim.loop).hrtime())
+  local write_ok, write_err = pcall(vim.fn.writefile, lines, tmp)
+  if not write_ok then
+    return false, write_err
+  end
+
+  local renamed, rename_err = (vim.uv or vim.loop).fs_rename(tmp, path)
+  if not renamed then
+    pcall((vim.uv or vim.loop).fs_unlink, tmp)
+    return false, rename_err
+  end
+  return true
+end
+
 local function project_root()
   local ok, root = pcall(sf_util().get_sf_root)
   if not ok or not root then
@@ -758,6 +774,49 @@ local function manifest_lines(items, api_version)
   return lines
 end
 
+local function manifest_base_name(value)
+  local name = vim.trim(tostring(value or ""))
+  name = name:gsub("%.[xX][mM][lL]$", "")
+  if name == "" then
+    return nil, "Manifest filename cannot be empty."
+  end
+  if name:find("[/\\]") or name:find("..", 1, true) or name:find("[%c]") then
+    return nil, "Use a filename only (no path separators, '..', or control characters)."
+  end
+  return name
+end
+
+function M.write_package_manifest(items, filename, opts)
+  opts = opts or {}
+  if not items or #items == 0 then
+    return nil, "Select at least one metadata member."
+  end
+
+  local name, name_err = manifest_base_name(filename)
+  if not name then
+    return nil, name_err
+  end
+
+  local ctx = context()
+  if not ctx then
+    return nil, "Salesforce project/target org unavailable."
+  end
+
+  local timestamp = opts.timestamp or os.date("%Y%m%d_%H%M%S")
+  local dir = vim.fs.joinpath(ctx.root, "manifest", "shard")
+  local path = vim.fs.joinpath(dir, string.format("%s_%s.xml", name, timestamp))
+  if (vim.uv or vim.loop).fs_stat(path) then
+    return nil, "Manifest already exists: " .. path
+  end
+
+  local api_version = ctx.api_version or FALLBACK_API_VERSION
+  local ok, write_err = atomic_write_lines(path, manifest_lines(items, api_version))
+  if not ok then
+    return nil, tostring(write_err)
+  end
+  return path
+end
+
 local function write_manifest_files(ctx, items)
   local api_version = ctx.api_version or FALLBACK_API_VERSION
   if not ctx.api_version then
@@ -802,6 +861,78 @@ local function run_in_term(args, callback)
       end)
     end
   end)
+end
+
+local function manifest_context()
+  local ctx = context()
+  if not ctx then
+    return nil
+  end
+  return vim.fs.joinpath(ctx.root, "manifest"), ctx
+end
+
+local function validate_manifest_path(path)
+  local dir, ctx = manifest_context()
+  if not dir then
+    return nil, nil, "Salesforce project/target org unavailable."
+  end
+
+  local real_dir = (vim.uv or vim.loop).fs_realpath(dir)
+  local real_path = path and (vim.uv or vim.loop).fs_realpath(path) or nil
+  if not real_dir or not real_path then
+    return nil, ctx, "Manifest file does not exist."
+  end
+  if real_path:sub(-4):lower() ~= ".xml" then
+    return nil, ctx, "Select an XML manifest."
+  end
+
+  local relative = vim.fs.relpath(real_dir, real_path)
+  if not relative or relative == ".." or relative:match("^%.%.[/\\]") then
+    return nil, ctx, "Manifest must be inside the project manifest/ directory."
+  end
+  return real_path, ctx
+end
+
+function M.manifest_dir()
+  return manifest_context()
+end
+
+function M.retrieve_manifest(path, callback)
+  local manifest, ctx, err = validate_manifest_path(path)
+  if not manifest then
+    notify(err, vim.log.levels.ERROR)
+    return false
+  end
+  run_in_term({
+    "sf",
+    "project",
+    "retrieve",
+    "start",
+    "--target-org",
+    ctx.org,
+    "--manifest",
+    manifest,
+  }, callback)
+  return true
+end
+
+function M.deploy_manifest(path, callback)
+  local manifest, ctx, err = validate_manifest_path(path)
+  if not manifest then
+    notify(err, vim.log.levels.ERROR)
+    return false
+  end
+  run_in_term({
+    "sf",
+    "project",
+    "deploy",
+    "start",
+    "--target-org",
+    ctx.org,
+    "--manifest",
+    manifest,
+  }, callback)
+  return true
 end
 
 local function action_context(items)
@@ -916,11 +1047,14 @@ function M.is_refreshing()
 end
 
 M._test = {
+  atomic_write_lines = atomic_write_lines,
   atomic_write_json = atomic_write_json,
+  manifest_base_name = manifest_base_name,
   manifest_lines = manifest_lines,
   normalize_orgs = normalize_orgs,
   safe_name = safe_name,
   shell_join = shell_join,
+  validate_manifest_path = validate_manifest_path,
 }
 
 return M

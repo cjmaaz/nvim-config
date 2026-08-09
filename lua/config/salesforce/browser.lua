@@ -115,7 +115,7 @@ local function preview_lines(selected, lookup, inventory)
   if not entry then
     return {
       "Tab toggles selection · Ctrl-A toggles all",
-      "Ctrl-E expand · <CR> retrieve · Ctrl-D deploy · Ctrl-X delete · Ctrl-U refresh",
+      "Ctrl-E expand · <CR> retrieve · Ctrl-G package.xml · Ctrl-D deploy · Ctrl-X delete · Ctrl-U refresh",
     }
   end
 
@@ -261,14 +261,10 @@ local function refresh_missing_types(types, index, done)
   end)
 end
 
-local function retrieve(entries, inventory)
+local function with_resolved_members(entries, inventory, callback)
   local members, missing = collect_retrieve_members(entries, inventory)
   if #missing == 0 then
-    if #members == 0 then
-      vim.notify("The selected metadata category is empty.", vim.log.levels.WARN, { title = "SF metadata" })
-      return
-    end
-    metadata.retrieve(members)
+    callback(members)
     return
   end
 
@@ -281,10 +277,40 @@ local function retrieve(entries, inventory)
     end
     local refreshed = metadata.load_inventory()
     local refreshed_members = refreshed and collect_retrieve_members(entries, refreshed) or {}
-    if #refreshed_members == 0 then
+    callback(refreshed_members)
+  end)
+end
+
+local function retrieve(entries, inventory)
+  with_resolved_members(entries, inventory, function(members)
+    if #members == 0 then
+      vim.notify("The selected metadata category is empty.", vim.log.levels.WARN, { title = "SF metadata" })
       return
     end
-    metadata.retrieve(refreshed_members)
+    metadata.retrieve(members)
+  end)
+end
+
+local function generate_manifest(entries, inventory)
+  with_resolved_members(entries, inventory, function(members)
+    if #members == 0 then
+      vim.notify("Select metadata members or categories first.", vim.log.levels.WARN, { title = "SF metadata" })
+      return
+    end
+
+    vim.ui.input({ prompt = "Package manifest filename: " }, function(filename)
+      if filename == nil then
+        return
+      end
+      local path, err = metadata.write_package_manifest(members, filename)
+      if not path then
+        vim.notify(err, vim.log.levels.ERROR, { title = "SF metadata" })
+        return
+      end
+      local ctx = metadata.get_context()
+      local relative = ctx and vim.fs.relpath(ctx.root, path) or path
+      vim.notify("Created " .. (relative or path), vim.log.levels.INFO, { title = "SF metadata" })
+    end)
   end)
 end
 
@@ -415,7 +441,7 @@ function M.open()
 
   require("fzf-lua").fzf_exec(contents, {
     prompt = string.format("Metadata [%s]> ", inventory.context.org),
-    header = "Tab select | <CR> retrieve | Ctrl-E expand | Ctrl-D deploy | Ctrl-X delete | Ctrl-U refresh",
+    header = "Tab select | <CR> retrieve | Ctrl-G package.xml | Ctrl-E expand | Ctrl-D deploy | Ctrl-X delete | Ctrl-U refresh",
     fzf_opts = {
       ["--multi"] = true,
       ["--delimiter"] = "\t",
@@ -453,6 +479,9 @@ function M.open()
       end,
       ["ctrl-d"] = function(selected)
         deploy(selected_entries(selected, lookup))
+      end,
+      ["ctrl-g"] = function(selected)
+        generate_manifest(selected_entries(selected, lookup), inventory)
       end,
       ["ctrl-x"] = function(selected)
         delete_remote(selected_entries(selected, lookup))
