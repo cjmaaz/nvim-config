@@ -42,9 +42,9 @@ local function build_entries(inventory, expanded)
     if members then
       suffix = string.format("%d cached", #members)
     elseif type_data.error then
-      suffix = "error — Alt-U/⌥U to retry"
+      suffix = "error — Ctrl-U to retry"
     else
-      suffix = "not cached — Alt-E/⌥E to fetch"
+      suffix = "not cached — Ctrl-E to fetch"
     end
 
     local is_expanded = expanded[metadata_type] == true
@@ -120,8 +120,8 @@ local function preview_lines(selected, lookup, inventory)
   local entry = entries[1]
   if not entry then
     return {
-      "Tab toggles selection · Alt-A/⌥A toggles all",
-      "Alt-E/⌥E expand · Enter retrieve · Alt-D/⌥D deploy · Alt-X/⌥X delete · Alt-U/⌥U refresh",
+      "Tab toggles selection · Ctrl-A toggles all",
+      "Ctrl-E expand · <CR> retrieve · Ctrl-D deploy · Ctrl-X delete · Ctrl-U refresh",
     }
   end
 
@@ -411,12 +411,22 @@ function M.open()
   local lines, lookup = build_entries(inventory, expansion_state(inventory))
   require("fzf-lua").fzf_exec(lines, {
     prompt = string.format("Metadata [%s]> ", inventory.context.org),
-    header = "Tab select | Enter retrieve | Alt-E/⌥E expand | Alt-D/⌥D deploy | Alt-X/⌥X delete | Alt-U/⌥U refresh",
+    header = "Tab select | <CR> retrieve | Ctrl-E expand | Ctrl-D deploy | Ctrl-X delete | Ctrl-U refresh",
     fzf_opts = {
       ["--multi"] = true,
       ["--delimiter"] = "\t",
       ["--with-nth"] = "3..",
       ["--scheme"] = "path",
+    },
+    keymap = {
+      fzf = {
+        ["ctrl-a"] = "toggle-all",
+        -- These defaults are replaced by metadata actions below.
+        ["ctrl-d"] = false, -- preview-page-down
+        ["ctrl-e"] = false, -- end-of-line
+        ["ctrl-u"] = false, -- preview-page-up
+        ["ctrl-x"] = false,
+      },
     },
     winopts = {
       preview = {
@@ -437,16 +447,16 @@ function M.open()
       ["default"] = function(selected)
         retrieve(selected_entries(selected, lookup), inventory)
       end,
-      ["alt-d"] = function(selected)
+      ["ctrl-d"] = function(selected)
         deploy(selected_entries(selected, lookup))
       end,
-      ["alt-x"] = function(selected)
+      ["ctrl-x"] = function(selected)
         delete_remote(selected_entries(selected, lookup))
       end,
-      ["alt-u"] = function(selected)
+      ["ctrl-u"] = function(selected)
         refresh_entry_type(selected_entries(selected, lookup))
       end,
-      ["alt-e"] = {
+      ["ctrl-e"] = {
         field_index = "{}",
         fn = function(selected)
           toggle_category(selected_entries(selected, lookup), inventory)

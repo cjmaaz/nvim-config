@@ -65,14 +65,14 @@ The browser starts with collapsed metadata categories. Expand only the types you
 | Key | macOS key | Action |
 | --- | --- | --- |
 | `<Tab>` | `Tab` | Toggle the current member or an entire category |
-| `<Alt-a>` | `⌥A` (Option-A) | Toggle all filtered entries |
-| `<Alt-e>` | `⌥E` (Option-E) | Expand / collapse the current category; uncached categories fetch first |
+| `<C-a>` | `⌃A` (Control-A) | Toggle all filtered entries |
+| `<C-e>` | `⌃E` (Control-E) | Expand / collapse the current category; uncached categories fetch first |
 | `<CR>` | `Return` | Retrieve selected members; a selected category retrieves all its cached members |
-| `<Alt-d>` | `⌥D` (Option-D) | Deploy matching local metadata after confirmation |
-| `<Alt-x>` | `⌥X` (Option-X) | Remote-only delete: dry-run, typed `DELETE`, then final confirmation |
-| `<Alt-u>` | `⌥U` (Option-U) | Refresh the current metadata type |
+| `<C-d>` | `⌃D` (Control-D) | Deploy matching local metadata after confirmation |
+| `<C-x>` | `⌃X` (Control-X) | Remote-only delete: dry-run, typed `DELETE`, then final confirmation |
+| `<C-u>` | `⌃U` (Control-U) | Refresh the current metadata type |
 
-On macOS, **Alt = Option (`⌥`)**. Control is `⌃` / `^`, which is different. Your terminal must send Option as **Alt/Meta (Esc+)**; otherwise Option-letter may insert symbols such as `∂` instead of triggering these actions.
+On macOS, `<C-…>` means **Control (`⌃`)**, not Command (`⌘`). Terminal applications generally intercept Command themselves and do not send it to Neovim, so these browser actions use portable Control keys.
 
 Category-wide selection applies to retrieval. Deploy and remote delete intentionally require explicit member selections. Deploy never adds ignore-conflict/error/warning flags automatically. Remote delete uses temporary `package.xml` / `destructiveChangesPost.xml` files below `sf_cache/metadata-browser/`, preserves local source, and does not purge the org recycle bin.
 
