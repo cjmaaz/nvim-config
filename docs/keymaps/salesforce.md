@@ -60,7 +60,7 @@ Also: `:SF` then Tab for command categories.
 
 Inventory is project-local under `sf_cache/`. `SF` and `So` automatically refresh the same configured common types as `SM`; `SU` lets you choose **Common** or **All enabled types**. The All path can take several minutes and also traverses Report, Dashboard, Document, and EmailTemplate folders.
 
-The browser starts with collapsed metadata categories. Expand only the types you need; their members render as `Type / folder / member`, so fzf patterns can match any level. Selected entries appear in the preview above the filter.
+The browser starts with collapsed metadata categories. Expand only the types you need; cached categories reload in place so the query and cursor stay put. Their members render as `Type / folder / member`, so fzf patterns can match any level. Selected entries appear in the preview above the filter.
 
 | Key | macOS key | Action |
 | --- | --- | --- |

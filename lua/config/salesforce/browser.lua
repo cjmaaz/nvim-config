@@ -204,14 +204,14 @@ local function toggle_category(entries, inventory)
     metadata.refresh_type(metadata_type, function(ok)
       if ok then
         expanded[metadata_type] = true
+        require("fzf-lua").close()
+        M.open() -- uncached data arrives asynchronously; one reopen is required
       end
-      M.open()
     end)
     return
   end
 
   expanded[metadata_type] = not expanded[metadata_type]
-  M.open()
 end
 
 local function collect_retrieve_members(entries, inventory)
@@ -408,8 +408,18 @@ function M.open()
     return
   end
 
-  local lines, lookup = build_entries(inventory, expansion_state(inventory))
-  require("fzf-lua").fzf_exec(lines, {
+  local expanded = expansion_state(inventory)
+  local lookup = {}
+  local function contents(fzf_cb)
+    local lines
+    lines, lookup = build_entries(inventory, expanded)
+    for _, line in ipairs(lines) do
+      fzf_cb(line)
+    end
+    fzf_cb()
+  end
+
+  require("fzf-lua").fzf_exec(contents, {
     prompt = string.format("Metadata [%s]> ", inventory.context.org),
     header = "Tab select | <CR> retrieve | Ctrl-E expand | Ctrl-D deploy | Ctrl-X delete | Ctrl-U refresh",
     fzf_opts = {
@@ -458,6 +468,7 @@ function M.open()
       end,
       ["ctrl-e"] = {
         field_index = "{}",
+        reload = true, -- update the list in place; preserve query/cursor and avoid flash
         fn = function(selected)
           toggle_category(selected_entries(selected, lookup), inventory)
         end,
