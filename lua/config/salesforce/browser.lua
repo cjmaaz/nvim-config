@@ -6,13 +6,22 @@
 local M = {}
 
 local metadata = require("config.salesforce.metadata")
+local expanded_by_context = {}
 
 local function type_path(full_name)
   local path = tostring(full_name or ""):gsub("/", " / "):gsub("%.", " / ")
   return path
 end
 
-local function build_entries(inventory)
+local function expansion_state(inventory)
+  local ctx = inventory.context
+  local key = table.concat({ ctx.root or "", ctx.org or "" }, "\0")
+  expanded_by_context[key] = expanded_by_context[key] or {}
+  return expanded_by_context[key]
+end
+
+local function build_entries(inventory, expanded)
+  expanded = expanded or {}
   local lines = {}
   local lookup = {}
   local next_id = 0
@@ -33,19 +42,21 @@ local function build_entries(inventory)
     if members then
       suffix = string.format("%d cached", #members)
     elseif type_data.error then
-      suffix = "error — Alt-U to retry"
+      suffix = "error — Alt-U/⌥U to retry"
     else
-      suffix = "not cached — Enter to fetch"
+      suffix = "not cached — Alt-E/⌥E to fetch"
     end
 
-    add("type", string.format("▸ %s / [%s]", metadata_type, suffix), {
+    local is_expanded = expanded[metadata_type] == true
+    local marker = is_expanded and "▾" or "▸"
+    add("type", string.format("%s %s / [%s]", marker, metadata_type, suffix), {
       type = metadata_type,
       descriptor = type_data.descriptor,
       error = type_data.error,
       fetched = type_data.fetched,
     })
 
-    if members then
+    if members and is_expanded then
       table.sort(members, function(a, b)
         return tostring(a.fullName):lower() < tostring(b.fullName):lower()
       end)
@@ -109,8 +120,8 @@ local function preview_lines(selected, lookup, inventory)
   local entry = entries[1]
   if not entry then
     return {
-      "Tab toggles selection · Alt-A toggles all",
-      "Enter retrieve · Alt-D deploy · Alt-X remote delete · Alt-U refresh type",
+      "Tab toggles selection · Alt-A/⌥A toggles all",
+      "Alt-E/⌥E expand · Enter retrieve · Alt-D/⌥D deploy · Alt-X/⌥X delete · Alt-U/⌥U refresh",
     }
   end
 
@@ -119,7 +130,9 @@ local function preview_lines(selected, lookup, inventory)
     lines[#lines + 1] = value.type
     lines[#lines + 1] = string.rep("─", #value.type)
     local type_data = inventory.types[value.type]
+    lines[#lines + 1] = "Expanded: " .. tostring(expansion_state(inventory)[value.type] == true)
     lines[#lines + 1] = "Cached members: " .. tostring(type_data.members and #type_data.members or 0)
+    lines[#lines + 1] = "Selecting this category retrieves every cached member."
     lines[#lines + 1] = "Fetched: " .. tostring(value.fetched and value.fetched.at or "never")
     if value.error then
       lines[#lines + 1] = "Error: " .. tostring(value.error)
@@ -170,24 +183,125 @@ local function selection_summary(ctx, members, verb)
   return table.concat(lines, "\n")
 end
 
-local function refresh_entry_type(entries)
+local function entry_type(entry)
+  return entry and entry.value and entry.value.type or nil
+end
+
+local function toggle_category(entries, inventory)
   local entry = entries[1]
   if not entry then
     return
   end
-  local metadata_type = entry.value.type
-  metadata.refresh_type(metadata_type, function()
-    M.open()
+
+  local metadata_type = entry_type(entry)
+  local type_data = metadata_type and inventory.types[metadata_type] or nil
+  if not type_data then
+    return
+  end
+
+  local expanded = expansion_state(inventory)
+  if type_data.members == nil then
+    metadata.refresh_type(metadata_type, function(ok)
+      if ok then
+        expanded[metadata_type] = true
+      end
+      M.open()
+    end)
+    return
+  end
+
+  expanded[metadata_type] = not expanded[metadata_type]
+  M.open()
+end
+
+local function collect_retrieve_members(entries, inventory)
+  local members = {}
+  local missing = {}
+  local seen = {}
+
+  local function add(member)
+    local id = string.format("%s:%s", member.type, member.fullName)
+    if not seen[id] then
+      seen[id] = true
+      members[#members + 1] = member
+    end
+  end
+
+  for _, entry in ipairs(entries) do
+    if entry.kind == "member" then
+      add(entry.value)
+    elseif entry.kind == "type" then
+      local metadata_type = entry.value.type
+      local type_members = inventory.types[metadata_type].members
+      if type_members == nil then
+        missing[#missing + 1] = metadata_type
+      else
+        for _, member in ipairs(type_members) do
+          add({
+            type = member.type or metadata_type,
+            fullName = member.fullName,
+            fileName = member.fileName,
+            manageableState = member.manageableState,
+            namespacePrefix = member.namespacePrefix,
+            raw = member,
+          })
+        end
+      end
+    end
+  end
+
+  return members, missing
+end
+
+local function refresh_missing_types(types, index, done)
+  if index > #types then
+    done(true)
+    return
+  end
+  metadata.refresh_type(types[index], function(ok)
+    if not ok then
+      done(false)
+      return
+    end
+    refresh_missing_types(types, index + 1, done)
   end)
 end
 
-local function retrieve(entries)
-  local members = member_values(entries)
-  if #members == 0 then
-    refresh_entry_type(entries)
+local function retrieve(entries, inventory)
+  local members, missing = collect_retrieve_members(entries, inventory)
+  if #missing == 0 then
+    if #members == 0 then
+      vim.notify("The selected metadata category is empty.", vim.log.levels.WARN, { title = "SF metadata" })
+      return
+    end
+    metadata.retrieve(members)
     return
   end
-  metadata.retrieve(members)
+
+  refresh_missing_types(missing, 1, function(ok)
+    if not ok then
+      vim.notify("Could not cache every selected metadata category.", vim.log.levels.ERROR, {
+        title = "SF metadata",
+      })
+      return
+    end
+    local refreshed = metadata.load_inventory()
+    local refreshed_members = refreshed and collect_retrieve_members(entries, refreshed) or {}
+    if #refreshed_members == 0 then
+      return
+    end
+    metadata.retrieve(refreshed_members)
+  end)
+end
+
+local function refresh_entry_type(entries)
+  local metadata_type = entry_type(entries[1])
+  if not metadata_type then
+    return
+  end
+  metadata.refresh_type(metadata_type, function()
+    M.open()
+  end)
 end
 
 local function deploy(entries)
@@ -294,10 +408,10 @@ function M.open()
     return
   end
 
-  local lines, lookup = build_entries(inventory)
+  local lines, lookup = build_entries(inventory, expansion_state(inventory))
   require("fzf-lua").fzf_exec(lines, {
     prompt = string.format("Metadata [%s]> ", inventory.context.org),
-    header = "Tab select | Enter retrieve/fetch | Alt-D deploy | Alt-X remote delete | Alt-U refresh type",
+    header = "Tab select | Enter retrieve | Alt-E/⌥E expand | Alt-D/⌥D deploy | Alt-X/⌥X delete | Alt-U/⌥U refresh",
     fzf_opts = {
       ["--multi"] = true,
       ["--delimiter"] = "\t",
@@ -321,7 +435,7 @@ function M.open()
     },
     actions = {
       ["default"] = function(selected)
-        retrieve(selected_entries(selected, lookup))
+        retrieve(selected_entries(selected, lookup), inventory)
       end,
       ["alt-d"] = function(selected)
         deploy(selected_entries(selected, lookup))
@@ -332,12 +446,19 @@ function M.open()
       ["alt-u"] = function(selected)
         refresh_entry_type(selected_entries(selected, lookup))
       end,
+      ["alt-e"] = {
+        field_index = "{}",
+        fn = function(selected)
+          toggle_category(selected_entries(selected, lookup), inventory)
+        end,
+      },
     },
   })
 end
 
 M._test = {
   build_entries = build_entries,
+  collect_retrieve_members = collect_retrieve_members,
   destructive_members = destructive_members,
   member_values = member_values,
   preview_lines = preview_lines,

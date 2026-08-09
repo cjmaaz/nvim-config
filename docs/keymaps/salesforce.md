@@ -60,20 +60,21 @@ Also: `:SF` then Tab for command categories.
 
 Inventory is project-local under `sf_cache/`. `SF` and `So` automatically refresh the same configured common types as `SM`; `SU` lets you choose **Common** or **All enabled types**. The All path can take several minutes and also traverses Report, Dashboard, Document, and EmailTemplate folders.
 
-The browser renders paths as `Type / folder / member`, so fzf patterns can match any level. Selected entries appear in the preview above the filter.
+The browser starts with collapsed metadata categories. Expand only the types you need; their members render as `Type / folder / member`, so fzf patterns can match any level. Selected entries appear in the preview above the filter.
 
 | Key | macOS key | Action |
 | --- | --- | --- |
-| `<Tab>` | `Tab` | Toggle the current metadata member |
+| `<Tab>` | `Tab` | Toggle the current member or an entire category |
 | `<Alt-a>` | `⌥A` (Option-A) | Toggle all filtered entries |
-| `<CR>` | `Return` | Retrieve selected members; on an uncached type row, fetch that type |
+| `<Alt-e>` | `⌥E` (Option-E) | Expand / collapse the current category; uncached categories fetch first |
+| `<CR>` | `Return` | Retrieve selected members; a selected category retrieves all its cached members |
 | `<Alt-d>` | `⌥D` (Option-D) | Deploy matching local metadata after confirmation |
 | `<Alt-x>` | `⌥X` (Option-X) | Remote-only delete: dry-run, typed `DELETE`, then final confirmation |
 | `<Alt-u>` | `⌥U` (Option-U) | Refresh the current metadata type |
 
 On macOS, **Alt = Option (`⌥`)**. Control is `⌃` / `^`, which is different. Your terminal must send Option as **Alt/Meta (Esc+)**; otherwise Option-letter may insert symbols such as `∂` instead of triggering these actions.
 
-Deploy never adds ignore-conflict/error/warning flags automatically. Remote delete uses temporary `package.xml` / `destructiveChangesPost.xml` files below `sf_cache/metadata-browser/`, preserves local source, and does not purge the org recycle bin.
+Category-wide selection applies to retrieval. Deploy and remote delete intentionally require explicit member selections. Deploy never adds ignore-conflict/error/warning flags automatically. Remote delete uses temporary `package.xml` / `destructiveChangesPost.xml` files below `sf_cache/metadata-browser/`, preserves local source, and does not purge the org recycle bin.
 
 `sf_cache/` is generated project data. Add it to each Salesforce project’s `.gitignore`; this config deliberately does not modify arbitrary project repositories.
 
