@@ -105,8 +105,20 @@ return {
       }
 
       local hl = vim.api.nvim_set_hl
+      local chrome = require("config.ui_chrome")
       local function has(style_tbl, key)
         return style_tbl and style_tbl[key] == true
+      end
+
+      -- Give unowned floats the same inset Bordo panel used by plugin UIs.
+      local function apply_float_chrome()
+        local float_bg = opts.transparent and "NONE" or chrome.panel_bg
+        hl(0, "NormalFloat", { fg = chrome.panel_fg, bg = float_bg })
+        -- hl(0, "NormalFloat", { link = "Normal" }) -- let floats blend into the editor
+        hl(0, "FloatBorder", { fg = chrome.divider_fg, bg = float_bg })
+        -- hl(0, "FloatBorder", { fg = chrome.border_fg, bg = float_bg }) -- rose outline
+        hl(0, "FloatTitle", { fg = chrome.title_fg, bg = float_bg, bold = true })
+        hl(0, "FloatFooter", { fg = chrome.muted_fg, bg = float_bg })
       end
 
       -- Comments → italic
@@ -210,6 +222,13 @@ return {
         vim.g.terminal_color_14 = pal.cyan
         vim.g.terminal_color_15 = pal.fg
       end
+
+      -- Apply after transparent/theme overrides; re-apply after runtime switches.
+      apply_float_chrome()
+      vim.api.nvim_create_autocmd("ColorScheme", {
+        group = vim.api.nvim_create_augroup("user_float_chrome", { clear = true }),
+        callback = apply_float_chrome,
+      })
     end,
   },
 

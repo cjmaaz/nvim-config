@@ -16,6 +16,11 @@ opt.laststatus = 3 -- one global statusline (best with lualine)
 -- opt.laststatus = 2 -- one statusline per window (busier with splits)
 -- opt.laststatus = 0 -- hide statusline entirely
 
+-- Default frame for floating windows that do not choose their own border.
+opt.winborder = "rounded" -- consistent soft boxes for diagnostics, menus, and prompts
+-- opt.winborder = "single" -- square corners with the same one-cell outline
+-- opt.winborder = "none" -- let floats blend into the editor background
+
 -- Always reserve the gutter for signs (gitsigns, diagnostics) so text does not jump.
 opt.signcolumn = "yes"
 -- opt.signcolumn = "auto" -- only show the column when a sign is present

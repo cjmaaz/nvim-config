@@ -42,6 +42,17 @@ return {
       local telescope = require("telescope")
       local actions = require("telescope.actions")
 
+      -- Keep the framed picker readable without a Nerd Font.
+      local picker_icons = vim.g.have_nerd_font and {
+        prompt = "  ",
+        caret = " ",
+        multi = "󰄬",
+      } or {
+        prompt = "> ",
+        caret = "> ",
+        multi = "+",
+      }
+
       --- Soft Bordo-dark panel (shared with which-key / neo-tree).
       local function apply_telescope_hl()
         local chrome = require("config.ui_chrome")
@@ -70,13 +81,56 @@ return {
         vim.api.nvim_set_hl(0, "TelescopeSelection", { fg = chrome.divider_fg, bg = chrome.active_bg, bold = true })
         vim.api.nvim_set_hl(0, "TelescopeSelectionCaret", { fg = border, bg = chrome.active_bg, bold = true })
         vim.api.nvim_set_hl(0, "TelescopeMultiSelection", { fg = chrome.title_fg, bg = chrome.active_bg })
+        vim.api.nvim_set_hl(0, "TelescopeMultiIcon", { fg = chrome.title_fg, bg = chrome.active_bg, bold = true })
         vim.api.nvim_set_hl(0, "TelescopeMatching", { fg = chrome.title_fg, bold = true })
         vim.api.nvim_set_hl(0, "TelescopePromptPrefix", { fg = border, bg = bg, bold = true })
+        vim.api.nvim_set_hl(0, "TelescopePromptCounter", { fg = chrome.muted_fg, bg = bg })
+        vim.api.nvim_set_hl(0, "TelescopePreviewLine", { fg = chrome.divider_fg, bg = chrome.active_bg })
+        vim.api.nvim_set_hl(0, "TelescopePreviewMatch", { fg = chrome.title_fg, bg = chrome.active_bg, bold = true })
         -- vim.api.nvim_set_hl(0, "TelescopeNormal", { link = "NormalFloat" }) -- theme default floats
       end
 
       telescope.setup({
         defaults = {
+          -- Framed results + preview grid, matching the video's layout.
+          layout_strategy = "horizontal",
+          -- layout_strategy = "vertical", -- stack preview above results on narrow screens
+          layout_config = {
+            width = 0.90, -- roomy without touching the screen edges
+            -- width = 0.80, -- Telescope default; more surrounding editor remains visible
+            height = 0.85, -- enough rows for results and code preview
+            -- height = 0.70, -- more compact framed picker
+            prompt_position = "bottom", -- match the reference's input box below results
+            -- prompt_position = "top", -- conventional search-first reading order
+            horizontal = {
+              preview_width = 0.55, -- give code a little more room than the result list
+              -- preview_width = 0.50, -- equal-width results and preview panes
+              preview_cutoff = 90, -- hide preview before the two-pane grid becomes cramped
+              -- preview_cutoff = 120, -- Telescope default; hide preview sooner
+            },
+          },
+
+          -- Keep all three picker panes visibly boxed.
+          border = true,
+          -- border = false, -- flatter picker with no pane outlines
+          borderchars = {
+            prompt = { "─", "│", "─", "│", "╭", "╮", "╯", "╰" },
+            results = { "─", "│", "─", "│", "╭", "╮", "╯", "╰" },
+            preview = { "─", "│", "─", "│", "╭", "╮", "╯", "╰" },
+          },
+
+          -- Icon-rich prompt, selected row, and multi-selection marker.
+          prompt_prefix = picker_icons.prompt,
+          selection_caret = picker_icons.caret,
+          multi_icon = picker_icons.multi,
+          entry_prefix = "  ",
+
+          -- Show the selected file/symbol in the preview pane's border.
+          dynamic_preview_title = true,
+          -- dynamic_preview_title = false, -- keep a static generic preview title
+          results_title = " Results ",
+          -- results_title = false, -- hide the results label for cleaner borders
+
           path_display = { "smart" }, -- shorten long paths intelligently
           -- path_display = { "truncate" }, -- cut the middle of long paths
           -- path_display = { "absolute" }, -- full paths (noisy in big monorepos)

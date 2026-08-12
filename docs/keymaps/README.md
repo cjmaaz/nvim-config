@@ -48,7 +48,8 @@ Defined in `init.lua`.
 | Bufferline | Matching Bordo active-buffer treatment; cycle with `<S-h>` / `<S-l>` — [core.md](./core.md) |
 | neo-tree | `<leader>fe` · `<leader>fE` · `<leader>ge` — [explorer.md](./explorer.md) |
 | Lazygit | `<leader>gg` · `<leader>gf` — [git.md](./git.md) |
-| Telescope | `<leader>sf` · `<leader>sg` · `<leader><leader>` — [telescope.md](./telescope.md) |
+| Telescope | Rounded prompt/results/preview grid with icons; `<leader>sf` · `<leader>sg` · `<leader><leader>` — [telescope.md](./telescope.md) |
+| Floating windows | Rounded Bordo frame by default; plugin-specific windows may override it |
 | Diagnostics | `]d`/`[d` · `<leader>e` · Trouble `<leader>xx` — [core.md](./core.md#diagnostics) · [qol.md](./qol.md) · [diagnostics/](../diagnostics/README.md) |
 | Treesitter / indent / pairs | Highlight, folds, guides, autopairs — [treesitter.md](./treesitter.md) |
 | LSP / format / blink | `gd`/`K`/`gr` · `<leader>cf` · `<C-y>` — [lsp.md](./lsp.md) |
@@ -56,7 +57,7 @@ Defined in `init.lua`.
 | Salesforce | `<leader>S…` · metadata `Su` · manifests `SP` · deploy `Sp` · cancel `Sx` — [salesforce.md](./salesforce.md) |
 | Comment / TODO / crumbs | `gcc` · `]t`/`[t` · `<leader>st` · dropbar `<leader>;` — [comment.md](./comment.md) |
 | QoL | sessions · Trouble · surround · flash · undotree · yanky · dial · rainbow · colorizer · space dots — [qol.md](./qol.md) |
-| Colorscheme | `noctis_bordo` — `lua/plugins/colorscheme.lua` |
+| Colorscheme | `noctis_bordo` + shared inset float chrome — `lua/plugins/colorscheme.lua` |
 | which-key | `<Space>` then wait — [which-key.md](./which-key.md) |
 | Plugin manager | `:Lazy` |
 
