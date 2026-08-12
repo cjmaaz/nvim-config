@@ -66,6 +66,16 @@ Label-jump (`folke/flash.nvim`). Mapped on **`gs`/`gS`** so stock `s` (substitut
 
 ---
 
+## Cursor animation (`lua/plugins/cursor.lua`)
+
+`smear-cursor.nvim` animates long cursor jumps between buffers and windows in terminal Neovim. The calm preset keeps ordinary neighboring-line and insert-mode movement static; commented options in `cursor.lua` enable the full smear effect.
+
+Command: `:SmearCursorToggle`. Neovide skips the plugin because it already has native cursor animation.
+
+Terminal animation is character-cell based and can briefly obscure text while moving. `legacy_computing_symbols_support` stays off unless the active font supports U+1FB00–U+1FBFF.
+
+---
+
 ## Undotree (`lua/plugins/undotree.lua`)
 
 Visual undo history. Needs `opt.undofile = true` (already on in `options.lua`).

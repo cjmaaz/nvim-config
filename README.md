@@ -57,6 +57,7 @@ nvim-config/
         ├── colorscheme.lua # noctis_bordo + highlight overlays
         ├── statusline.lua  # responsive Bordo lualine + icons
         ├── bufferline.lua # matching buffer bar (not tabpages)
+        ├── cursor.lua     # calm smear animation across buffers/windows
         ├── explorer.lua  # neo-tree file / git explorer
         ├── telescope.lua # fuzzy find / grep / buffers
         ├── treesitter.lua # parsers, highlight, folds, autotag
