@@ -1,12 +1,84 @@
 --------------------------------------------------------------------------------
--- Salesforce metadata browser — fzf-lua path hierarchy + multi-select actions
--- Selected items render in the upper preview; inventory comes from project sf_cache.
+-- Salesforce metadata browser — fzf hierarchy, upper details, right selections
+-- Inventory and member audit fields come from the project-local sf_cache.
 --------------------------------------------------------------------------------
 
 local M = {}
 
 local metadata = require("config.salesforce.metadata")
 local expanded_by_context = {}
+local browser_highlights_registered = false
+
+local function apply_browser_highlights()
+  local chrome = require("config.ui_chrome")
+  vim.api.nvim_set_hl(0, "SFMetadataTitle", { fg = chrome.title_fg, bold = true })
+  vim.api.nvim_set_hl(0, "SFMetadataLabel", { fg = chrome.muted_fg })
+  vim.api.nvim_set_hl(0, "SFMetadataValue", { fg = chrome.panel_fg })
+  vim.api.nvim_set_hl(0, "SFMetadataDate", { fg = "#7BE6AB" })
+  vim.api.nvim_set_hl(0, "SFMetadataCategory", { fg = chrome.border_fg, bold = true })
+  vim.api.nvim_set_hl(0, "SFMetadataMember", { fg = "#4CA1B3" })
+  vim.api.nvim_set_hl(0, "SFMetadataSelectedNormal", { fg = chrome.panel_fg, bg = chrome.panel_bg })
+  vim.api.nvim_set_hl(0, "SFMetadataSelectedBorder", { fg = chrome.divider_fg, bg = chrome.panel_bg })
+  vim.api.nvim_set_hl(0, "SFMetadataSelectedTitle", { fg = chrome.title_fg, bg = chrome.panel_bg, bold = true })
+
+  if not browser_highlights_registered then
+    browser_highlights_registered = true
+    vim.api.nvim_create_autocmd("ColorScheme", {
+      group = vim.api.nvim_create_augroup("sf_metadata_browser_hl", { clear = true }),
+      callback = apply_browser_highlights,
+    })
+  end
+end
+
+local function ansi(group, text)
+  local ok, utils = pcall(require, "fzf-lua.utils")
+  if not ok then
+    return tostring(text)
+  end
+  local colored = utils.ansi_from_hl(group, tostring(text))
+  return colored
+end
+
+local function detail_field(label, value, value_group)
+  return ansi("SFMetadataLabel", label .. ": ") .. ansi(value_group or "SFMetadataValue", value or "—")
+end
+
+local selected_pane = {
+  buf = nil,
+  win = nil,
+  group = nil,
+  fzf_win = nil,
+  entries = {},
+  inventory = nil,
+  reposition_pending = false,
+}
+local selected_ns = vim.api.nvim_create_namespace("sf_metadata_selected")
+local render_selected_pane
+
+local function close_selected_pane()
+  if selected_pane.group then
+    pcall(vim.api.nvim_del_augroup_by_id, selected_pane.group)
+  end
+  if selected_pane.win and vim.api.nvim_win_is_valid(selected_pane.win) then
+    pcall(vim.api.nvim_win_close, selected_pane.win, true)
+  end
+  if selected_pane.buf and vim.api.nvim_buf_is_valid(selected_pane.buf) then
+    pcall(vim.api.nvim_buf_delete, selected_pane.buf, { force = true })
+  end
+  selected_pane.buf = nil
+  selected_pane.win = nil
+  selected_pane.group = nil
+  selected_pane.fzf_win = nil
+  selected_pane.entries = {}
+  selected_pane.inventory = nil
+  selected_pane.reposition_pending = false
+end
+
+local function comma_number(value)
+  local reversed = tostring(value or 0):reverse():gsub("(%d%d%d)", "%1,")
+  local formatted = reversed:reverse():gsub("^,", "")
+  return formatted
+end
 
 local function type_path(full_name)
   local path = tostring(full_name or ""):gsub("/", " / "):gsub("%.", " / ")
@@ -20,17 +92,19 @@ local function expansion_state(inventory)
   return expanded_by_context[key]
 end
 
+local function stable_entry_id(kind, value)
+  return vim.fn.sha256(table.concat({ kind, value.type or "", value.fullName or "" }, "\0"))
+end
+
 local function build_entries(inventory, expanded)
   expanded = expanded or {}
   local lines = {}
   local lookup = {}
-  local next_id = 0
   local types = vim.tbl_keys(inventory.types)
   table.sort(types)
 
   local function add(kind, display, value)
-    next_id = next_id + 1
-    local id = tostring(next_id)
+    local id = stable_entry_id(kind, value)
     lookup[id] = { kind = kind, display = display, value = value }
     lines[#lines + 1] = table.concat({ id, kind, display }, "\t")
   end
@@ -87,6 +161,20 @@ local function selected_entries(selected, lookup)
   return entries
 end
 
+local function update_selected_pane(payload, lookup, inventory)
+  local count = tonumber(payload and payload[#payload]) or 0
+  local selected = {}
+  if count > 0 and payload[1] then
+    local ok, lines = pcall(vim.fn.readfile, payload[1])
+    if ok then
+      selected = selected_entries(lines, lookup)
+    end
+  end
+  selected_pane.entries = selected
+  selected_pane.inventory = inventory
+  render_selected_pane()
+end
+
 local function member_values(entries)
   local values = {}
   for _, entry in ipairs(entries) do
@@ -97,51 +185,214 @@ local function member_values(entries)
   return values
 end
 
-local function preview_lines(selected, lookup, inventory)
-  local entries = selected_entries(selected, lookup)
+local function selected_pane_lines(entries, inventory, max_lines)
   local lines = {}
-  local members = member_values(entries)
+  local groups = {}
+  max_lines = math.max(max_lines or 1, 1)
 
-  if #members > 0 then
-    lines[#lines + 1] = string.format("Selected metadata (%d)", #members)
-    lines[#lines + 1] = string.rep("─", 42)
-    for _, member in ipairs(members) do
-      lines[#lines + 1] = string.format("• %s:%s", member.type, member.fullName)
+  for _, entry in ipairs(entries) do
+    if #lines >= max_lines then
+      break
     end
-    return lines
+    if entry.kind == "type" then
+      local metadata_type = entry.value.type
+      local type_data = inventory.types[metadata_type]
+      local count = type_data and type_data.members and #type_data.members or 0
+      lines[#lines + 1] = string.format("▸ %s — all %s cached members", metadata_type, comma_number(count))
+      groups[#groups + 1] = "SFMetadataCategory"
+    else
+      lines[#lines + 1] = string.format("• %s:%s", entry.value.type, entry.value.fullName)
+      groups[#groups + 1] = "SFMetadataMember"
+    end
   end
 
+  if #entries > #lines then
+    if #lines == max_lines then
+      lines[#lines] = string.format("… %s more selected", comma_number(#entries - max_lines + 1))
+      groups[#groups] = "SFMetadataLabel"
+    else
+      lines[#lines + 1] = string.format("… %s more selected", comma_number(#entries - #lines))
+      groups[#groups + 1] = "SFMetadataLabel"
+    end
+  end
+  if #lines == 0 then
+    lines[1] = "No metadata selected"
+    groups[1] = "SFMetadataLabel"
+  end
+  return lines, groups
+end
+
+render_selected_pane = function()
+  if not selected_pane.buf or not vim.api.nvim_buf_is_valid(selected_pane.buf) then
+    return
+  end
+  local height = selected_pane.win
+      and vim.api.nvim_win_is_valid(selected_pane.win)
+      and vim.api.nvim_win_get_height(selected_pane.win)
+    or 20
+  local lines, groups = selected_pane_lines(selected_pane.entries, selected_pane.inventory, height)
+
+  vim.bo[selected_pane.buf].modifiable = true
+  vim.api.nvim_buf_set_lines(selected_pane.buf, 0, -1, false, lines)
+  vim.api.nvim_buf_clear_namespace(selected_pane.buf, selected_ns, 0, -1)
+  for index, group in ipairs(groups) do
+    vim.api.nvim_buf_add_highlight(selected_pane.buf, selected_ns, group, index - 1, 0, -1)
+  end
+  vim.bo[selected_pane.buf].modifiable = false
+
+  if selected_pane.win and vim.api.nvim_win_is_valid(selected_pane.win) then
+    local config = vim.api.nvim_win_get_config(selected_pane.win)
+    config.title = string.format(" Selected metadata (%s) ", comma_number(#selected_pane.entries))
+    config.title_pos = "center"
+    vim.api.nvim_win_set_config(selected_pane.win, config)
+  end
+end
+
+local function place_selected_pane()
+  local fzf_win = selected_pane.fzf_win
+  if not fzf_win or not vim.api.nvim_win_is_valid(fzf_win) then
+    return
+  end
+
+  local wins = { fzf_win }
+  local ok, fzf_utils = pcall(require, "fzf-lua.utils")
+  local winobj = ok and fzf_utils.fzf_winobj() or nil
+  if winobj and winobj.preview_winid and vim.api.nvim_win_is_valid(winobj.preview_winid) then
+    wins[#wins + 1] = winobj.preview_winid
+  end
+
+  local top = vim.o.lines
+  local bottom = 0
+  local right = 0
+  for _, win in ipairs(wins) do
+    local pos = vim.api.nvim_win_get_position(win)
+    top = math.min(top, math.max(pos[1] - 1, 0))
+    bottom = math.max(bottom, pos[1] + vim.api.nvim_win_get_height(win) + 1)
+    right = math.max(right, pos[2] + vim.api.nvim_win_get_width(win) + 2)
+  end
+
+  local width = vim.o.columns - right - 2
+  local max_bottom = vim.o.lines - vim.o.cmdheight - 1
+  local height = math.min(bottom, max_bottom) - top
+  local too_narrow = vim.o.columns < 100 or width < 24 or height < 8 or (winobj and winobj.fullscreen)
+  if too_narrow then
+    if selected_pane.win and vim.api.nvim_win_is_valid(selected_pane.win) then
+      vim.api.nvim_win_close(selected_pane.win, true)
+    end
+    selected_pane.win = nil
+    return
+  end
+
+  if not selected_pane.buf or not vim.api.nvim_buf_is_valid(selected_pane.buf) then
+    selected_pane.buf = vim.api.nvim_create_buf(false, true)
+    vim.bo[selected_pane.buf].buftype = "nofile"
+    vim.bo[selected_pane.buf].bufhidden = "wipe"
+    vim.bo[selected_pane.buf].swapfile = false
+    vim.bo[selected_pane.buf].filetype = "sfmetadata-selected"
+  end
+
+  local config = {
+    relative = "editor",
+    row = top,
+    col = right,
+    width = width,
+    height = height,
+    style = "minimal",
+    border = "rounded",
+    title = string.format(" Selected metadata (%s) ", comma_number(#selected_pane.entries)),
+    title_pos = "center",
+    focusable = false,
+    mouse = false,
+    zindex = 51,
+  }
+  if selected_pane.win and vim.api.nvim_win_is_valid(selected_pane.win) then
+    vim.api.nvim_win_set_config(selected_pane.win, config)
+  else
+    selected_pane.win = vim.api.nvim_open_win(selected_pane.buf, false, config)
+    vim.wo[selected_pane.win].wrap = false
+    vim.wo[selected_pane.win].cursorline = false
+    vim.wo[selected_pane.win].winhighlight =
+      "Normal:SFMetadataSelectedNormal,NormalFloat:SFMetadataSelectedNormal,FloatBorder:SFMetadataSelectedBorder,FloatTitle:SFMetadataSelectedTitle"
+  end
+  render_selected_pane()
+end
+
+local function schedule_selected_pane()
+  if selected_pane.reposition_pending then
+    return
+  end
+  selected_pane.reposition_pending = true
+  vim.schedule(function()
+    selected_pane.reposition_pending = false
+    place_selected_pane()
+  end)
+end
+
+local function open_selected_pane(event, inventory)
+  close_selected_pane()
+  selected_pane.fzf_win = event.winid
+  selected_pane.inventory = inventory
+  selected_pane.group = vim.api.nvim_create_augroup("sf_metadata_selected_pane", { clear = true })
+  vim.api.nvim_create_autocmd({ "VimResized", "WinResized" }, {
+    group = selected_pane.group,
+    callback = schedule_selected_pane,
+  })
+  vim.defer_fn(schedule_selected_pane, 10)
+end
+
+local function detail_lines(current, lookup, inventory)
+  local entries = selected_entries(current, lookup)
+  local lines = {}
   local entry = entries[1]
   if not entry then
     return {
-      "Tab toggles selection · ^A toggles all · <CR> retrieves",
-      "^G package.xml · ^E expand · ^D deploy · ^X delete · ^U refresh",
+      ansi("SFMetadataTitle", "Metadata details"),
+      detail_field("Focus", "Move onto a category or member"),
     }
   end
 
   if entry.kind == "type" then
     local value = entry.value
-    lines[#lines + 1] = value.type
-    lines[#lines + 1] = string.rep("─", #value.type)
+    local descriptor = value.descriptor or {}
     local type_data = inventory.types[value.type]
-    lines[#lines + 1] = "Expanded: " .. tostring(expansion_state(inventory)[value.type] == true)
-    lines[#lines + 1] = "Cached members: " .. tostring(type_data.members and #type_data.members or 0)
-    lines[#lines + 1] = "Selecting this category retrieves every cached member."
-    lines[#lines + 1] = "Fetched: " .. tostring(value.fetched and value.fetched.at or "never")
+    local fetched_at = value.fetched and value.fetched.at
+
+    lines[#lines + 1] = ansi("SFMetadataTitle", "Category · " .. value.type)
+    lines[#lines + 1] = ansi("SFMetadataLabel", string.rep("─", 50))
+    lines[#lines + 1] = detail_field("XML name", descriptor.xmlName or value.type)
+    lines[#lines + 1] = detail_field("Directory", descriptor.directoryName)
+    lines[#lines + 1] = detail_field("Suffix", descriptor.suffix)
+    lines[#lines + 1] = detail_field("Folder based", tostring(descriptor.inFolder == true))
+    lines[#lines + 1] = detail_field("Requires meta file", tostring(descriptor.metaFile == true))
+    lines[#lines + 1] = detail_field("Expanded", tostring(expansion_state(inventory)[value.type] == true))
+    lines[#lines + 1] = detail_field("Cached members", tostring(type_data.members and #type_data.members or 0))
+    lines[#lines + 1] = detail_field(
+      "Fetched",
+      fetched_at and os.date("%Y-%m-%d %H:%M:%S", fetched_at) or "never",
+      fetched_at and "SFMetadataDate" or nil
+    )
+    lines[#lines + 1] = detail_field(
+      "Child metadata",
+      type(descriptor.childXmlNames) == "table" and table.concat(descriptor.childXmlNames, ", ") or nil
+    )
     if value.error then
-      lines[#lines + 1] = "Error: " .. tostring(value.error)
+      lines[#lines + 1] = detail_field("Error", tostring(value.error), "DiagnosticError")
     end
     return lines
   end
 
   local value = entry.value
-  lines[#lines + 1] = string.format("%s:%s", value.type, value.fullName)
-  lines[#lines + 1] = string.rep("─", 42)
-  lines[#lines + 1] = "File: " .. tostring(value.fileName or "—")
-  lines[#lines + 1] = "State: " .. tostring(value.manageableState or "—")
-  lines[#lines + 1] = "Namespace: " .. tostring(value.namespacePrefix or "—")
-  lines[#lines + 1] = "Modified by: " .. tostring(value.lastModifiedByName or "—")
-  lines[#lines + 1] = "Modified at: " .. tostring(value.lastModifiedDate or "—")
+  local raw = value.raw or {}
+  lines[#lines + 1] = ansi("SFMetadataTitle", string.format("%s:%s", value.type, value.fullName))
+  lines[#lines + 1] = ansi("SFMetadataLabel", string.rep("─", 50))
+  lines[#lines + 1] = detail_field("File", value.fileName or raw.fileName)
+  lines[#lines + 1] = detail_field("Metadata ID", raw.id)
+  lines[#lines + 1] = detail_field("Manageable state", value.manageableState or raw.manageableState)
+  lines[#lines + 1] = detail_field("Namespace", value.namespacePrefix or raw.namespacePrefix)
+  lines[#lines + 1] = detail_field("Created by", raw.createdByName)
+  lines[#lines + 1] = detail_field("Created at", raw.createdDate, "SFMetadataDate")
+  lines[#lines + 1] = detail_field("Modified by", value.lastModifiedByName or raw.lastModifiedByName)
+  lines[#lines + 1] = detail_field("Modified at", value.lastModifiedDate or raw.lastModifiedDate, "SFMetadataDate")
   return lines
 end
 
@@ -411,6 +662,7 @@ local function delete_remote(entries)
 end
 
 function M.open()
+  apply_browser_highlights()
   local inventory = metadata.load_inventory()
   if not inventory then
     return
@@ -446,7 +698,15 @@ function M.open()
       ["--multi"] = true,
       ["--delimiter"] = "\t",
       ["--with-nth"] = "3..",
+      ["--id-nth"] = "1",
       ["--scheme"] = "path",
+      ["--preview-label"] = " Details ",
+    },
+    fzf_colors = {
+      ["preview-fg"] = { "fg", "SFMetadataValue" },
+      ["preview-bg"] = { "bg", "SFMetadataSelectedNormal" },
+      ["preview-border"] = { "fg", "SFMetadataSelectedBorder" },
+      ["preview-label"] = { "fg", "SFMetadataTitle" },
     },
     keymap = {
       fzf = {
@@ -459,21 +719,44 @@ function M.open()
       },
     },
     winopts = {
+      width = 0.66,
+      height = 0.85,
+      row = 0.50,
+      col = 0.05,
+      on_create = function(event)
+        open_selected_pane(event, inventory)
+      end,
+      on_close = close_selected_pane,
       preview = {
         layout = "vertical",
-        vertical = "up:35%", -- selected items above the filter/results
+        vertical = "up:35%", -- focused-item details above the filter/results
         -- vertical = "down:50%", -- conventional preview below results
         hidden = false,
-        title = " Selected metadata ",
       },
     },
     preview = {
-      field_index = "{+}",
-      fn = function(selected)
-        return preview_lines(selected, lookup, inventory)
+      field_index = "{}",
+      fn = function(current)
+        return detail_lines(current, lookup, inventory)
       end,
     },
     actions = {
+      ["load"] = {
+        field_index = "{+f} $FZF_SELECT_COUNT",
+        exec_silent = true,
+        header = false,
+        fn = function(payload)
+          update_selected_pane(payload, lookup, inventory)
+        end,
+      },
+      ["multi"] = {
+        field_index = "{+f} $FZF_SELECT_COUNT",
+        exec_silent = true,
+        header = false,
+        fn = function(payload)
+          update_selected_pane(payload, lookup, inventory)
+        end,
+      },
       ["default"] = function(selected)
         retrieve(selected_entries(selected, lookup), inventory)
       end,
@@ -502,11 +785,20 @@ end
 
 M._test = {
   build_entries = build_entries,
+  close_selected_pane = close_selected_pane,
   collect_retrieve_members = collect_retrieve_members,
   destructive_members = destructive_members,
+  detail_lines = detail_lines,
   member_values = member_values,
-  preview_lines = preview_lines,
+  open_selected_pane = open_selected_pane,
+  place_selected_pane = place_selected_pane,
+  selected_pane_lines = selected_pane_lines,
   selected_entries = selected_entries,
+  stable_entry_id = stable_entry_id,
+  update_selected_pane = update_selected_pane,
+  selected_pane_state = function()
+    return selected_pane
+  end,
   type_path = type_path,
 }
 

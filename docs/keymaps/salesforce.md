@@ -61,7 +61,9 @@ Also: `:SF` then Tab for command categories.
 
 Inventory is project-local under `sf_cache/`. `SF` and `So` automatically refresh the same configured common types as `SM`; `SU` lets you choose **Common** or **All enabled types**. The All path can take several minutes and also traverses Report, Dashboard, Document, and EmailTemplate folders.
 
-The browser starts with collapsed metadata categories. Expand only the types you need; cached categories reload in place so the query and cursor stay put. Their members render as `Type / folder / member`, so fzf patterns can match any level. A query ending at `Type /` keeps that category row first for quick collapse or selection. Selected entries appear in the preview above the filter.
+The browser uses three panes: focused-item audit details across the upper-left, searchable results below, and live selected-item summaries on the right. Member details include creator/date, modifier/date, metadata ID, file, namespace, and manageable state; category details show descriptor/cache fields. A selected category appears once in the right pane as `Type — all N cached members` with a distinct color rather than listing every child.
+
+Categories start collapsed. Expand only the types you need; cached categories reload in place so the query and cursor stay put. Their members render as `Type / folder / member`, so fzf patterns can match any level. A query ending at `Type /` keeps that category row first for quick collapse or selection. On narrow windows/fullscreen, the right pane hides cleanly while details and results remain usable.
 
 | Key | macOS key | Action |
 | --- | --- | --- |
