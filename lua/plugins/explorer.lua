@@ -136,6 +136,12 @@ return {
           -- Space is our global leader — don't let neo-tree steal it for toggle_node.
           ["<space>"] = "none",
           -- ["<space>"] = { "toggle_node", nowait = false }, -- neo-tree default
+
+          -- Leave the sidebar instead of running global `:bnext` inside its
+          -- unlisted buffer, which can trigger close_if_last_window and exit.
+          ["<S-l>"] = function()
+            vim.cmd("wincmd l")
+          end,
         },
       },
 

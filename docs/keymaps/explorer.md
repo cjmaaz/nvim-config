@@ -39,6 +39,7 @@ Focus must be **in** the tree (click it or move with `<C-h>` if it’s on the le
 | `s` | Open file in a **vertical** split |
 | `t` | Open file in a **new tabpage** |
 | `P` | Toggle **preview** float of the file under the cursor |
+| `<S-l>` (`L`) | Focus the editor window to the right; avoids running buffer-cycle `:bnext` inside the sidebar |
 | `q` | Close the neo-tree window |
 | `<Esc>` | Cancel preview / floating prompt |
 
@@ -88,6 +89,7 @@ Focus must be **in** the tree (click it or move with `<C-h>` if it’s on the le
 | `git_status_scope_to_path` | **true** | Faster when a monorepo worktree is above the displayed root; set the commented `false` alternate in `explorer.lua` if scoped results do not suit you |
 | `hide_dotfiles` / `hide_gitignored` | **true** | Dotfiles & gitignored are filtered by default; **`H`** shows them (dimmed). Always-show: `.gitignore`, `.forceignore`, `.sfdx`, `.sf`. `never_show`: `.DS_Store` / `thumbs.db` (H won’t reveal those). |
 | `window.mappings["<space>"]` | `none` | Space is `<leader>` — don’t toggle nodes with Space |
+| `window.mappings["<S-l>"]` | focus right | Leave the sidebar safely; global `<S-l>` continues to cycle buffers in normal file windows |
 | Width | 34 base + auto-expand | Long visible names grow the sidebar instead of fading; `e` toggles back to the base width |
 
 Full option reference: `:help neo-tree` and `:help neo-tree-mappings`.

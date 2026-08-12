@@ -22,6 +22,8 @@ Nav: [index](./README.md) · [git](./git.md) · [explorer](./explorer.md) · [te
 
 Commented alternates in config: force delete (`bdelete!`), `<leader>c` as buffer-delete, wipeout.
 
+Inside neo-tree only, `<S-l>` is buffer-local and focuses the editor to the right; this prevents `:bnext` from replacing the sidebar buffer. Everywhere else it remains **next buffer**.
+
 ### Bufferline (UI)
 
 Defined in `lua/plugins/bufferline.lua`. Visual bar of **buffers** (`mode = "buffers"`). Cycle still uses `<S-h>` / `<S-l>` above — not `gt` / `gT` (those remain tabpages). Close with `<leader>bd` (close icons are off).
