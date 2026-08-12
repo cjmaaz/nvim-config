@@ -30,7 +30,7 @@ Buffer-local maps appear only after a language server attaches (`LspAttach`).
 
 **On demand:** first time you open a matching filetype, Mason installs the server then enables it — Python (`basedpyright`), JS/TS (`ts_ls`), HTML/CSS, Java (`jdtls`), Rust, C/C++ (`clangd`), JSON/YAML, **Apex** (`apex_ls` / `apex-language-server`). Needs **Java** on PATH for Apex. Optional: `$APEX_LS_JAR`.
 
-`ts_ls` semantic tokens are disabled in `on_init`: TypeScript Server 6 can lose file synchronization in large LWC workspaces and repeatedly raise `getEncodedSemanticClassifications: Could not find source file`. Treesitter highlighting remains active; `lsp.lua` keeps a commented plain `ts_ls = {}` alternate if the upstream issue is fixed later.
+`ts_ls` semantic tokens and same-symbol document highlights are disabled in `on_init`: TypeScript Server 6 can lose file synchronization in large LWC workspaces and repeatedly raise `getEncodedSemanticClassifications` / `getDocumentHighlights: Could not find source file`. Treesitter highlighting remains active, and other LSPs keep document highlights; `lsp.lua` retains a commented plain `ts_ls = {}` alternate if the upstream issue is fixed later.
 
 UI: `:Mason`, fidget progress. Lua Neovim APIs: lazydev.
 
