@@ -38,6 +38,13 @@ map("n", "<leader>bd", "<cmd>bdelete<CR>", { desc = "Delete buffer" })
 -- Optional: wipe vs delete (wipe drops marks/options harder — usually skip for now)
 -- map("n", "<leader>bw", "<cmd>bwipeout<CR>", { desc = "Wipe buffer" })
 
+-- --- Project scaffolding ---
+
+-- Pick an ecosystem, collect its inputs, then run the maintained generator CLI.
+map("n", "<leader>pn", function()
+  require("config.project_scaffold").open()
+end, { desc = "Project: new scaffold" })
+
 -- --- Small QoL (still core; not a separate topic) ---
 
 -- Clear search highlight (pairs with hlsearch in options).

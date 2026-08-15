@@ -21,6 +21,7 @@ nvim-config/
 │   │   ├── core.md       # buffers, windows, diagnostics keys, …
 │   │   ├── git.md
 │   │   ├── explorer.md
+│   │   ├── project.md     # Maven / Flutter / CMake project generator
 │   │   ├── telescope.md
 │   │   ├── treesitter.md
 │   │   ├── lsp.md        # LSP, blink, format, lint
@@ -44,6 +45,7 @@ nvim-config/
     ├── config/           # editor core — load before plugins
     │   ├── options.lua   # everyday editing options
     │   ├── keymaps.lua   # non-plugin maps (buffers, windows, diagnostics, …)
+    │   ├── project_scaffold.lua # CLI-backed new-project picker
     │   ├── autocmds.lua  # yank, trim, final newline (Apex exempt), filetypes
     │   ├── lazy.lua      # bootstrap lazy.nvim + import plugins/
     │   ├── telescope/
@@ -80,4 +82,4 @@ nvim-config/
 1. Install host tools from [docs/TOOLS.md](docs/TOOLS.md) (Neovim **0.12+**, Git, a Nerd Font, **`rg` + `fd`**, **tree-sitter CLI** + C compiler; **JDK** if you edit Apex; **`sf` CLI** for Salesforce projects).
 2. Point Neovim at this config (symlink, `NVIM_APPNAME`, or clone as your `~/.config/nvim`).
 3. Open Neovim once — lazy.nvim bootstraps and installs plugins from `lazy-lock.json` (Treesitter/Mason may download on first use).
-4. Skim [docs/keymaps/](docs/keymaps/README.md) — `<leader>sf` / `<leader>cf` / `gd` / neo-tree `<leader>fe` / Salesforce `<leader>S`.
+4. Skim [docs/keymaps/](docs/keymaps/README.md) — `<leader>sf` / `<leader>pn` / `<leader>cf` / `gd` / neo-tree `<leader>fe` / Salesforce `<leader>S`.

@@ -245,6 +245,10 @@ return {
           { pattern = "^up$", icon = "󰁝", color = "cyan" },
           { pattern = "^down$", icon = "󰁅", color = "cyan" },
 
+          -------------------------------------------------------------- Projects
+          { pattern = "project: new scaffold", icon = "󰏗", color = "green" },
+          { pattern = "project", icon = "󰏗", color = "green" },
+
           ------------------------------------------------ Explorer / sessions
           { pattern = "toggle file explorer", icon = "󰙅", color = "azure" },
           { pattern = "reveal current file in explorer", icon = "󰈙", color = "azure" },
@@ -337,6 +341,7 @@ return {
         { "<leader>S", group = "Salesforce", mode = { "n", "x" }, icon = { icon = "󰢎", color = "blue" } },
         { "<leader>c", group = "Code", icon = { icon = "", color = "purple" } },
         { "<leader>d", group = "Delete (black hole)", mode = { "n", "v" }, icon = { icon = "󰩹", color = "red" } },
+        { "<leader>p", group = "Project", icon = { icon = "󰏗", color = "green" } },
         { "<leader>t", group = "Toggle", icon = { icon = "", color = "yellow" } },
         { "<leader>q", group = "Session", icon = { icon = "", color = "purple" } },
         { "<leader>x", group = "Trouble", icon = { icon = "󰔫", color = "red" } },

@@ -57,6 +57,20 @@ Without `tree-sitter` + a C compiler, `:TSUpdate` / parser install will fail.
 
 ---
 
+## Project generators
+
+`<leader>pn` only needs the CLI for the project type you select. Neovim checks the executable before collecting project details.
+
+| Project type | Tools | Check | Install |
+| --- | --- | --- | --- |
+| **Java — Maven** | JDK + Maven | `java -version` · `mvn --version` | `brew install openjdk maven` · `sudo pacman -S jdk-openjdk maven` |
+| **Flutter app** | Flutter SDK | `flutter --version` | [Official Flutter installation](https://docs.flutter.dev/get-started/install) |
+| **C++ — CMake** | CMake + `cmake-init` 0.41+ | `cmake --version` · `cmake-init --version` | CMake: `brew install cmake` · `sudo pacman -S cmake`; generator: `pipx install cmake-init` |
+
+For isolated Python CLI installs, install `pipx` first with `brew install pipx` or `sudo pacman -S python-pipx`.
+
+---
+
 ## Config ↔ tools map
 
 | Config area | Relies on |
@@ -84,3 +98,4 @@ Without `tree-sitter` + a C compiler, `:TSUpdate` / parser install will fail.
 | `lua/plugins/linting.lua` | Mason linters lazy-by-ft (`eslint_d`, `ruff`, …); skip until binary on PATH; npm `min-release-age` can block installs — [quiet.md](./diagnostics/quiet.md#example-no-eslint-diagnostics--mason-eslint_d-failed) |
 | `lua/plugins/completion.lua` | optional `make` for LuaSnip jsregexp |
 | `lua/plugins/salesforce.lua` | `sf` CLI; host **`fzf`** (fzf-lua); `curl` for SObject refresh; optional ctags |
+| `lua/config/project_scaffold.lua` | per-generator CLI: `mvn`, `flutter`, or `cmake-init` |
