@@ -247,6 +247,7 @@ return {
 
           -------------------------------------------------------------- Projects
           { pattern = "project: new scaffold", icon = "󰏗", color = "green" },
+          { pattern = "project: run/build/test", icon = "󰐊", color = "green" },
           { pattern = "project", icon = "󰏗", color = "green" },
 
           ------------------------------------------------ Explorer / sessions

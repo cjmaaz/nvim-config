@@ -45,6 +45,11 @@ map("n", "<leader>pn", function()
   require("config.project_scaffold").open()
 end, { desc = "Project: new scaffold" })
 
+-- Detect the nearest project and choose a Run / Build / Test action.
+map("n", "<leader>pr", function()
+  require("config.project_runner").open()
+end, { desc = "Project: run/build/test" })
+
 -- --- Small QoL (still core; not a separate topic) ---
 
 -- Clear search highlight (pairs with hlsearch in options).

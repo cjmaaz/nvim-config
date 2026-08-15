@@ -1,7 +1,7 @@
 --------------------------------------------------------------------------------
 -- Project scaffolding — one picker over each ecosystem's maintained CLI.
--- Generates Maven Java, Flutter, and CMake C++ projects without storing stale
--- framework templates in this config.
+-- Generates Maven, Flutter, CMake, Rust, Python, Node/Vite, and Go projects
+-- without storing stale framework templates in this config.
 --------------------------------------------------------------------------------
 
 local M = {}
@@ -38,6 +38,13 @@ local function validate_cmake_name(value)
   return true
 end
 
+local function validate_package_name(value)
+  if not value:match("^[A-Za-z0-9_][A-Za-z0-9_-]*$") then
+    return false, "Use letters, numbers, `_`, or `-`; do not include a path."
+  end
+  return true
+end
+
 local function validate_package_id(value)
   if value == "" or value:sub(1, 1) == "." or value:sub(-1) == "." or value:find("..", 1, true) then
     return false, "Use a dotted identifier such as `com.example`."
@@ -46,6 +53,32 @@ local function validate_package_id(value)
     if not segment:match("^[A-Za-z_][A-Za-z0-9_]*$") then
       return false, "Every package segment must be a valid Java-style identifier."
     end
+  end
+  return true
+end
+
+local function validate_go_module(value)
+  if value == "" or value:find("%s") or value:sub(1, 1) == "/" or value:sub(-1) == "/" then
+    return false, "Use a Go module path such as `example.com/user/project`."
+  end
+  if value:find("//", 1, true) or not value:match("^[A-Za-z0-9._~/%-]+$") then
+    return false, "Go module paths cannot contain spaces or shell characters."
+  end
+  return true
+end
+
+local function prepare_directory(path)
+  local ok, result = pcall(vim.fn.mkdir, path, "p")
+  if not ok or result == 0 then
+    return false, "Could not create target directory: " .. path
+  end
+  return true
+end
+
+local function write_lines(path, lines)
+  local ok, result = pcall(vim.fn.writefile, lines, path)
+  if not ok or result ~= 0 then
+    return false, "Could not write starter file: " .. path
   end
   return true
 end
@@ -157,7 +190,234 @@ local generators = {
       return { "cmake-init", "create", context.target, "-e" }
     end,
   },
+  {
+    id = "rust-bin",
+    label = "Rust — Binary",
+    icon = vim.g.have_nerd_font and " " or "",
+    executable = "cargo",
+    install_hint = "Install Rust with rustup so `cargo` is available on PATH.",
+    default_name = "my_rust_app",
+    validate_name = validate_package_name,
+    entry = vim.fs.joinpath("src", "main.rs"),
+    command = function(context)
+      return { "cargo", "new", context.target, "--bin" }
+    end,
+  },
+  {
+    id = "rust-lib",
+    label = "Rust — Library",
+    icon = vim.g.have_nerd_font and " " or "",
+    executable = "cargo",
+    install_hint = "Install Rust with rustup so `cargo` is available on PATH.",
+    default_name = "my_rust_lib",
+    validate_name = validate_package_name,
+    entry = vim.fs.joinpath("src", "lib.rs"),
+    command = function(context)
+      return { "cargo", "new", context.target, "--lib" }
+    end,
+  },
+  {
+    id = "python-app",
+    label = "Python — Packaged app",
+    icon = vim.g.have_nerd_font and "󰌠 " or "",
+    executable = "uv",
+    install_hint = "Install uv (`brew install uv` / `sudo pacman -S uv`).",
+    default_name = "my-python-app",
+    validate_name = validate_package_name,
+    entry = "pyproject.toml",
+    command = function(context)
+      return { "uv", "init", "--package", context.target }
+    end,
+  },
+  {
+    id = "python-lib",
+    label = "Python — Library",
+    icon = vim.g.have_nerd_font and "󰌠 " or "",
+    executable = "uv",
+    install_hint = "Install uv (`brew install uv` / `sudo pacman -S uv`).",
+    default_name = "my-python-lib",
+    validate_name = validate_package_name,
+    entry = "pyproject.toml",
+    command = function(context)
+      return { "uv", "init", "--lib", context.target }
+    end,
+  },
+  {
+    id = "node-ts",
+    label = "Node — TypeScript CLI",
+    icon = vim.g.have_nerd_font and "󰎙 " or "",
+    executable = "npm",
+    install_hint = "Install Node.js and npm (`brew install node` / `sudo pacman -S nodejs npm`).",
+    default_name = "my-node-app",
+    validate_name = validate_package_name,
+    entry = vim.fs.joinpath("src", "index.ts"),
+    prepare = function(context)
+      local ok, message = prepare_directory(vim.fs.joinpath(context.target, "src"))
+      if not ok then
+        return false, message
+      end
+      ok, message = write_lines(vim.fs.joinpath(context.target, "src", "index.ts"), {
+        string.format('console.log("Hello from %s!");', context.name),
+      })
+      if not ok then
+        return false, message
+      end
+      return write_lines(vim.fs.joinpath(context.target, "tsconfig.json"), {
+        "{",
+        '  "compilerOptions": {',
+        '    "target": "ES2022",',
+        '    "module": "NodeNext",',
+        '    "moduleResolution": "NodeNext",',
+        '    "rootDir": "src",',
+        '    "outDir": "dist",',
+        '    "strict": true,',
+        '    "esModuleInterop": true,',
+        '    "skipLibCheck": true',
+        "  },",
+        '  "include": ["src"]',
+        "}",
+      })
+    end,
+    steps = function(context)
+      return {
+        { args = { "npm", "init", "--yes" }, cwd = context.target },
+        {
+          args = { "npm", "install", "--save-dev", "typescript", "tsx", "@types/node" },
+          cwd = context.target,
+        },
+        {
+          args = {
+            "npm",
+            "pkg",
+            "set",
+            "type=module",
+            "scripts.dev=tsx src/index.ts",
+            "scripts.build=tsc",
+            "scripts.start=node dist/index.js",
+          },
+          cwd = context.target,
+        },
+      }
+    end,
+  },
+  {
+    id = "vite-ts",
+    label = "Vite — Vanilla TypeScript",
+    icon = vim.g.have_nerd_font and "󰎙 " or "",
+    executable = "npm",
+    install_hint = "Install Node.js and npm (`brew install node` / `sudo pacman -S nodejs npm`).",
+    default_name = "my-vite-app",
+    validate_name = validate_package_name,
+    entry = vim.fs.joinpath("src", "main.ts"),
+    steps = function(context)
+      return {
+        {
+          args = {
+            "npm",
+            "create",
+            "vite@latest",
+            context.name,
+            "--",
+            "--template",
+            "vanilla-ts",
+            "--no-interactive",
+          },
+          cwd = context.parent,
+          env = { npm_config_yes = "true" },
+        },
+        { args = { "npm", "install" }, cwd = context.target },
+      }
+    end,
+  },
+  {
+    id = "go",
+    label = "Go — Application",
+    icon = vim.g.have_nerd_font and " " or "",
+    executable = "go",
+    install_hint = "Install Go (`brew install go` / `sudo pacman -S go`).",
+    default_name = "my-go-app",
+    validate_name = validate_package_name,
+    entry = "main.go",
+    fields = {
+      {
+        key = "module_path",
+        prompt = "Go module path: ",
+        default = function(context)
+          return "example.com/" .. context.name
+        end,
+        validate = validate_go_module,
+      },
+    },
+    prepare = function(context)
+      local ok, message = prepare_directory(context.target)
+      if not ok then
+        return false, message
+      end
+      return write_lines(vim.fs.joinpath(context.target, "main.go"), {
+        "package main",
+        "",
+        'import "fmt"',
+        "",
+        "func main() {",
+        string.format('\tfmt.Println("Hello from %s!")', context.name),
+        "}",
+      })
+    end,
+    steps = function(context)
+      return {
+        { args = { "go", "mod", "init", context.module_path }, cwd = context.target },
+        { args = { "go", "fmt", "./..." }, cwd = context.target },
+      }
+    end,
+  },
 }
+
+local function steps_for(generator, context)
+  if generator.steps then
+    return generator.steps(context)
+  end
+  return {
+    {
+      args = generator.command(context),
+      cwd = context.parent,
+    },
+  }
+end
+
+local function display_steps(steps)
+  return table.concat(
+    vim.tbl_map(function(step)
+      return string.format("(%s) %s", step.cwd, display_command(step.args))
+    end, steps),
+    "\n"
+  )
+end
+
+local function run_steps(steps, index, done)
+  local step = steps[index]
+  if not step then
+    done(true)
+    return
+  end
+
+  local started, process_or_error = pcall(vim.system, step.args, {
+    cwd = step.cwd,
+    env = step.env,
+    text = true,
+  }, function(result)
+    vim.schedule(function()
+      if result.code ~= 0 then
+        done(false, string.format("%s\n%s", display_command(step.args), failure_output(result)))
+        return
+      end
+      run_steps(steps, index + 1, done)
+    end)
+  end)
+
+  if not started then
+    done(false, "Could not start generator:\n" .. tostring(process_or_error))
+  end
+end
 
 local function fields_for(generator)
   local fields = {
@@ -252,8 +512,8 @@ local function run_generator(generator, context)
     return
   end
 
-  local args = generator.command(context)
-  notify("Command preview:\n" .. display_command(args))
+  local steps = steps_for(generator, context)
+  notify("Command preview:\n" .. display_steps(steps))
   vim.ui.select({ "Create project", "Cancel" }, {
     prompt = string.format("Create %s in %s?", generator.label, context.parent),
   }, function(choice)
@@ -263,24 +523,24 @@ local function run_generator(generator, context)
 
     running = true
     notify("Creating " .. context.name .. "…")
-    local started, process_or_error = pcall(vim.system, args, {
-      cwd = context.parent,
-      text = true,
-    }, function(result)
-      vim.schedule(function()
+    if generator.prepare then
+      local prepared, ok, message = pcall(generator.prepare, context)
+      if not prepared or not ok then
         running = false
-        if result.code ~= 0 then
-          notify(failure_output(result), vim.log.levels.ERROR)
-          return
-        end
-        open_generated_project(generator, context)
-      end)
-    end)
-
-    if not started then
-      running = false
-      notify("Could not start generator:\n" .. tostring(process_or_error), vim.log.levels.ERROR)
+        local error_message = prepared and message or ok
+        notify(tostring(error_message or "Could not prepare project files."), vim.log.levels.ERROR)
+        return
+      end
     end
+
+    run_steps(steps, 1, function(ok, message)
+      running = false
+      if not ok then
+        notify(message, vim.log.levels.ERROR)
+        return
+      end
+      open_generated_project(generator, context)
+    end)
   end)
 end
 

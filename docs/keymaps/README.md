@@ -18,7 +18,7 @@ Only maps we actually set are listed. Built-in Vim/Neovim keys (`hjkl`, `:w`, `g
 | Buffers, windows, motion, diagnostics | [core.md](./core.md) |
 | Git (gitsigns) | [git.md](./git.md) |
 | Explorer (neo-tree) | [explorer.md](./explorer.md) |
-| Project scaffolding | [project.md](./project.md) |
+| Project scaffolding and tasks | [project.md](./project.md) |
 | Telescope | [telescope.md](./telescope.md) |
 | Treesitter / indent / autopairs | [treesitter.md](./treesitter.md) |
 | LSP / completion / formatting / lint | [lsp.md](./lsp.md) |
@@ -48,7 +48,7 @@ Defined in `init.lua`.
 | Statusline (lualine) | Dark Bordo mode caps with clean spacing; branch, diff, smart path, diagnostics, LSP, location |
 | Bufferline | Matching Bordo active-buffer treatment; cycle with `<S-h>` / `<S-l>` — [core.md](./core.md) |
 | neo-tree | `<leader>fe` · `<leader>fE` · `<leader>ge` — [explorer.md](./explorer.md) |
-| Project scaffolding | `<leader>pn` → Maven / Flutter / CMake generator — [project.md](./project.md) |
+| Project workflows | `<leader>pn` scaffold · `<leader>pr` run/build/test — [project.md](./project.md) |
 | Lazygit | `<leader>gg` · `<leader>gf` — [git.md](./git.md) |
 | Telescope | Rounded prompt/results/preview grid with icons; `<leader>sf` · `<leader>sg` · `<leader><leader>` — [telescope.md](./telescope.md) |
 | Floating windows | Rounded Bordo frame by default; plugin-specific windows may override it |

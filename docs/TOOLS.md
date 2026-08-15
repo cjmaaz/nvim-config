@@ -59,15 +59,19 @@ Without `tree-sitter` + a C compiler, `:TSUpdate` / parser install will fail.
 
 ## Project generators
 
-`<leader>pn` only needs the CLI for the project type you select. Neovim checks the executable before collecting project details.
+`<leader>pn` only needs the CLI for the project type you select. `<leader>pr` needs the detected project’s CLI. Neovim checks executables before starting work.
 
 | Project type | Tools | Check | Install |
 | --- | --- | --- | --- |
 | **Java — Maven** | JDK + Maven | `java -version` · `mvn --version` | `brew install openjdk maven` · `sudo pacman -S jdk-openjdk maven` |
 | **Flutter app** | Flutter SDK | `flutter --version` | [Official Flutter installation](https://docs.flutter.dev/get-started/install) |
 | **C++ — CMake** | CMake + `cmake-init` 0.41+ | `cmake --version` · `cmake-init --version` | CMake: `brew install cmake` · `sudo pacman -S cmake`; generator: `pipx install cmake-init` |
+| **Rust** | Rust toolchain + Cargo | `cargo --version` | [rustup](https://rustup.rs/) · install `rustup`, then run `rustup default stable` |
+| **Node / Vite TypeScript** | Node.js + npm (Vite needs Node 20.19+ or 22.12+) | `node --version` · `npm --version` | `brew install node` · `sudo pacman -S nodejs npm` |
+| **Python** | `uv` | `uv --version` | `brew install uv` · `sudo pacman -S uv` · [uv installation](https://docs.astral.sh/uv/getting-started/installation/) |
+| **Go** | Go toolchain | `go version` | `brew install go` · `sudo pacman -S go` |
 
-For isolated Python CLI installs, install `pipx` first with `brew install pipx` or `sudo pacman -S python-pipx`.
+For an isolated `cmake-init` install, install `pipx` first with `brew install pipx` or `sudo pacman -S python-pipx`.
 
 ---
 
@@ -98,4 +102,5 @@ For isolated Python CLI installs, install `pipx` first with `brew install pipx` 
 | `lua/plugins/linting.lua` | Mason linters lazy-by-ft (`eslint_d`, `ruff`, …); skip until binary on PATH; npm `min-release-age` can block installs — [quiet.md](./diagnostics/quiet.md#example-no-eslint-diagnostics--mason-eslint_d-failed) |
 | `lua/plugins/completion.lua` | optional `make` for LuaSnip jsregexp |
 | `lua/plugins/salesforce.lua` | `sf` CLI; host **`fzf`** (fzf-lua); `curl` for SObject refresh; optional ctags |
-| `lua/config/project_scaffold.lua` | per-generator CLI: `mvn`, `flutter`, or `cmake-init` |
+| `lua/config/project_scaffold.lua` | per-generator CLI: `mvn`, `flutter`, `cmake-init`, `cargo`, `npm`, `uv`, or `go` |
+| `lua/config/project_runner.lua` | detected project CLI; shell + native terminal for live task output |
