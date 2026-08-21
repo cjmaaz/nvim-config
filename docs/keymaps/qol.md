@@ -147,11 +147,11 @@ Paints `#hex` / `rgb()` / `hsl()` / Tailwind-ish classes in-buffer (`nvim-highli
 
 ---
 
-## Space / listchars dots
+## Invisible characters / listchars
 
-In `lua/config/options.lua`: `list` + `listchars.space = "·"` (plus tab/trail/nbsp). Highlight `Whitespace` is dimmed in `autocmds.lua` so dots stay **very light**.
+`list` remains enabled for tabs, trailing spaces, and non-breaking spaces. Ordinary-space dots are disabled by commenting `listchars.space` in `lua/config/options.lua`.
 
-Toggle off: `vim.opt.list = false` or remove `space` from `listchars`.
+To restore dim ordinary-space dots, uncomment `space = "·"`. To hide every list character, use `vim.opt.list = false`.
 
 ---
 

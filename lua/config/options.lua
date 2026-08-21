@@ -150,13 +150,13 @@ opt.linebreak = true
 opt.list = true
 -- opt.list = false -- hide tabs / trailing spaces / nbsp / space markers
 
--- Glyphs used when list is on (Kickstart-style trail/nbsp; we also mark plain spaces).
--- Space dots use highlight group Whitespace — keep it very dim (see autocmds.lua).
+-- Glyphs used when list is on (Kickstart-style tab/trail/nbsp).
+-- Plain-space dots are optional below; Whitespace stays dim in autocmds.lua.
 opt.listchars = {
   tab = "» ", -- tabs (should be rare with expandtab)
   trail = "·", -- trailing spaces on a line
   nbsp = "␣", -- non-breaking space
-  space = "·", -- every space (very light via Whitespace hl)
+  -- space = "·", -- show every ordinary space as a dim dot
   -- extends = "…", -- char when line continues past the window (wrap off)
   -- precedes = "…", -- char when line starts left of the window
   -- eol = "¬", -- end-of-line mark (noisy for code)
