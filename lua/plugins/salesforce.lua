@@ -149,8 +149,34 @@ local function install_sf_access_token_fix()
   end
 end
 
-return {
-  {
+local function salesforce_root(bufnr, refresh)
+  local project_context = require("config.project_context")
+  if refresh then
+    project_context.invalidate(bufnr or vim.api.nvim_get_current_buf())
+  end
+  return project_context.salesforce_root(bufnr)
+end
+
+local function guarded_load(callback, bufnr)
+  if not salesforce_root(bufnr, true) then
+    vim.notify("Open this from a Salesforce project first.", vim.log.levels.WARN, { title = "sf.nvim" })
+    return false
+  end
+  if not package.loaded.sf then
+    pcall(vim.api.nvim_del_user_command, "SF")
+    require("lazy").load({ plugins = { "sf.nvim" } })
+    if not package.loaded.sf then
+      vim.notify("Could not load sf.nvim.", vim.log.levels.ERROR, { title = "sf.nvim" })
+      return false
+    end
+  end
+  if callback then
+    callback()
+  end
+  return true
+end
+
+local plugin = {
     "xixiaofinland/sf.nvim",
     cmd = "SF", -- :SF … user commands
     ft = { -- load when editing SF-ish buffers
@@ -209,6 +235,13 @@ return {
       { "<leader>Sl", sf_action("pull_log"), desc = "SF: pull debug log" },
       { "<leader>Se", sf_action("toggle_term"), desc = "SF: toggle terminal" },
       { "<leader>Sx", cancel_sf_actions, desc = "SF: cancel active actions" },
+      {
+        "<leader>SV",
+        function()
+          require("config.salesforce.vlocity").open()
+        end,
+        desc = "SF: retrieve Vlocity DataPacks",
+      },
 
       -- Deploy (save + push current file)
       { "<leader>Sp", sf_action("save_and_push"), desc = "SF: save and deploy current file" },
@@ -228,7 +261,22 @@ return {
       { "[v", sf_action("uncovered_jump_backward"), desc = "SF: previous uncovered line" },
       { "]v", sf_action("uncovered_jump_forward"), desc = "SF: next uncovered line" },
 
-      -- SOQL (visual selection)
+      -- SOQL builder / whole-file / visual selection.
+      {
+        "<leader>SQ",
+        function()
+          require("config.salesforce.query").open()
+        end,
+        desc = "SF: build SOQL query",
+      },
+      {
+        "<leader>Sq",
+        function()
+          require("config.salesforce.query").run_current(false)
+        end,
+        mode = "n",
+        desc = "SF: run SOQL file",
+      },
       {
         "<leader>Sq",
         sf_action("run_highlighted_soql"),
@@ -325,6 +373,7 @@ return {
         auto_display_code_sign = true, -- show coverage signs after coverage test runs
         -- auto_display_code_sign = false, -- only via <leader>Sv
       })
+      require("config.salesforce.query").setup()
 
       -- SFTerm visibility belongs to <leader>Se (q also hides when focused).
       -- Esc cancels any foreground/background SF action; otherwise it clears search.
@@ -372,5 +421,54 @@ return {
         },
       })
     end,
-  },
 }
+
+local guarded_keys = plugin.keys
+plugin.keys = nil
+plugin.cmd = nil
+plugin.ft = nil
+
+plugin.init = function()
+  for _, key in ipairs(guarded_keys) do
+    local mapping = key
+    local mode = mapping.mode or "n"
+    vim.keymap.set(mode, mapping[1], function()
+      guarded_load(mapping[2])
+    end, {
+      desc = mapping.desc,
+      silent = mapping.silent,
+    })
+  end
+
+  vim.api.nvim_create_user_command("SF", function(opts)
+    guarded_load(function()
+      vim.cmd("SF" .. (opts.args ~= "" and (" " .. opts.args) or ""))
+    end)
+  end, {
+    nargs = "*",
+    desc = "Salesforce commands (Salesforce projects only)",
+  })
+
+  local group = vim.api.nvim_create_augroup("salesforce_root_loader", { clear = true })
+  vim.api.nvim_create_autocmd("FileType", {
+    group = group,
+    pattern = {
+      "apex",
+      "html",
+      "javascript",
+      "javascriptreact",
+      "sflog",
+      "soql",
+      "sosl",
+      "typescript",
+      "typescriptreact",
+    },
+    callback = function(event)
+      if salesforce_root(event.buf, true) then
+        guarded_load(nil, event.buf)
+      end
+    end,
+  })
+end
+
+return { plugin }

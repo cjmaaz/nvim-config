@@ -4,6 +4,7 @@
 -- theme, then switches — and lualine's theme = "auto" would lag behind.
 --
 -- Alternatives (enable only one colorscheme plugin at a time):
+--   - talha-akram/noctis.nvim         (previous Noctis Bordo; retained below)
 --   - rebelot/kanagawa.nvim          (Kanagawa dragon — commented below)
 --   - folke/tokyonight.nvim          (LazyVim default)
 --   - craftzdog/solarized-osaka.nvim (Craftzdog)
@@ -13,12 +14,79 @@
 --------------------------------------------------------------------------------
 
 return {
-  -- Active: VS Code Noctis Bordo (warm rose / burgundy).
+  -- Active: Rosé Pine Main — warm, modern, readable without muted syntax.
+  {
+    "rose-pine/neovim",
+    name = "rose-pine",
+    lazy = false, -- paint before UI plugins to avoid startup flash
+    -- lazy = true, -- wrong for themes: bars/floats initialize against defaults
+    priority = 1000,
+    -- priority = 50, -- too late for statusline/chrome consumers
+    opts = {
+      variant = "main",
+      -- variant = "moon", -- softer/cooler alternate
+      dark_variant = "main",
+      dim_inactive_windows = true,
+      -- dim_inactive_windows = false, -- keep every split equally bright
+      extend_background_behind_borders = true,
+      enable = {
+        terminal = true,
+        legacy_highlights = true,
+        migrations = true,
+      },
+      styles = {
+        bold = true,
+        italic = true,
+        transparency = false,
+      },
+      groups = {
+        border = "subtle",
+        link = "iris",
+        panel = "surface",
+        error = "love",
+        hint = "iris",
+        info = "foam",
+        note = "pine",
+        todo = "rose",
+        warn = "gold",
+      },
+    },
+    config = function(_, opts)
+      require("rose-pine").setup(opts)
+      vim.cmd.colorscheme("rose-pine-main")
+      -- vim.cmd.colorscheme("rose-pine-moon") -- softer/cooler Rosé Pine variant
+
+      local chrome = require("config.ui_chrome")
+      local hl = vim.api.nvim_set_hl
+      local function apply_overrides()
+        hl(0, "NormalFloat", { fg = chrome.panel_fg, bg = chrome.panel_bg })
+        -- hl(0, "NormalFloat", { link = "Normal" }) -- blend floats into editor
+        hl(0, "FloatBorder", { fg = chrome.divider_fg, bg = chrome.panel_bg })
+        -- hl(0, "FloatBorder", { fg = chrome.love, bg = chrome.panel_bg }) -- vivid edge
+        hl(0, "FloatTitle", { fg = chrome.title_fg, bg = chrome.panel_bg, bold = true })
+        hl(0, "FloatFooter", { fg = chrome.muted_fg, bg = chrome.panel_bg })
+        hl(0, "@markup.strong", { bold = true })
+        hl(0, "@markup.italic", { italic = true })
+        hl(0, "@markup.strikethrough", { strikethrough = true })
+        hl(0, "@lsp.mod.deprecated", { strikethrough = true, italic = true })
+        hl(0, "DiagnosticDeprecated", { strikethrough = true })
+      end
+      apply_overrides()
+      vim.api.nvim_create_autocmd("ColorScheme", {
+        group = vim.api.nvim_create_augroup("user_float_chrome", { clear = true }),
+        callback = apply_overrides,
+      })
+    end,
+  },
+
+  -- Inactive alternate: VS Code Noctis Bordo (warm rose / burgundy).
   -- talha-akram/noctis.nvim has no plugin setup()/opts API (unlike kanagawa).
   -- The `opts` table below mirrors the kanagawa knobs we care about and is
   -- applied with nvim_set_hl after :colorscheme.
   {
     "talha-akram/noctis.nvim",
+    enabled = false, -- keep the previous theme available without loading it
+    -- enabled = true, -- switch back after disabling Rosé Pine above
     -- Load timing: colorschemes should paint before other UI plugins.
     lazy = false, -- load at startup (required for colorschemes)
     -- lazy = true, -- wrong for themes: UI would flash the default first

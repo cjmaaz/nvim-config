@@ -53,6 +53,7 @@ Without `tree-sitter` + a C compiler, `:TSUpdate` / parser install will fail.
 | **Java (JDK)** | `apex_ls` / `jdtls` on the JVM | `java -version` | `brew install openjdk` · `sudo pacman -S jdk-openjdk` |
 | **Node.js** | Some Mason LSPs / prettierd / optional `sf` install path | `node --version` | `brew install node` · `sudo pacman -S nodejs npm` |
 | **Salesforce CLI (`sf`)** | `sf.nvim` org/deploy/test/metadata | `sf --version` | [CLI setup](https://developer.salesforce.com/tools/salesforcecli) (npm / installer; not a brew/pacman first-class package on all hosts) |
+| **Vlocity Build Tool** | Managed-package DataPack retrieval (`<leader>SV`) | `vlocity --version` | Node 18+ · `npm install --global vlocity` |
 | **universal-ctags** | Optional Apex jump enhancement (`<leader>Sc`) | `ctags --version` | `brew install universal-ctags` · `sudo pacman -S ctags` |
 
 ---
@@ -93,6 +94,7 @@ For an isolated `cmake-init` install, install `pipx` first with `brew install pi
 | `lua/plugins/rainbow.lua` | treesitter parsers for the language |
 | `lua/plugins/colorizer.lua` | (none) |
 | `lua/plugins/explorer.lua` | Nerd Font icons (optional) |
+| `lua/plugins/markdown.lua` | no external runtime; existing Treesitter Markdown parsers |
 | `lua/plugins/telescope.lua` | `rg`, `fd`; optional `make` for fzf-native |
 | `lua/plugins/treesitter.lua` | Neovim 0.12+, `tree-sitter` CLI 0.26.1+, C compiler |
 | `lua/plugins/indent.lua` | (none beyond Neovim) |
@@ -101,6 +103,8 @@ For an isolated `cmake-init` install, install `pipx` first with `brew install pi
 | `lua/plugins/formatting.lua` | Mason formatters (`stylua` + `prettierd` auto; others as needed); FoS allowlist |
 | `lua/plugins/linting.lua` | Mason linters lazy-by-ft (`eslint_d`, `ruff`, …); skip until binary on PATH; npm `min-release-age` can block installs — [quiet.md](./diagnostics/quiet.md#example-no-eslint-diagnostics--mason-eslint_d-failed) |
 | `lua/plugins/completion.lua` | optional `make` for LuaSnip jsregexp |
-| `lua/plugins/salesforce.lua` | `sf` CLI; host **`fzf`** (fzf-lua); `curl` for SObject refresh; optional ctags |
+| `lua/plugins/salesforce.lua` | `sf` CLI; host **`fzf`**; `curl` for Apex SObject stubs; npm `vlocity` for managed-package DataPacks; optional ctags |
+| `lua/config/salesforce/schema.lua` | `sf sobject list/describe`; no separate SOQL language server |
+| `lua/config/gremlins.lua` | (none; native Neovim diagnostics) |
 | `lua/config/project_scaffold.lua` | per-generator CLI: `mvn`, `flutter`, `cmake-init`, `cargo`, `npm`, `uv`, or `go` |
 | `lua/config/project_runner.lua` | detected project CLI; shell + native terminal for live task output |

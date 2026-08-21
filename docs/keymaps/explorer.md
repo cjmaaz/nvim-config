@@ -1,6 +1,6 @@
 # Explorer (neo-tree)
 
-Defined in `lua/plugins/explorer.lua`. Sidebar file tree (not netrw / oil), with clickable **Files / Buffers / Git** source tabs and auto-expanding width for long names. Press `?` inside the tree for neo-tree’s own help. Shared Bordo chrome (`config.ui_chrome`) gives it a soft-white edge, raised active row, and the same accents as bufferline, dropbar, which-key, and Telescope.
+Defined in `lua/plugins/explorer.lua`. Sidebar file tree (not netrw / oil), with clickable **Files / Buffers / Git** source tabs and auto-expanding width for long names. Press `?` inside the tree for neo-tree’s own help. Shared Rosé Pine chrome (`config.ui_chrome`) gives it a subtle edge, raised active row, and the same accents as bufferline, dropbar, which-key, and Telescope.
 
 Nav: [index](./README.md) · [core](./core.md) · [git](./git.md) · [telescope](./telescope.md) · [treesitter](./treesitter.md) · [lsp](./lsp.md) · [which-key](./which-key.md)
 

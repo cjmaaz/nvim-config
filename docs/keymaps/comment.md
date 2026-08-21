@@ -52,7 +52,7 @@ Shows the file path and current symbol chain (e.g. `Class › method`) in the **
 | `[;` | n | Go to the start of the current symbol context |
 | `];` | n | Select the next symbol context |
 
-Click a winbar component to open its sibling menu; click an entry to jump. In a menu, `i` starts fuzzy filtering, `<CR>` selects, and `q` / `<Esc>` closes it. Hover previews are enabled, and menu chrome follows the shared Bordo panel palette.
+Click a winbar component to open its sibling menu; click an entry to jump. In a menu, `i` starts fuzzy filtering, `<CR>` selects, and `q` / `<Esc>` closes it. Hover previews are enabled, and menu chrome follows the shared Rosé Pine panel palette.
 
 ---
 

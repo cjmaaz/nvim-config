@@ -1,10 +1,10 @@
 # Salesforce (sf.nvim)
 
-Org, retrieve/deploy, Apex tests/coverage, metadata list, and SF terminal — via Salesforce CLI.
+Org, retrieve/deploy, Apex tests/coverage, managed-package Vlocity, SOQL, metadata lists, and SF terminal.
 
 Plugin: `lua/plugins/salesforce.lua`. Language intelligence stays in [lsp.md](./lsp.md) (`apex_ls`).
 
-**Host:** `sf` CLI (`sf --version`) — [TOOLS.md](../TOOLS.md).  
+**Host:** `sf` CLI (`sf --version`); npm `vlocity` for managed-package DataPacks — [TOOLS.md](../TOOLS.md).
 **Project:** cwd or file under a folder with `sfdx-project.json` or `.forceignore`.  
 **Check:** `:check sf` · `:lua require("sf.util").get_sf_root()`
 
@@ -44,6 +44,9 @@ Also: `:SF` then Tab for command categories.
 | `<leader>SR` | n | Repeat last tests |
 | `<leader>Sv` | n | Toggle coverage signs |
 | `]v` / `[v` | n | Next / previous uncovered line |
+| `<leader>SV` | n | Retrieve scoped or full managed-package Vlocity DataPacks |
+| `<leader>SQ` | n | Open the schema-aware SOQL builder |
+| `<leader>Sq` | n | Save and run the current `.soql` file |
 | `<leader>Sq` | x | Run **visual** selection as SOQL |
 | `<leader>SM` | n | Pull metadata inventory JSON |
 | `<leader>Sm` | n | List metadata to retrieve (fzf-lua) |
@@ -54,6 +57,48 @@ Also: `:SF` then Tab for command categories.
 | `<leader>SP` | n | Search package manifests under `manifest/` and its subdirectories |
 | `<leader>Ss` | n | Refresh SObject definitions (helps `apex_ls`) |
 | `<leader>Sc` | n | Create Apex ctags (needs `universal-ctags`) |
+
+---
+
+## Managed-package Vlocity retrieval (`<leader>SV`)
+
+This is Vlocity Build Tool **DataPack** retrieval for managed-package CMT orgs. It is separate from Metadata API OmniStudio types such as `OmniScript`; `sf project retrieve -m Omni*` is not a substitute.
+
+The picker discovers YAML jobs below the Salesforce project’s `vlocity/` directory and prefers `ExportOmni.yaml`. It resolves `node_modules/.bin/vlocity` first, then the npm-global `vlocity` command.
+
+| Mode | Behavior |
+| --- | --- |
+| **Retrieve one DataPack** | Search cached remote keys plus local `vlocity/Type/Key` folders, refresh the remote key inventory, or enter `Type/Key` manually |
+| **Full configured export** | Run the selected job’s `packExport` only after explicit confirmation; warns when local `vlocity/` changes exist |
+| **Refresh key inventory** | Run `packGetAllAvailableExports --json` and cache only key/type/label/status fields |
+
+Scoped exports preserve the selected job’s dependency-depth settings. Full export never includes inactive bulk export or cleanup operations. Both exports run in SFTerm; cancel with `Esc` or `<leader>Sx`. Exit status and a newly written `VlocityBuildLog.yaml` are checked, but partial errors still require reviewing the terminal/log.
+
+The inventory cache is org-scoped below `sf_cache/metadata-browser/`. It never stores access tokens, org URLs, record IDs, creator names, or sample DataPack data.
+
+---
+
+## SOQL builder, completion, and runner
+
+`<leader>SQ` selects a queryable SObject, lazily caches its describe data, opens a multi-select field picker, and writes an org-scoped draft below `sf_cache/query-builder/`. Drafts stay outside deployable package directories.
+
+Blink completion in `.soql` buffers uses the disk/memory cache only:
+
+- SObjects after `FROM`;
+- fields and relationships in query clauses;
+- cached related-object fields after `.`;
+- SOQL keywords, functions, operators, and date literals.
+
+Schema cache entries refresh after 24 hours. Network requests happen while opening the builder or explicitly changing an object—not while typing.
+
+| Query-buffer key | Action |
+| --- | --- |
+| `<localleader>f` (`\f`) | Pick fields and replace the draft’s SELECT list |
+| `<localleader>o` (`\o`) | Change SObject / open its draft |
+| `<localleader>r` (`\r`) | Save and run standard SOQL |
+| `<localleader>t` (`\t`) | Save and run through the Tooling API |
+
+Normal `<leader>Sq` saves the whole `.soql` buffer before execution. Visual `<leader>Sq` keeps sf.nvim’s existing selected-text runner. Results use SFTerm and the captured project/org context.
 
 ---
 
@@ -103,6 +148,7 @@ Both actions run in SFTerm. Toggle the float with `<leader>Se`; cancel with `Esc
 
 ## Notes
 
+- **Project isolation:** sf.nvim, fzf-lua, query schema modules, and the global `vim.system` token workaround load only after a current buffer/cwd resolves to `sfdx-project.json` or `.forceignore`. Ordinary HTML/JS/TS/SOQL projects keep lightweight guarded mappings only. Once sf.nvim has been used in a Neovim process it remains loaded, but mappings, SOQL completion, and statusline output continue to re-check the active project root.
 - **Org flow:** `<leader>SF` refreshes orgs and common metadata for the CLI-default target. `<leader>So` selects a local target and then refreshes common metadata. `<leader>SO` changes only the global target.
 - **SFTerm** (float after deploy/retrieve/metadata): stays open so you can read output. `<leader>Se` toggles it; focused `q` also hides it. `Esc` is a cancel key, not a visibility toggle.
 - **Cancel:** `Esc` and `<leader>Sx` send Ctrl-C to running SFTerm channels and stop background inventory processes without requiring `<C-w>w`, whether the float is focused, unfocused, hidden, or absent. With nothing running, normal-mode `Esc` still clears search highlighting. Focused terminal-mode `<C-c>` remains native. Cancellation is best-effort after Salesforce has accepted a server-side deploy job.

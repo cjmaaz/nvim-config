@@ -19,6 +19,7 @@ Only maps we actually set are listed. Built-in Vim/Neovim keys (`hjkl`, `:w`, `g
 | Git (gitsigns) | [git.md](./git.md) |
 | Explorer (neo-tree) | [explorer.md](./explorer.md) |
 | Project scaffolding and tasks | [project.md](./project.md) |
+| Markdown rendering | [markdown.md](./markdown.md) |
 | Telescope | [telescope.md](./telescope.md) |
 | Treesitter / indent / autopairs | [treesitter.md](./treesitter.md) |
 | LSP / completion / formatting / lint | [lsp.md](./lsp.md) |
@@ -35,7 +36,7 @@ Only maps we actually set are listed. Built-in Vim/Neovim keys (`hjkl`, `:w`, `g
 | Key | Meaning |
 | --- | --- |
 | `<Space>` (`mapleader`) | Global leader prefix for custom maps |
-| `\` (`maplocalleader`) | Buffer-local leader (unused so far; reserved) |
+| `\` (`maplocalleader`) | Buffer-local leader (SOQL drafts use `\f` / `\o` / `\r` / `\t`) |
 
 Defined in `init.lua`.
 
@@ -45,21 +46,22 @@ Defined in `init.lua`.
 
 | Area | How you use it today |
 | --- | --- |
-| Statusline (lualine) | Dark Bordo mode caps with clean spacing; branch, diff, smart path, diagnostics, LSP, location |
-| Bufferline | Matching Bordo active-buffer treatment; cycle with `<S-h>` / `<S-l>` — [core.md](./core.md) |
+| Statusline (lualine) | Dark Rosé Pine mode caps with clean spacing; branch, diff, smart path, diagnostics, LSP, location |
+| Bufferline | Matching Rosé Pine active-buffer treatment; cycle with `<S-h>` / `<S-l>` — [core.md](./core.md) |
 | neo-tree | `<leader>fe` · `<leader>fE` · `<leader>ge` — [explorer.md](./explorer.md) |
 | Project workflows | `<leader>pn` scaffold · `<leader>pr` run/build/test — [project.md](./project.md) |
+| Markdown | `<leader>mr` inline render · `<leader>mp` side preview — [markdown.md](./markdown.md) |
 | Lazygit | `<leader>gg` · `<leader>gf` — [git.md](./git.md) |
 | Telescope | Rounded prompt/results/preview grid with icons; `<leader>sf` · `<leader>sg` · `<leader><leader>` — [telescope.md](./telescope.md) |
-| Floating windows | Rounded Bordo frame by default; plugin-specific windows may override it |
+| Floating windows | Rounded Rosé Pine frame by default; plugin-specific windows may override it |
 | Diagnostics | `]d`/`[d` · `<leader>e` · Trouble `<leader>xx` — [core.md](./core.md#diagnostics) · [qol.md](./qol.md) · [diagnostics/](../diagnostics/README.md) |
 | Treesitter / indent / pairs | Highlight, folds, guides, autopairs — [treesitter.md](./treesitter.md) |
 | LSP / format / blink | `gd`/`K`/`gr` · `<leader>cf` · `<C-y>` — [lsp.md](./lsp.md) |
 | Lint (nvim-lint) | `<leader>cl` · `<leader>tl` toggle auto · lazy Mason — [lsp.md](./lsp.md#linting-luapluginslintinglua) |
-| Salesforce | `<leader>S…` · metadata `Su` · manifests `SP` · deploy `Sp` · cancel `Sx` — [salesforce.md](./salesforce.md) |
+| Salesforce | `<leader>S…` · Vlocity `SV` · SOQL `SQ`/`Sq` · metadata `Su` · cancel `Sx` — [salesforce.md](./salesforce.md) |
 | Comment / TODO / crumbs | `gcc` · `]t`/`[t` · `<leader>st` · dropbar `<leader>;` — [comment.md](./comment.md) |
-| QoL | sessions · Trouble · surround · flash · undotree · yanky · dial · rainbow · colorizer · space dots — [qol.md](./qol.md) |
-| Colorscheme | `noctis_bordo` + shared inset float chrome — `lua/plugins/colorscheme.lua` |
+| QoL | Gremlins · sessions · Trouble · surround · flash · undotree · yanky · dial · rainbow · colorizer — [qol.md](./qol.md) |
+| Colorscheme | `rose-pine-main` + shared inset float chrome — `lua/plugins/colorscheme.lua` |
 | which-key | `<Space>` then wait — [which-key.md](./which-key.md) |
 | Plugin manager | `:Lazy` |
 
@@ -75,4 +77,4 @@ When you add keymaps in a later slice:
 
 ---
 
-Nav: [core](./core.md) · [git](./git.md) · [explorer](./explorer.md) · [project](./project.md) · [telescope](./telescope.md) · [treesitter](./treesitter.md) · [lsp](./lsp.md) · [salesforce](./salesforce.md) · [comment](./comment.md) · [which-key](./which-key.md)
+Nav: [core](./core.md) · [git](./git.md) · [explorer](./explorer.md) · [project](./project.md) · [markdown](./markdown.md) · [telescope](./telescope.md) · [treesitter](./treesitter.md) · [lsp](./lsp.md) · [salesforce](./salesforce.md) · [comment](./comment.md) · [which-key](./which-key.md)

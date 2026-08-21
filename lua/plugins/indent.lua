@@ -26,11 +26,12 @@ return {
 
       -- Dim passive guides; brighten / sync scope via palette (and ColorScheme).
       local function apply_indent_highlights()
+        local chrome = require("config.ui_chrome")
         palette.apply({ bold = true })
 
         -- Non-active indent columns — same “quiet but visible” weight as listchars
-        -- space dots (Whitespace ≈ #3d3a45 in autocmds.lua). Active scope stays bright.
-        vim.api.nvim_set_hl(0, "IblIndent", { fg = "#3d3a45", nocombine = true })
+        -- space dots. Active scope stays bright.
+        vim.api.nvim_set_hl(0, "IblIndent", { fg = chrome.highlight_med, nocombine = true })
         -- vim.api.nvim_set_hl(0, "IblIndent", { fg = "#2a2833", nocombine = true }) -- near-invisible
         -- vim.api.nvim_set_hl(0, "IblIndent", { fg = "#4a4654", nocombine = true }) -- stronger guides
         -- vim.api.nvim_set_hl(0, "IblIndent", { fg = "#5c5866", nocombine = true }) -- match stronger Whitespace
@@ -38,7 +39,7 @@ return {
 
         -- Fallback single-color scope (used only if scope.highlight is a string / IblScope).
         -- When using the rainbow list below, depth colors come from RainbowDelimiterCustom*.
-        vim.api.nvim_set_hl(0, "IblScope", { fg = "#BD93F9", bold = true, nocombine = true })
+        vim.api.nvim_set_hl(0, "IblScope", { fg = chrome.iris, bold = true, nocombine = true })
         -- vim.api.nvim_set_hl(0, "IblScope", { fg = "#8BE9FD", bold = true }) -- cyan
         -- vim.api.nvim_set_hl(0, "IblScope", { fg = "#FFB86C", bold = true }) -- orange
         -- vim.api.nvim_set_hl(0, "IblScope", { link = "Identifier" }) -- follow theme
@@ -161,7 +162,9 @@ return {
             "TelescopePrompt",
             "Trouble",
             "undotree",
-            -- "markdown", -- uncomment if guides annoy in prose
+            "markdown", -- render-markdown owns prose structure
+            "markdown.mdx",
+            -- "text", -- also suppress guides in plain text buffers
           },
           buftypes = {
             "terminal",

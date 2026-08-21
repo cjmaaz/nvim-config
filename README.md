@@ -21,7 +21,8 @@ nvim-config/
 │   │   ├── core.md       # buffers, windows, diagnostics keys, …
 │   │   ├── git.md
 │   │   ├── explorer.md
-│   │   ├── project.md     # Maven / Flutter / CMake project generator
+│   │   ├── project.md     # multi-ecosystem scaffolds + task runner
+│   │   ├── markdown.md    # inline render + side preview
 │   │   ├── telescope.md
 │   │   ├── treesitter.md
 │   │   ├── lsp.md        # LSP, blink, format, lint
@@ -47,21 +48,29 @@ nvim-config/
     │   ├── keymaps.lua   # non-plugin maps (buffers, windows, diagnostics, …)
     │   ├── project_scaffold.lua # CLI-backed new-project picker
     │   ├── project_runner.lua # project-aware run / build / test terminal
+    │   ├── project_context.lua # lightweight Salesforce root gate
+    │   ├── gremlins.lua  # invisible/confusable Unicode diagnostics
     │   ├── autocmds.lua  # yank, trim, final newline (Apex exempt), filetypes
     │   ├── lazy.lua      # bootstrap lazy.nvim + import plugins/
     │   ├── telescope/
     │   │   └── multigrep.lua # content grep + raw file-glob mode
     │   └── salesforce/
+    │       ├── process.lua # shared safe CLI/SFTerm/cancellation helpers
     │       ├── metadata.lua # org inventory, sf_cache, manifests, actions
     │       ├── browser.lua # fzf metadata hierarchy + multi-select
-    │       └── manifests.lua # search/retrieve/deploy project manifests
+    │       ├── manifests.lua # search/retrieve/deploy project manifests
+    │       ├── vlocity.lua # managed-package DataPack retrieval
+    │       ├── schema.lua # org-scoped SObject describe cache
+    │       ├── completion.lua # Blink SOQL completion source
+    │       └── query.lua # SOQL builder and SFTerm runner
     └── plugins/          # one plugin (or small family) per file
         ├── init.lua      # empty list; keeps `import = "plugins"` valid
-        ├── colorscheme.lua # noctis_bordo + highlight overlays
-        ├── statusline.lua  # responsive Bordo lualine + icons
+        ├── colorscheme.lua # Rosé Pine Main + highlight overlays
+        ├── statusline.lua  # responsive Rosé Pine lualine + icons
         ├── bufferline.lua # matching buffer bar (not tabpages)
         ├── cursor.lua     # calm smear animation across buffers/windows
         ├── explorer.lua  # neo-tree file / git explorer
+        ├── markdown.lua  # rendered Markdown + side preview
         ├── telescope.lua # fuzzy find / grep / buffers
         ├── treesitter.lua # parsers, highlight, folds, autotag
         ├── indent.lua    # indent-blankline (ibl) guides

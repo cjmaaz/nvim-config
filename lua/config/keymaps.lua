@@ -50,6 +50,16 @@ map("n", "<leader>pr", function()
   require("config.project_runner").open()
 end, { desc = "Project: run/build/test" })
 
+-- --- Gremlins (dangerous invisible / confusable Unicode) ---
+
+map("n", "<leader>tg", function()
+  require("config.gremlins").toggle()
+end, { desc = "Toggle Gremlins tracker" })
+
+map("n", "<leader>tG", function()
+  require("config.gremlins").quickfix()
+end, { desc = "Gremlins quickfix" })
+
 -- --- Small QoL (still core; not a separate topic) ---
 
 -- Clear search highlight (pairs with hlsearch in options).

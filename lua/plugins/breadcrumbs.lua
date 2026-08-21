@@ -5,7 +5,7 @@
 -- Alts: nvim-navic in lualine (revert block below) · barbecue.nvim · skip.
 --------------------------------------------------------------------------------
 
---- Bordo winbar/menu chrome, shared with which-key / neo-tree / Telescope.
+--- Rosé Pine winbar/menu chrome, shared with which-key / neo-tree / Telescope.
 local function apply_dropbar_hl()
   local chrome = require("config.ui_chrome")
   local bg, fg = chrome.panel_bg, chrome.panel_fg
@@ -69,7 +69,7 @@ return {
       vim.keymap.set("n", "];", dropbar.select_next_context, { desc = "Select next context" })
 
       apply_dropbar_hl()
-      local hl_group = vim.api.nvim_create_augroup("dropbar_bordo_hl", { clear = true })
+      local hl_group = vim.api.nvim_create_augroup("dropbar_theme_hl", { clear = true })
       vim.api.nvim_create_autocmd("ColorScheme", {
         group = hl_group,
         callback = apply_dropbar_hl,

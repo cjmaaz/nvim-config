@@ -28,3 +28,5 @@ require("config.keymaps")
 require("config.lazy")
 -- Loads lua/config/autocmds.lua
 require("config.autocmds")
+-- Reveals dangerous invisible / confusable Unicode in code buffers.
+require("config.gremlins").setup()

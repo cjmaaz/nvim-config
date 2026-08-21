@@ -21,10 +21,10 @@ api.nvim_create_autocmd("TextYankPost", {
 -- Dim listchars space/trail dots so they stay visible but quiet (Kickstart-ish list).
 -- Whitespace = space/trail listchars; NonText often used for eol/extends.
 local function apply_listchar_highlights()
-  -- Very light gray — readable on noctis_bordo / dark themes without shouting.
-  vim.api.nvim_set_hl(0, "Whitespace", { fg = "#3d3a45", nocombine = true })
-  -- vim.api.nvim_set_hl(0, "Whitespace", { fg = "#2a2830", nocombine = true }) -- even dimmer
-  -- vim.api.nvim_set_hl(0, "Whitespace", { fg = "#5c5866", nocombine = true }) -- stronger dots
+  local chrome = require("config.ui_chrome")
+  vim.api.nvim_set_hl(0, "Whitespace", { fg = chrome.highlight_med, nocombine = true })
+  -- vim.api.nvim_set_hl(0, "Whitespace", { fg = chrome.highlight_low, nocombine = true }) -- dimmer dots
+  -- vim.api.nvim_set_hl(0, "Whitespace", { fg = chrome.muted, nocombine = true }) -- stronger dots
   -- vim.api.nvim_set_hl(0, "Whitespace", { link = "Comment" }) -- follow theme comments
 end
 apply_listchar_highlights()
@@ -134,6 +134,7 @@ vim.filetype.add({
     cls = "apex",
     trigger = "apex",
     apex = "apex",
-    -- soql = "soql", -- enable with SF treesitter/LSP later
+    soql = "soql", -- standalone query drafts: treesitter + cached org completion
+    -- sosl = "sosl", -- enable when a SOSL builder/completion source is added
   },
 })

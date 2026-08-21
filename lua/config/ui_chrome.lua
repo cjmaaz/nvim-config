@@ -1,29 +1,41 @@
 --------------------------------------------------------------------------------
--- Shared UI chrome — lualine, bufferline, dropbar, which-key, neo-tree, Telescope
--- Noctis Bordo editor bg0 is #312A2D; panels use a slightly darker sibling so
--- floats/sidebars read as inset chrome without pure #000 harshness.
+-- Shared Rosé Pine Main chrome — bars, floats, pickers, sidebars, diagnostics.
 --------------------------------------------------------------------------------
 
 local M = {}
 
--- Bordo bg0 (#312A2D) nudged darker (~same hue, lower luminance).
-M.panel_bg = "#241F22"
--- M.panel_bg = "#2B2528" -- stock Bordo bg2 (only a hair darker than editor)
--- M.panel_bg = "#1C181A" -- deeper still
--- M.panel_bg = "#000000" -- pure black (harsh on Bordo)
+M.base = "#191724"
+M.surface = "#1F1D2E"
+M.overlay = "#26233A"
+M.muted = "#6E6A86"
+M.subtle = "#908CAA"
+M.text = "#E0DEF4"
+M.love = "#EB6F92"
+M.gold = "#F6C177"
+M.rose = "#EBBCBA"
+M.pine = "#31748F"
+M.foam = "#9CCFD8"
+M.iris = "#C4A7E7"
+M.highlight_low = "#21202E"
+M.highlight_med = "#403D52"
+M.highlight_high = "#524F67"
 
-M.panel_fg = "#C9BEC2" -- Bordo fg
-M.border_fg = "#D17B9A" -- Bordo rose
-M.title_fg = "#F6C38A" -- Bordo yellow
-M.muted_fg = "#87757C" -- subdued labels / inactive bars
+-- Inset panels remain distinct without introducing near-black islands.
+M.panel_bg = M.surface
+-- M.panel_bg = M.overlay -- brighter panels with stronger separation
+M.panel_fg = M.text
+M.border_fg = M.rose
+-- M.border_fg = M.love -- stronger warning-like borders
+M.title_fg = M.gold
+M.muted_fg = M.subtle
 
--- Bright, thin dividers shared by bars and panel borders.
-M.divider_fg = "#E8E1E4" -- soft white; visible without pure-white glare
--- M.divider_fg = "#C9BEC2" -- quieter: match normal panel text
+-- Dividers stay readable but avoid the previous near-white glare.
+M.divider_fg = M.subtle
+-- M.divider_fg = M.text -- strongest edge contrast
 
 -- Selected rows / components sit one step above the panel background.
-M.active_bg = "#3C2F34" -- Bordo bg1
--- M.active_bg = "#2B2528" -- subtler active fill
+M.active_bg = M.overlay
+-- M.active_bg = M.highlight_med -- stronger selected-row fill
 M.separator_fg = M.active_bg -- compatibility name used by existing chrome
 
 return M

@@ -8,16 +8,16 @@ local M = {}
 
 -- { highlight_group_name, guifg }
 M.palette = {
-  { "RainbowDelimiterCustom1", "#FF5555" }, -- vivid red
-  { "RainbowDelimiterCustom2", "#F1FA8C" }, -- bright yellow
-  { "RainbowDelimiterCustom3", "#8BE9FD" }, -- cyan
-  { "RainbowDelimiterCustom4", "#FF79C6" }, -- pink / magenta
-  { "RainbowDelimiterCustom5", "#50FA7B" }, -- green
-  { "RainbowDelimiterCustom6", "#BD93F9" }, -- purple
-  { "RainbowDelimiterCustom7", "#FFB86C" }, -- orange
-  { "RainbowDelimiterCustom8", "#61AFEF" }, -- blue
-  { "RainbowDelimiterCustom9", "#FF6E6E" }, -- coral
-  { "RainbowDelimiterCustom10", "#E2E2A0" }, -- pale gold / khaki
+  { "RainbowDelimiterCustom1", "#EB6F92" }, -- love
+  { "RainbowDelimiterCustom2", "#9CCFD8" }, -- foam
+  { "RainbowDelimiterCustom3", "#F6C177" }, -- gold
+  { "RainbowDelimiterCustom4", "#C4A7E7" }, -- iris
+  { "RainbowDelimiterCustom5", "#31748F" }, -- pine
+  { "RainbowDelimiterCustom6", "#EBBCBA" }, -- rose
+  { "RainbowDelimiterCustom7", "#B4637A" }, -- deep love
+  { "RainbowDelimiterCustom8", "#56949F" }, -- deep foam
+  { "RainbowDelimiterCustom9", "#C49A5A" }, -- deep gold
+  { "RainbowDelimiterCustom10", "#907AA9" }, -- deep iris
 }
 
 --- Apply guifg (+ bold) for every palette group. Safe to call on ColorScheme.

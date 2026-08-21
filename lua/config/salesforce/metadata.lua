@@ -5,6 +5,7 @@
 --------------------------------------------------------------------------------
 
 local M = {}
+local process = require("config.salesforce.process")
 
 local SCHEMA_VERSION = 1
 -- Bound org-list calls so an All refresh does not flood Metadata API.
@@ -21,8 +22,6 @@ local FOLDER_TYPES = {
   Report = "ReportFolder",
 }
 
-local active_processes = {}
-local next_process_id = 0
 local generation = 0
 local refreshing = false
 local orgs = {}
@@ -148,53 +147,16 @@ local function context()
   }
 end
 
-local function error_message(decoded, obj)
-  if type(decoded) == "table" then
-    return decoded.message
-      or decoded.name
-      or (type(decoded.result) == "table" and decoded.result.message)
-  end
-  local stderr = obj and obj.stderr or nil
-  return stderr and stderr:gsub("%s+$", "") or "Unknown Salesforce CLI error"
-end
-
 local function run_json(args, opts, callback)
   opts = opts or {}
-  next_process_id = next_process_id + 1
-  local process_id = next_process_id
   local token = opts.generation or generation
 
-  local handle
-  local function on_exit(obj)
-    vim.schedule(function()
-      active_processes[process_id] = nil
-      if token ~= generation then
-        return
-      end
-
-      local decoded_ok, decoded = pcall(vim.json.decode, obj.stdout or "")
-      if obj.code ~= 0 or not decoded_ok or type(decoded) ~= "table" or decoded.status ~= 0 then
-        callback(error_message(decoded_ok and decoded or nil, obj), nil, obj)
-        return
-      end
-      callback(nil, decoded.result, obj)
-    end)
-  end
-
-  local started, process_or_error = pcall(vim.system, args, {
-    cwd = opts.cwd,
-    text = true,
-  }, on_exit)
-  if not started then
-    vim.schedule(function()
-      callback(tostring(process_or_error))
-    end)
-    return nil
-  end
-  handle = process_or_error
-
-  active_processes[process_id] = handle
-  return handle
+  return process.run_sf_json(args, opts, function(err, result, obj)
+    if token ~= generation then
+      return
+    end
+    callback(err, result, obj)
+  end)
 end
 
 local function with_api_version(args, api_version)
@@ -845,23 +807,7 @@ local function write_manifest_files(ctx, items)
   }
 end
 
-local function shell_join(args)
-  local escaped = {}
-  for _, arg in ipairs(args) do
-    escaped[#escaped + 1] = vim.fn.shellescape(arg)
-  end
-  return table.concat(escaped, " ")
-end
-
-local function run_in_term(args, callback)
-  require("sf").run(shell_join(args), function(_, _, exit_code)
-    if callback then
-      vim.schedule(function()
-        callback(exit_code == 0, exit_code)
-      end)
-    end
-  end)
-end
+local run_in_term = process.run_in_term
 
 local function manifest_context()
   local ctx = context()
@@ -1031,15 +977,9 @@ function M.get_context()
 end
 
 function M.cancel_background()
-  local count = 0
   generation = generation + 1
-  for id, handle in pairs(active_processes) do
-    count = count + 1
-    pcall(handle.kill, handle, 15)
-    active_processes[id] = nil
-  end
   refreshing = false
-  return count
+  return process.cancel_background()
 end
 
 function M.is_refreshing()
@@ -1053,7 +993,7 @@ M._test = {
   manifest_lines = manifest_lines,
   normalize_orgs = normalize_orgs,
   safe_name = safe_name,
-  shell_join = shell_join,
+  shell_join = process.shell_join,
   validate_manifest_path = validate_manifest_path,
 }
 

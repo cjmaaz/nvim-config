@@ -6,6 +6,26 @@ Nav: [index](./README.md) · [core](./core.md) · [git](./git.md) · [telescope]
 
 ---
 
+## Gremlins tracker (`lua/config/gremlins.lua`)
+
+Non-destructive diagnostics reveal dangerous Unicode in code/config buffers:
+
+- invisible/security controls such as zero-width characters, bidi overrides/isolates, BOM, soft hyphen, exotic spaces, tags, and variation selectors appear as errors;
+- common Greek/Cyrillic/full-width ASCII lookalikes appear as warnings.
+
+Prose, terminal/plugin buffers, binary buffers, and files larger than 1 MiB are excluded to limit noise and scanning cost. Nothing is automatically normalized or deleted.
+
+| Key | Action |
+| --- | --- |
+| `<leader>tg` | Toggle Gremlins diagnostics for the current buffer |
+| `<leader>tG` | Put current-buffer Gremlins in quickfix and open it |
+
+Commands: `:GremlinsToggle` · `:GremlinsRescan` · `:GremlinsQuickfix`.
+
+Alternatives considered: `vscode-unicode-highlight.nvim` (exact UI idea but immature/global module names/no tests), `vim-unicode-homoglyphs` (Vimscript normalization), conceal-only rendering, and external auto-fixing scanners.
+
+---
+
 ## Sessions (`lua/plugins/persistence.lua`)
 
 Restores open buffers for a cwd after restart (`folke/persistence.nvim`). Auto-saves on exit unless you stop it.

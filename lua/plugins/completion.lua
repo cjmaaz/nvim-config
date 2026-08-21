@@ -63,6 +63,23 @@ return {
         default = { "lsp", "path", "snippets", "buffer" }, -- full set
         -- default = { "lsp", "path", "snippets" }, -- drop buffer word noise
         -- default = { "lsp", "path" }, -- minimal
+        per_filetype = {
+          soql = function()
+            if require("config.project_context").is_salesforce(0) then
+              return { "soql", "snippets", "buffer" }
+            end
+            return { "snippets", "buffer" } -- standalone SOQL: no SF module/cache load
+          end,
+          -- soql = { "soql" }, -- schema only; no snippets/buffer words
+        },
+        providers = {
+          soql = {
+            name = "SOQL",
+            module = "config.salesforce.completion",
+            score_offset = 100, -- rank org fields/objects above buffer words
+            -- score_offset = 0, -- let every source rank equally
+          },
+        },
       },
       signature = {
         enabled = true, -- show function signature help while typing

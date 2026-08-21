@@ -1,5 +1,5 @@
 --------------------------------------------------------------------------------
--- Statusline: clean Bordo lualine + file icons
+-- Statusline: clean Rosé Pine lualine + file icons
 -- Refs: CodeOSS ui.lua (standalone lualine + SF org/coverage); Craftzdog/LazyVim
 --   only tweak LazyVim's. Alternatives to lualine (pick one ecosystem):
 --   - echasnovski/mini.statusline  (lighter, mini.nvim family)
@@ -9,39 +9,40 @@
 
 local chrome = require("config.ui_chrome")
 
--- Noctis Bordo accents; statusline layers sit slightly darker than other panels.
-local bordo = {
-  bg = "#1F1B1D", -- modest step darker than shared panel_bg (#241F22)
+-- Shared Rosé Pine accents; statusline remains flat and edge-free.
+local palette = {
+  bg = chrome.base,
   -- bg = chrome.panel_bg, -- match which-key / neo-tree / Telescope
-  bg_alt = "#2B2528", -- raised section, still darker than the old Bordo bg1
+  bg_alt = chrome.surface,
   -- bg_alt = chrome.active_bg, -- brighter section contrast
   fg = chrome.panel_fg,
   muted = chrome.muted_fg,
-  rose = chrome.border_fg,
-  orange = "#C5663F",
-  yellow = chrome.title_fg,
-  green = "#7BE6AB",
-  cyan = "#4CA1B3",
-  blue = "#64AAE4",
-  purple = "#7060EB",
+  rose = chrome.love,
+  orange = chrome.rose,
+  yellow = chrome.gold,
+  green = chrome.foam,
+  pine = chrome.pine,
+  cyan = chrome.foam,
+  blue = chrome.foam,
+  purple = chrome.iris,
 }
 
 -- Flat sections with a mode-colored cap on both ends.
-local bordo_theme = {
+local rose_pine_theme = {
   normal = {
-    a = { fg = bordo.bg, bg = bordo.blue, gui = "bold" },
-    b = { fg = bordo.fg, bg = bordo.bg_alt },
-    c = { fg = bordo.fg, bg = bordo.bg },
+    a = { fg = palette.bg, bg = palette.blue, gui = "bold" },
+    b = { fg = palette.fg, bg = palette.bg_alt },
+    c = { fg = palette.fg, bg = palette.bg },
   },
-  insert = { a = { fg = bordo.bg, bg = bordo.green, gui = "bold" } },
-  visual = { a = { fg = bordo.bg, bg = bordo.purple, gui = "bold" } },
-  replace = { a = { fg = bordo.bg, bg = bordo.rose, gui = "bold" } },
-  command = { a = { fg = bordo.bg, bg = bordo.yellow, gui = "bold" } },
-  terminal = { a = { fg = bordo.bg, bg = bordo.orange, gui = "bold" } },
+  insert = { a = { fg = palette.fg, bg = palette.pine, gui = "bold" } },
+  visual = { a = { fg = palette.bg, bg = palette.purple, gui = "bold" } },
+  replace = { a = { fg = palette.bg, bg = palette.rose, gui = "bold" } },
+  command = { a = { fg = palette.bg, bg = palette.yellow, gui = "bold" } },
+  terminal = { a = { fg = palette.bg, bg = palette.orange, gui = "bold" } },
   inactive = {
-    a = { fg = bordo.muted, bg = bordo.bg, gui = "bold" },
-    b = { fg = bordo.muted, bg = bordo.bg },
-    c = { fg = bordo.muted, bg = bordo.bg },
+    a = { fg = palette.muted, bg = palette.bg, gui = "bold" },
+    b = { fg = palette.muted, bg = palette.bg },
+    c = { fg = palette.muted, bg = palette.bg },
   },
 }
 
@@ -78,6 +79,9 @@ end
 -- component stays empty until a Salesforce command/file loads the plugin.
 -- Alts: always `require("sf")` (forces load) · hardcode alias · skip entirely.
 local function salesforce_status()
+  if not require("config.project_context").is_salesforce(0) then
+    return ""
+  end
   local sf = package.loaded.sf
   if not sf then
     return "" -- plugin not loaded yet → hide component
@@ -131,8 +135,8 @@ return {
     },
     opts = {
       options = {
-        -- Bordo palette with a mode-colored cap.
-        theme = bordo_theme,
+        -- Rosé Pine palette with a mode-colored cap.
+        theme = rose_pine_theme,
         -- theme = "auto", -- follow the active colorscheme instead
 
         -- Keep component boundaries clean; the horizontal edge separates the bar.
@@ -173,9 +177,9 @@ return {
             "diff", -- +/-/~ counts; richer when gitsigns is loaded
             symbols = status_icons.diff,
             diff_color = {
-              added = { fg = bordo.green },
-              modified = { fg = bordo.yellow },
-              removed = { fg = bordo.rose },
+              added = { fg = palette.green },
+              modified = { fg = palette.yellow },
+              removed = { fg = palette.rose },
             },
           },
           -- { "diff", symbols = { added = "+", modified = "~", removed = "-" } }, -- ASCII-only
@@ -211,10 +215,12 @@ return {
         lualine_x = {
           {
             salesforce_status,
-            color = { fg = bordo.blue, gui = "bold" },
+            color = { fg = palette.blue, gui = "bold" },
             -- Only paint when sf.nvim is loaded and the screen has room.
             cond = function()
-              return package.loaded.sf ~= nil and vim.o.columns >= 100
+              return package.loaded.sf ~= nil
+                and require("config.project_context").is_salesforce(0)
+                and vim.o.columns >= 100
             end,
             -- cond = function() return package.loaded.sf ~= nil end, -- show at every width
             -- icon = "󰢎", -- lualine can prefix an icon separately if you prefer
@@ -225,21 +231,21 @@ return {
             sources = { "nvim_diagnostic" },
             symbols = status_icons.diagnostics,
             diagnostics_color = {
-              error = { fg = bordo.rose },
-              warn = { fg = bordo.yellow },
-              info = { fg = bordo.blue },
-              hint = { fg = bordo.cyan },
+              error = { fg = palette.rose },
+              warn = { fg = palette.yellow },
+              info = { fg = palette.blue },
+              hint = { fg = palette.cyan },
             },
           },
           {
             "lsp_status", -- active client names + progress
             icon = status_icons.lsp,
-            color = { fg = bordo.cyan },
+            color = { fg = palette.cyan },
             cond = min_columns(120),
           },
           {
             "filetype", -- name + devicon
-            color = { fg = bordo.yellow },
+            color = { fg = palette.yellow },
             cond = min_columns(90),
           },
           -- { "encoding", cond = min_columns(140) }, -- show utf-8 on very wide screens

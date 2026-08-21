@@ -105,6 +105,11 @@ return {
           { pattern = "sf: browse metadata", icon = "󰉓", color = "azure" },
           { pattern = "sf: update metadata browser", icon = "󰓅", color = "azure" },
           { pattern = "sf: browse package manifests", icon = "󰈙", color = "azure" },
+          { pattern = "sf: retrieve vlocity datapacks", icon = "󰇚", color = "azure" },
+
+          -- SOQL builder / runner → yellow
+          { pattern = "sf: build soql query", icon = "󰆼", color = "yellow" },
+          { pattern = "sf: run soql", icon = "󰆼", color = "yellow" },
 
           -- Tests / coverage (St ST Sa SA SR Sv ]v [v) → green
           { pattern = "sf: test under cursor %+ coverage", icon = "󰝖", color = "green" },
@@ -250,6 +255,10 @@ return {
           { pattern = "project: run/build/test", icon = "󰐊", color = "green" },
           { pattern = "project", icon = "󰏗", color = "green" },
 
+          -------------------------------------------------------------- Markdown
+          { pattern = "markdown: toggle rendering", icon = "󰽛", color = "purple" },
+          { pattern = "markdown: toggle side preview", icon = "󰈈", color = "purple" },
+
           ------------------------------------------------ Explorer / sessions
           { pattern = "toggle file explorer", icon = "󰙅", color = "azure" },
           { pattern = "reveal current file in explorer", icon = "󰈙", color = "azure" },
@@ -267,6 +276,8 @@ return {
           { pattern = "toggle flash search", icon = "⚡", color = "yellow" },
           { pattern = "flash jump", icon = "⚡", color = "yellow" },
           { pattern = "flash", icon = "⚡", color = "yellow" },
+          { pattern = "toggle gremlins tracker", icon = "󰀪", color = "orange" },
+          { pattern = "gremlins quickfix", icon = "󰁨", color = "orange" },
           { pattern = "dial additive increment", icon = "󰐖", color = "green" },
           { pattern = "dial additive decrement", icon = "󰍴", color = "red" },
           { pattern = "dial increment", icon = "󰐖", color = "green" },
@@ -338,6 +349,7 @@ return {
         { "<leader>h", group = "Git hunk", mode = { "n", "v" }, icon = { icon = "󰊢", color = "orange" } },
         { "<leader>f", group = "File/Find", icon = { icon = "󰙅", color = "azure" } },
         { "<leader>g", group = "Git", icon = { icon = "", color = "orange" } },
+        { "<leader>m", group = "Markdown", icon = { icon = "󰍔", color = "purple" } },
         { "<leader>s", group = "Search", mode = { "n", "v" }, icon = { icon = "", color = "green" } },
         { "<leader>S", group = "Salesforce", mode = { "n", "x" }, icon = { icon = "󰢎", color = "blue" } },
         { "<leader>c", group = "Code", icon = { icon = "", color = "purple" } },

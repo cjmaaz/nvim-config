@@ -49,6 +49,8 @@ blink.cmp + LuaSnip. **Accept with `<C-y>`** (Kickstart / `:help ins-completion`
 | `<C-e>` | Cancel |
 | `<C-space>` | Open menu / docs |
 
+For `.soql` buffers, Blink adds a custom **SOQL** source backed by the selected org’s project-local schema cache. It completes SObjects, fields, relationships, keywords, functions, and date literals without contacting the org while typing. Refresh/populate the cache through the [SOQL builder](./salesforce.md#soql-builder-completion-and-runner).
+
 ---
 
 ## Formatting (`lua/plugins/formatting.lua`)
