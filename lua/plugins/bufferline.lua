@@ -42,7 +42,7 @@ return {
         diagnostics = false, -- turn on after LSP: "nvim_lsp"
         -- diagnostics = "nvim_lsp",
       },
-      -- Same flat Rosé Pine layers as lualine; active buffer gets the bright divider.
+      -- Same flat Monokai Pro layers as lualine; active buffer gets the bright divider.
       highlights = {
         fill = { fg = chrome.muted_fg, bg = chrome.panel_bg },
         background = { fg = chrome.muted_fg, bg = chrome.panel_bg },

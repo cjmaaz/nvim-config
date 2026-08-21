@@ -65,8 +65,8 @@ nvim-config/
     │       └── query.lua # SOQL builder and SFTerm runner
     └── plugins/          # one plugin (or small family) per file
         ├── init.lua      # empty list; keeps `import = "plugins"` valid
-        ├── colorscheme.lua # Rosé Pine Main + highlight overlays
-        ├── statusline.lua  # responsive Rosé Pine lualine + icons
+        ├── colorscheme.lua # Monokai Pro + retained theme alternates
+        ├── statusline.lua  # responsive Monokai Pro lualine + icons
         ├── bufferline.lua # matching buffer bar (not tabpages)
         ├── cursor.lua     # calm smear animation across buffers/windows
         ├── explorer.lua  # neo-tree file / git explorer

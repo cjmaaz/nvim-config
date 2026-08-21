@@ -46,14 +46,14 @@ Defined in `init.lua`.
 
 | Area | How you use it today |
 | --- | --- |
-| Statusline (lualine) | Dark Rosé Pine mode caps with clean spacing; branch, diff, smart path, diagnostics, LSP, location |
-| Bufferline | Matching Rosé Pine active-buffer treatment; cycle with `<S-h>` / `<S-l>` — [core.md](./core.md) |
+| Statusline (lualine) | Warm-charcoal Monokai mode caps; branch, diff, smart path, diagnostics, LSP, location |
+| Bufferline | Matching Monokai Pro active-buffer treatment; cycle with `<S-h>` / `<S-l>` — [core.md](./core.md) |
 | neo-tree | `<leader>fe` · `<leader>fE` · `<leader>ge` — [explorer.md](./explorer.md) |
 | Project workflows | `<leader>pn` scaffold · `<leader>pr` run/build/test — [project.md](./project.md) |
 | Markdown | `<leader>mr` inline render · `<leader>mp` side preview — [markdown.md](./markdown.md) |
 | Lazygit | `<leader>gg` · `<leader>gf` — [git.md](./git.md) |
 | Telescope | Rounded prompt/results/preview grid with icons; `<leader>sf` · `<leader>sg` · `<leader><leader>` — [telescope.md](./telescope.md) |
-| Floating windows | Rounded Rosé Pine frame by default; plugin-specific windows may override it |
+| Floating windows | Rounded Monokai Pro frame by default; plugin-specific windows may override it |
 | Diagnostics | `]d`/`[d` · `<leader>e` · Trouble `<leader>xx` — [core.md](./core.md#diagnostics) · [qol.md](./qol.md) · [diagnostics/](../diagnostics/README.md) |
 | Treesitter / indent / pairs | Highlight, folds, guides, autopairs — [treesitter.md](./treesitter.md) |
 | LSP / format / blink | `gd`/`K`/`gr` · `<leader>cf` · `<C-y>` — [lsp.md](./lsp.md) |
@@ -61,7 +61,7 @@ Defined in `init.lua`.
 | Salesforce | `<leader>S…` · Vlocity `SV` · SOQL `SQ`/`Sq` · metadata `Su` · cancel `Sx` — [salesforce.md](./salesforce.md) |
 | Comment / TODO / crumbs | `gcc` · `]t`/`[t` · `<leader>st` · dropbar `<leader>;` — [comment.md](./comment.md) |
 | QoL | Gremlins · sessions · Trouble · surround · flash · undotree · yanky · dial · rainbow · colorizer — [qol.md](./qol.md) |
-| Colorscheme | `rose-pine-main` + shared inset float chrome — `lua/plugins/colorscheme.lua` |
+| Colorscheme | `monokai-pro` (`pro` filter) + shared inset float chrome — `lua/plugins/colorscheme.lua` |
 | which-key | `<Space>` then wait — [which-key.md](./which-key.md) |
 | Plugin manager | `:Lazy` |
 

@@ -5,7 +5,7 @@
 -- Alts: nvim-navic in lualine (revert block below) · barbecue.nvim · skip.
 --------------------------------------------------------------------------------
 
---- Rosé Pine winbar/menu chrome, shared with which-key / neo-tree / Telescope.
+--- Monokai Pro winbar/menu chrome, shared with which-key / neo-tree / Telescope.
 local function apply_dropbar_hl()
   local chrome = require("config.ui_chrome")
   local bg, fg = chrome.panel_bg, chrome.panel_fg

@@ -1,5 +1,5 @@
 --------------------------------------------------------------------------------
--- Statusline: clean Rosé Pine lualine + file icons
+-- Statusline: clean Monokai Pro lualine + file icons
 -- Refs: CodeOSS ui.lua (standalone lualine + SF org/coverage); Craftzdog/LazyVim
 --   only tweak LazyVim's. Alternatives to lualine (pick one ecosystem):
 --   - echasnovski/mini.statusline  (lighter, mini.nvim family)
@@ -9,7 +9,7 @@
 
 local chrome = require("config.ui_chrome")
 
--- Shared Rosé Pine accents; statusline remains flat and edge-free.
+-- Shared Monokai Pro accents; statusline remains flat and edge-free.
 local palette = {
   bg = chrome.base,
   -- bg = chrome.panel_bg, -- match which-key / neo-tree / Telescope
@@ -17,18 +17,18 @@ local palette = {
   -- bg_alt = chrome.active_bg, -- brighter section contrast
   fg = chrome.panel_fg,
   muted = chrome.muted_fg,
-  rose = chrome.love,
-  orange = chrome.rose,
-  yellow = chrome.gold,
-  green = chrome.foam,
-  pine = chrome.pine,
-  cyan = chrome.foam,
-  blue = chrome.foam,
-  purple = chrome.iris,
+  rose = chrome.red,
+  orange = chrome.orange,
+  yellow = chrome.yellow,
+  green = chrome.green,
+  pine = chrome.green,
+  cyan = chrome.cyan,
+  blue = chrome.cyan,
+  purple = chrome.magenta,
 }
 
 -- Flat sections with a mode-colored cap on both ends.
-local rose_pine_theme = {
+local monokai_theme = {
   normal = {
     a = { fg = palette.bg, bg = palette.blue, gui = "bold" },
     b = { fg = palette.fg, bg = palette.bg_alt },
@@ -135,8 +135,8 @@ return {
     },
     opts = {
       options = {
-        -- Rosé Pine palette with a mode-colored cap.
-        theme = rose_pine_theme,
+        -- Monokai Pro palette with a mode-colored cap.
+        theme = monokai_theme,
         -- theme = "auto", -- follow the active colorscheme instead
 
         -- Keep component boundaries clean; the horizontal edge separates the bar.

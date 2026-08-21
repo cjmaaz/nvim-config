@@ -4,6 +4,7 @@
 -- theme, then switches — and lualine's theme = "auto" would lag behind.
 --
 -- Alternatives (enable only one colorscheme plugin at a time):
+--   - rose-pine/neovim               (previous Rosé Pine Main; retained below)
 --   - talha-akram/noctis.nvim         (previous Noctis Bordo; retained below)
 --   - rebelot/kanagawa.nvim          (Kanagawa dragon — commented below)
 --   - folke/tokyonight.nvim          (LazyVim default)
@@ -14,10 +15,80 @@
 --------------------------------------------------------------------------------
 
 return {
-  -- Active: Rosé Pine Main — warm, modern, readable without muted syntax.
+  -- Active: Monokai Pro — warm charcoal background + vivid balanced accents.
+  {
+    "loctvl842/monokai-pro.nvim",
+    lazy = false, -- paint before UI plugins to avoid startup flash
+    -- lazy = true, -- wrong for themes: bars/floats initialize against defaults
+    priority = 1000,
+    -- priority = 50, -- too late for statusline/chrome consumers
+    opts = {
+      transparent_background = false,
+      -- transparent_background = true, -- use the terminal's own background
+      terminal_colors = true,
+      devicons = vim.g.have_nerd_font,
+      filter = "pro",
+      -- filter = "ristretto", -- warmer/deeper alternate
+      styles = {
+        comment = { italic = true },
+        keyword = {},
+        type = {},
+        storageclass = {},
+        structure = {},
+        parameter = {},
+        annotation = {},
+        tag_attribute = {},
+      },
+      inc_search = "background",
+      -- inc_search = "underline", -- quieter incremental-search treatment
+      background_clear = {},
+      plugins = {
+        bufferline = {
+          underline_selected = false,
+          underline_visible = false,
+          underline_fill = false,
+          bold = true,
+        },
+        indent_blankline = {
+          context_highlight = "default",
+          context_start_underline = false,
+        },
+      },
+    },
+    config = function(_, opts)
+      require("monokai-pro").setup(opts)
+      vim.cmd.colorscheme("monokai-pro")
+      -- require("monokai-pro").load("ristretto") -- warmer/deeper filter
+
+      local chrome = require("config.ui_chrome")
+      local hl = vim.api.nvim_set_hl
+      local function apply_overrides()
+        hl(0, "NormalFloat", { fg = chrome.panel_fg, bg = chrome.panel_bg })
+        -- hl(0, "NormalFloat", { link = "Normal" }) -- blend floats into editor
+        hl(0, "FloatBorder", { fg = chrome.divider_fg, bg = chrome.panel_bg })
+        -- hl(0, "FloatBorder", { fg = chrome.red, bg = chrome.panel_bg }) -- vivid edge
+        hl(0, "FloatTitle", { fg = chrome.title_fg, bg = chrome.panel_bg, bold = true })
+        hl(0, "FloatFooter", { fg = chrome.muted_fg, bg = chrome.panel_bg })
+        hl(0, "@markup.strong", { bold = true })
+        hl(0, "@markup.italic", { italic = true })
+        hl(0, "@markup.strikethrough", { strikethrough = true })
+        hl(0, "@lsp.mod.deprecated", { strikethrough = true, italic = true })
+        hl(0, "DiagnosticDeprecated", { strikethrough = true })
+      end
+      apply_overrides()
+      vim.api.nvim_create_autocmd("ColorScheme", {
+        group = vim.api.nvim_create_augroup("user_float_chrome", { clear = true }),
+        callback = apply_overrides,
+      })
+    end,
+  },
+
+  -- Inactive alternate: Rosé Pine Main.
   {
     "rose-pine/neovim",
     name = "rose-pine",
+    enabled = false, -- retain the previous theme without loading it
+    -- enabled = true, -- switch back after disabling Monokai Pro above
     lazy = false, -- paint before UI plugins to avoid startup flash
     -- lazy = true, -- wrong for themes: bars/floats initialize against defaults
     priority = 1000,
@@ -86,7 +157,7 @@ return {
   {
     "talha-akram/noctis.nvim",
     enabled = false, -- keep the previous theme available without loading it
-    -- enabled = true, -- switch back after disabling Rosé Pine above
+    -- enabled = true, -- switch back after disabling Monokai Pro above
     -- Load timing: colorschemes should paint before other UI plugins.
     lazy = false, -- load at startup (required for colorschemes)
     -- lazy = true, -- wrong for themes: UI would flash the default first
