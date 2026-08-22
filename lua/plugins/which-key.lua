@@ -191,7 +191,6 @@ return {
           ------------------------------------------------------------------- Git
           { pattern = "lazygit %(current file%)", icon = "󰈙", color = "orange" },
           { pattern = "lazygit", icon = "", color = "orange" },
-          { pattern = "toggle git status explorer", icon = "󰊢", color = "orange" },
           { pattern = "next git hunk", icon = "󰁔", color = "orange" },
           { pattern = "previous git hunk", icon = "󰁍", color = "orange" },
           { pattern = "stage selected hunk", icon = "󰐕", color = "green" },

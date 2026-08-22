@@ -1,5 +1,5 @@
 --------------------------------------------------------------------------------
--- Statusline: clean Monokai Pro lualine + file icons
+-- Statusline: curved Catppuccin Mocha lualine + file icons
 -- Refs: CodeOSS ui.lua (standalone lualine + SF org/coverage); Craftzdog/LazyVim
 --   only tweak LazyVim's. Alternatives to lualine (pick one ecosystem):
 --   - echasnovski/mini.statusline  (lighter, mini.nvim family)
@@ -9,7 +9,7 @@
 
 local chrome = require("config.ui_chrome")
 
--- Shared Monokai Pro accents; statusline remains flat and edge-free.
+-- Shared neutral-Mocha accents; curved separators form rounded bubbles.
 local palette = {
   bg = chrome.base,
   -- bg = chrome.panel_bg, -- match which-key / neo-tree / Telescope
@@ -28,9 +28,9 @@ local palette = {
 }
 
 -- Flat sections with a mode-colored cap on both ends.
-local monokai_theme = {
+local catppuccin_theme = {
   normal = {
-    a = { fg = palette.bg, bg = palette.blue, gui = "bold" },
+    a = { fg = palette.bg, bg = chrome.lavender, gui = "bold" },
     b = { fg = palette.fg, bg = palette.bg_alt },
     c = { fg = palette.fg, bg = palette.bg },
   },
@@ -135,14 +135,15 @@ return {
     },
     opts = {
       options = {
-        -- Monokai Pro palette with a mode-colored cap.
-        theme = monokai_theme,
+        -- Neutral Catppuccin palette with mode-colored rounded sections.
+        theme = catppuccin_theme,
         -- theme = "auto", -- follow the active colorscheme instead
 
-        -- Keep component boundaries clean; the horizontal edge separates the bar.
+        -- Curved section transitions create the bubble look from the reference.
         component_separators = { left = "", right = "" },
         -- component_separators = { left = "│", right = "│" }, -- vertical dividers (visually busy)
-        section_separators = { left = "", right = "" }, -- clean, no Powerline wedges
+        section_separators = { left = "", right = "" },
+        -- section_separators = { left = "", right = "" }, -- previous flat rectangles
         -- component_separators = { left = "", right = "" }, -- Powerline (needs Nerd Font)
         -- section_separators = { left = "", right = "" }, -- Powerline wedges
 

@@ -53,7 +53,7 @@ return {
         multi = "+",
       }
 
-      --- Warm Monokai Pro panel (shared with which-key / neo-tree).
+      --- Neutral Catppuccin panel (shared with which-key / neo-tree).
       local function apply_telescope_hl()
         local chrome = require("config.ui_chrome")
         local bg, fg = chrome.panel_bg, chrome.panel_fg

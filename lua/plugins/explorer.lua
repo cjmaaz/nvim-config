@@ -57,27 +57,27 @@ return {
         "<cmd>Neotree filesystem reveal left<CR>",
         desc = "Reveal current file in explorer",
       },
-      {
-        "<leader>ge",
-        "<cmd>Neotree git_status toggle<CR>",
-        desc = "Toggle git status explorer",
-      },
+      -- { "<leader>ge", "<cmd>Neotree git_status toggle<CR>", desc = "Toggle git status explorer" },
       -- { "\\", "<cmd>Neotree reveal<CR>", desc = "Neo-tree reveal (Kickstart)" }, -- conflicts with maplocalleader
     },
     opts = {
+      -- Keep Neo-tree focused on files; buffers use <leader><leader>, Git uses LazyGit.
+      sources = { "filesystem" },
+      -- sources = { "filesystem", "buffers", "git_status" }, -- restore all source views
+
       -- Close neo-tree if it would be the last window (avoids empty layout).
       close_if_last_window = true,
       -- close_if_last_window = false,
 
-      -- Clickable Files / Buffers / Git tabs inside Neo-tree's own winbar.
+      -- Source tabs are unnecessary when filesystem is the only active source.
       source_selector = {
-        winbar = true,
-        -- winbar = false, -- hide tabs; switch sources only with < / >
+        winbar = false,
+        -- winbar = true, -- restore clickable source tabs with sources above
         statusline = false, -- lualine owns the global statusline
         sources = {
           { source = "filesystem", display_name = "Files" },
-          { source = "buffers", display_name = "Buffers" },
-          { source = "git_status", display_name = "Git" },
+          -- { source = "buffers", display_name = "Buffers" },
+          -- { source = "git_status", display_name = "Git" },
         },
         content_layout = "center",
         tabs_layout = "equal",

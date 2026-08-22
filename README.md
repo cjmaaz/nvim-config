@@ -65,11 +65,12 @@ nvim-config/
     │       └── query.lua # SOQL builder and SFTerm runner
     └── plugins/          # one plugin (or small family) per file
         ├── init.lua      # empty list; keeps `import = "plugins"` valid
-        ├── colorscheme.lua # Monokai Pro + retained theme alternates
-        ├── statusline.lua  # responsive Monokai Pro lualine + icons
+        ├── colorscheme.lua # neutral-background Catppuccin Mocha
+        ├── statusline.lua  # responsive curved Catppuccin lualine
         ├── bufferline.lua # matching buffer bar (not tabpages)
         ├── cursor.lua     # calm smear animation across buffers/windows
-        ├── explorer.lua  # neo-tree file / git explorer
+        ├── explorer.lua  # filesystem-only neo-tree
+        ├── incline.lua   # rounded file + current-symbol window labels
         ├── markdown.lua  # rendered Markdown + side preview
         ├── telescope.lua # fuzzy find / grep / buffers
         ├── treesitter.lua # parsers, highlight, folds, autotag
@@ -82,7 +83,7 @@ nvim-config/
         ├── salesforce.lua # sf.nvim + fzf-lua; <leader>S… (Sp push, Sx cancel)
         ├── comment.lua   # Comment.nvim + context-commentstring
         ├── todo-comments.lua # TODO/FIXME highlight + ]t / <leader>st
-        ├── breadcrumbs.lua # dropbar clickable winbar + symbol menus
+        ├── breadcrumbs.lua # disabled Dropbar alternate
         ├── git.lua       # gitsigns signs + hunk keymaps
         └── which-key.lua # leader popup / group labels
 ```

@@ -24,7 +24,7 @@ Only maps we actually set are listed. Built-in Vim/Neovim keys (`hjkl`, `:w`, `g
 | Treesitter / indent / autopairs | [treesitter.md](./treesitter.md) |
 | LSP / completion / formatting / lint | [lsp.md](./lsp.md) |
 | Salesforce (sf.nvim) | [salesforce.md](./salesforce.md) |
-| Comment / TODO / breadcrumbs | [comment.md](./comment.md) |
+| Comment / TODO / window context | [comment.md](./comment.md) |
 | QoL (sessions, Trouble, surround, flash, undotree) | [qol.md](./qol.md) |
 | which-key | [which-key.md](./which-key.md) |
 | UI cheat sheet | [below](#ui-notes) |
@@ -46,24 +46,26 @@ Defined in `init.lua`.
 
 | Area | How you use it today |
 | --- | --- |
-| Statusline (lualine) | Warm-charcoal Monokai mode caps; branch, diff, smart path, diagnostics, LSP, location |
-| Bufferline | Matching Monokai Pro active-buffer treatment; cycle with `<S-h>` / `<S-l>` — [core.md](./core.md) |
-| neo-tree | `<leader>fe` · `<leader>fE` · `<leader>ge` — [explorer.md](./explorer.md) |
+| Statusline (lualine) | Curved neutral-Mocha bubbles; branch, diff, path, diagnostics, LSP, location |
+| Bufferline | Matching Catppuccin active-buffer treatment; cycle with `<S-h>` / `<S-l>` — [core.md](./core.md) |
+| neo-tree | Filesystem only: `<leader>fe` · `<leader>fE` — [explorer.md](./explorer.md) |
 | Project workflows | `<leader>pn` scaffold · `<leader>pr` run/build/test — [project.md](./project.md) |
 | Markdown | `<leader>mr` inline render · `<leader>mp` side preview — [markdown.md](./markdown.md) |
 | Lazygit | `<leader>gg` · `<leader>gf` — [git.md](./git.md) |
 | Telescope | Rounded prompt/results/preview grid with icons; `<leader>sf` · `<leader>sg` · `<leader><leader>` — [telescope.md](./telescope.md) |
-| Floating windows | Rounded Monokai Pro frame by default; plugin-specific windows may override it |
+| Floating windows | Rounded neutral-Mocha frame by default; plugin-specific windows may override it |
 | Diagnostics | `]d`/`[d` · `<leader>e` · Trouble `<leader>xx` — [core.md](./core.md#diagnostics) · [qol.md](./qol.md) · [diagnostics/](../diagnostics/README.md) |
 | Treesitter / indent / pairs | Highlight, folds, guides, autopairs — [treesitter.md](./treesitter.md) |
 | LSP / format / blink | `gd`/`K`/`gr` · `<leader>cf` · `<C-y>` — [lsp.md](./lsp.md) |
 | Lint (nvim-lint) | `<leader>cl` · `<leader>tl` toggle auto · lazy Mason — [lsp.md](./lsp.md#linting-luapluginslintinglua) |
 | Salesforce | `<leader>S…` · Vlocity `SV` · SOQL `SQ`/`Sq` · metadata `Su` · cancel `Sx` — [salesforce.md](./salesforce.md) |
-| Comment / TODO / crumbs | `gcc` · `]t`/`[t` · `<leader>st` · dropbar `<leader>;` — [comment.md](./comment.md) |
+| Comment / TODO / context | `gcc` · `]t`/`[t` · `<leader>st`; Incline shows file + current LSP symbols — [comment.md](./comment.md) |
 | QoL | Gremlins · sessions · Trouble · surround · flash · undotree · yanky · dial · rainbow · colorizer — [qol.md](./qol.md) |
-| Colorscheme | `monokai-pro` (`pro` filter) + shared inset float chrome — `lua/plugins/colorscheme.lua` |
+| Colorscheme | Catppuccin Mocha accents on a neutral near-black background — `lua/plugins/colorscheme.lua` |
 | which-key | `<Space>` then wait — [which-key.md](./which-key.md) |
 | Plugin manager | `:Lazy` |
+
+The previous footer looked rectangular because both lualine separator sets were explicitly empty. The current `` / `` Nerd Font Powerline glyphs draw curved transitions by using each neighboring section’s foreground/background colors.
 
 ---
 

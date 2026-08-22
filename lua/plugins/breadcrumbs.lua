@@ -5,7 +5,7 @@
 -- Alts: nvim-navic in lualine (revert block below) · barbecue.nvim · skip.
 --------------------------------------------------------------------------------
 
---- Monokai Pro winbar/menu chrome, shared with which-key / neo-tree / Telescope.
+--- Neutral Catppuccin menu chrome retained for the disabled Dropbar alternate.
 local function apply_dropbar_hl()
   local chrome = require("config.ui_chrome")
   local bg, fg = chrome.panel_bg, chrome.panel_fg
@@ -45,6 +45,8 @@ end
 return {
   {
     "Bekaboo/dropbar.nvim",
+    enabled = false, -- temporarily hide the breadcrumb winbar
+    -- enabled = true, -- restore the winbar and breadcrumb mappings
     -- The plugin's startup file installs lightweight lazy autocmds itself.
     lazy = false,
     dependencies = {

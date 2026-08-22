@@ -42,9 +42,17 @@ Also: `:TodoQuickFix` · `:TodoLocList` · `:TodoTelescope`.
 
 ---
 
-## Breadcrumbs (dropbar.nvim)
+## Window context (incline.nvim + nvim-navic)
 
-Shows the file path and current symbol chain (e.g. `Class › method`) in the **winbar**. Symbols come from LSP, Treesitter, or Markdown; path navigation works without an LSP.
+`lua/plugins/incline.lua` shows a compact rounded label at the top-right of each editor window. Every label contains the file icon/name and modified state; the focused window also shows up to the last three LSP class/function/method symbols.
+
+Unlike a built-in full-width winbar, Incline consumes only the width of its content and leaves the rest of the top row available for code.
+
+### Disabled Dropbar alternate
+
+`enabled = false` in `lua/plugins/breadcrumbs.lua` keeps the previous clickable path/symbol winbar available without displaying it. Flip to the commented `enabled = true` alternate to restore Dropbar.
+
+When Dropbar is enabled, it shows the file path and current symbol chain (e.g. `Class › method`) in the full-width winbar.
 
 | Key | Mode | Action |
 | --- | --- | --- |
@@ -52,7 +60,7 @@ Shows the file path and current symbol chain (e.g. `Class › method`) in the **
 | `[;` | n | Go to the start of the current symbol context |
 | `];` | n | Select the next symbol context |
 
-Click a winbar component to open its sibling menu; click an entry to jump. In a menu, `i` starts fuzzy filtering, `<CR>` selects, and `q` / `<Esc>` closes it. Hover previews are enabled, and menu chrome follows the shared Monokai Pro panel palette.
+These three mappings are disabled with Dropbar. Its components are clickable; in a menu, `i` starts fuzzy filtering, `<CR>` selects, and `q` / `<Esc>` closes it.
 
 ---
 

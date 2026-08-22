@@ -37,7 +37,7 @@ Commented alternates in config: `<leader>g…` prefix, inline preview (`hi`), di
 
 which-key group: **Git hunk** under `<leader>h` — [which-key.md](./which-key.md). Toggle group also lists `tb`.
 
-Git status tree: [`<leader>ge`](./explorer.md) (neo-tree).
+Neo-tree keeps Git status badges in its filesystem view, but its separate Git source is disabled; use LazyGit for browsing changes.
 
 ---
 

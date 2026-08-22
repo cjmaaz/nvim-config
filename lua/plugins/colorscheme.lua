@@ -4,6 +4,7 @@
 -- theme, then switches — and lualine's theme = "auto" would lag behind.
 --
 -- Alternatives (enable only one colorscheme plugin at a time):
+--   - loctvl842/monokai-pro.nvim      (previous warm-charcoal theme; retained below)
 --   - rose-pine/neovim               (previous Rosé Pine Main; retained below)
 --   - talha-akram/noctis.nvim         (previous Noctis Bordo; retained below)
 --   - rebelot/kanagawa.nvim          (Kanagawa dragon — commented below)
@@ -15,9 +16,122 @@
 --------------------------------------------------------------------------------
 
 return {
-  -- Active: Monokai Pro — warm charcoal background + vivid balanced accents.
+  -- Active: Catppuccin Mocha accents on a neutral near-black background.
+  {
+    "catppuccin/nvim",
+    name = "catppuccin",
+    lazy = false, -- paint before UI plugins so curved separators inherit colors
+    -- lazy = true, -- wrong for themes: bubbles can initialize with black edges
+    priority = 1000,
+    -- priority = 50, -- too late for statusline/chrome consumers
+    opts = {
+      flavour = "mocha",
+      background = {
+        light = "latte",
+        dark = "mocha",
+      },
+      transparent_background = false,
+      -- transparent_background = true, -- use terminal background instead
+      show_end_of_buffer = false,
+      term_colors = true,
+      dim_inactive = {
+        enabled = true,
+        shade = "dark",
+        percentage = 0.08,
+      },
+      styles = {
+        comments = { "italic" },
+        conditionals = {},
+        loops = {},
+        functions = {},
+        keywords = {},
+        strings = {},
+        variables = {},
+        numbers = {},
+        booleans = {},
+        properties = {},
+        types = {},
+        operators = {},
+      },
+      color_overrides = {
+        mocha = {
+          base = "#18181B",
+          mantle = "#141417",
+          crust = "#101012",
+          surface0 = "#27272C",
+          surface1 = "#3F3F46",
+          surface2 = "#52525B",
+          overlay0 = "#71717A",
+          overlay1 = "#8B8B95",
+          overlay2 = "#A1A1AA",
+        },
+      },
+      default_integrations = true,
+      auto_integrations = true,
+      integrations = {
+        blink_cmp = true,
+        bufferline = true,
+        fidget = true,
+        fzf = true,
+        gitsigns = true,
+        indent_blankline = {
+          enabled = true,
+          scope_color = "mauve",
+          colored_indent_levels = false,
+        },
+        lsp_trouble = true,
+        mason = true,
+        native_lsp = {
+          enabled = true,
+          underlines = {
+            errors = { "undercurl" },
+            hints = { "undercurl" },
+            warnings = { "undercurl" },
+            information = { "undercurl" },
+            ok = { "undercurl" },
+          },
+        },
+        neotree = true,
+        rainbow_delimiters = true,
+        render_markdown = true,
+        telescope = { enabled = true },
+        treesitter = true,
+        which_key = true,
+      },
+    },
+    config = function(_, opts)
+      require("catppuccin").setup(opts)
+      vim.cmd.colorscheme("catppuccin-mocha")
+      -- vim.cmd.colorscheme("catppuccin") -- follows configured flavour
+
+      local chrome = require("config.ui_chrome")
+      local hl = vim.api.nvim_set_hl
+      local function apply_overrides()
+        hl(0, "NormalFloat", { fg = chrome.panel_fg, bg = chrome.panel_bg })
+        -- hl(0, "NormalFloat", { link = "Normal" }) -- blend floats into editor
+        hl(0, "FloatBorder", { fg = chrome.divider_fg, bg = chrome.panel_bg })
+        -- hl(0, "FloatBorder", { fg = chrome.red, bg = chrome.panel_bg }) -- vivid edge
+        hl(0, "FloatTitle", { fg = chrome.title_fg, bg = chrome.panel_bg, bold = true })
+        hl(0, "FloatFooter", { fg = chrome.muted_fg, bg = chrome.panel_bg })
+        hl(0, "@markup.strong", { bold = true })
+        hl(0, "@markup.italic", { italic = true })
+        hl(0, "@markup.strikethrough", { strikethrough = true })
+        hl(0, "@lsp.mod.deprecated", { strikethrough = true, italic = true })
+        hl(0, "DiagnosticDeprecated", { strikethrough = true })
+      end
+      apply_overrides()
+      vim.api.nvim_create_autocmd("ColorScheme", {
+        group = vim.api.nvim_create_augroup("user_float_chrome", { clear = true }),
+        callback = apply_overrides,
+      })
+    end,
+  },
+
+  -- Inactive alternate: Monokai Pro.
   {
     "loctvl842/monokai-pro.nvim",
+    enabled = false, -- retain the previous theme without loading it
+    -- enabled = true, -- switch back after disabling Catppuccin above
     lazy = false, -- paint before UI plugins to avoid startup flash
     -- lazy = true, -- wrong for themes: bars/floats initialize against defaults
     priority = 1000,
@@ -88,7 +202,7 @@ return {
     "rose-pine/neovim",
     name = "rose-pine",
     enabled = false, -- retain the previous theme without loading it
-    -- enabled = true, -- switch back after disabling Monokai Pro above
+    -- enabled = true, -- switch back after disabling Catppuccin above
     lazy = false, -- paint before UI plugins to avoid startup flash
     -- lazy = true, -- wrong for themes: bars/floats initialize against defaults
     priority = 1000,
@@ -157,7 +271,7 @@ return {
   {
     "talha-akram/noctis.nvim",
     enabled = false, -- keep the previous theme available without loading it
-    -- enabled = true, -- switch back after disabling Monokai Pro above
+    -- enabled = true, -- switch back after disabling Catppuccin above
     -- Load timing: colorschemes should paint before other UI plugins.
     lazy = false, -- load at startup (required for colorschemes)
     -- lazy = true, -- wrong for themes: UI would flash the default first

@@ -8,7 +8,7 @@ Pinned to Telescope **`master`** (not frozen `0.1.x`) so preview highlighting wo
 
 Config also shims `telescope.utils.if_nil` when missing (Nvim 0.12 + Telescope master can leave it nil, which breaks `vim.ui.select` / org picker via ui-select).
 
-Panel chrome uses the shared Monokai Pro palette from `lua/config/ui_chrome.lua`: neutral borders, a raised active row, and yellow/orange accents matching the bars, which-key, and neo-tree. Normal pickers use a responsive 90% × 85% horizontal grid with separately rounded prompt/results/preview boxes, the prompt at the bottom, and the selected file or symbol in the preview title. File rows and picker markers use Nerd Font icons when available, with plain-text fallbacks.
+Panel chrome uses Catppuccin Mocha accents over the neutral charcoal palette in `lua/config/ui_chrome.lua`: subtle borders, a raised active row, and pastel accents matching the bars, which-key, and neo-tree. Normal pickers use a responsive 90% × 85% horizontal grid with separately rounded prompt/results/preview boxes, the prompt at the bottom, and the selected file or symbol in the preview title. File rows and picker markers use Nerd Font icons when available, with plain-text fallbacks.
 
 **Ignore globs** (extra noise beyond `.gitignore`): `node_modules/`, `.git/`, `.sfdx/`, `.sf/`, `target/`, `dist/`, `build/`, `*.class`/`*.jar`, lockfiles, `*.min.js`/`*.min.css` — see `file_ignore_patterns` in `telescope.lua`.
 

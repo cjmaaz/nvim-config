@@ -2,7 +2,7 @@
 
 Defined in `lua/plugins/which-key.lua`. Discovers pending keys after a prefix; does **not** add maps by itself (labels come from each map’s `desc` plus `spec` groups).
 
-Popup: **classic** full-width strip with a rounded neutral border and warm Monokai surface bg from `lua/config/ui_chrome.lua` (shared across bars and panels), max height **50%** of the screen, `no_overlap = false`. Columns have no forced maximum width, so long descriptions stay intact rather than being ellipsized.
+Popup: **classic** full-width strip with a rounded neutral border and charcoal Catppuccin surface bg from `lua/config/ui_chrome.lua` (shared across bars and panels), max height **50%** of the screen, `no_overlap = false`. Columns have no forced maximum width, so long descriptions stay intact rather than being ellipsized.
 
 Icons (when `vim.g.have_nerd_font`): **color = related-action family**, not the whole leader group. Similar/paired maps share a color with different glyphs (e.g. SF tests `a`/`A`/`t`/`T` green; retrieve/metadata azure; `<leader>c` format/lint/action each their own color). `]a`/`A`/`b`/`B` (and `[` twins) are mapped in `keymaps.lua` with buffer=cyan / argument=azure.
 
@@ -22,7 +22,7 @@ Nav: [index](./README.md) · [core](./core.md) · [git](./git.md) · [explorer](
 | `<leader>b` | Buffer | `lua/config/keymaps.lua` (`bd`, …) | [core.md](./core.md) |
 | `<leader>h` | Git hunk | `lua/plugins/git.lua` `on_attach` | [git.md](./git.md) |
 | `<leader>f` | File/Find | `lua/plugins/explorer.lua` (`fe`, `fE`) | [explorer.md](./explorer.md) |
-| `<leader>g` | Git | `explorer.lua` (`ge`); `lazygit.lua` (`gg`, `gf`) | [explorer.md](./explorer.md) · [git.md](./git.md) |
+| `<leader>g` | Git | `lazygit.lua` (`gg`, `gf`) | [git.md](./git.md) |
 | `<leader>m` | Markdown | `markdown.lua` (`mr`, `mp`) | [markdown.md](./markdown.md) |
 | `<leader>d` | Delete (black hole) | `keymaps.lua` (`d`, `D`); `x` also black-hole | [core.md](./core.md) |
 | `<leader>s` | Search | `telescope.lua` (`sf`, `sg`, `sm` multi-grep, `sp` packages, …); `todo-comments` (`st`) | [telescope.md](./telescope.md) · [comment.md](./comment.md) |

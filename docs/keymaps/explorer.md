@@ -1,6 +1,6 @@
 # Explorer (neo-tree)
 
-Defined in `lua/plugins/explorer.lua`. Sidebar file tree (not netrw / oil), with clickable **Files / Buffers / Git** source tabs and auto-expanding width for long names. Press `?` inside the tree for neo-tree’s own help. Shared Monokai Pro chrome (`config.ui_chrome`) gives it a neutral edge, raised active row, and the same accents as bufferline, dropbar, which-key, and Telescope.
+Defined in `lua/plugins/explorer.lua`. Neo-tree is now a filesystem-only sidebar (not netrw / oil) with auto-expanding width for long names. Buffer selection stays on `<leader><leader>` and Git browsing stays in LazyGit; filesystem Git badges remain enabled. Press `?` inside the tree for neo-tree’s own help. Shared neutral Catppuccin chrome matches bufferline, Incline, which-key, and Telescope.
 
 Nav: [index](./README.md) · [core](./core.md) · [git](./git.md) · [telescope](./telescope.md) · [treesitter](./treesitter.md) · [lsp](./lsp.md) · [which-key](./which-key.md)
 
@@ -12,7 +12,6 @@ Nav: [index](./README.md) · [core](./core.md) · [git](./git.md) · [telescope]
 | --- | --- | --- |
 | `<leader>fe` | Toggle filesystem tree (left) | Same key again closes it |
 | `<leader>fE` | Reveal the current file in the tree | Opens the tree and jumps to this buffer’s path |
-| `<leader>ge` | Toggle **git status** view | Changed/untracked files in a float |
 
 `<leader>` is **Space**, so e.g. `Space` then `f` then `e`. which-key shows groups **File/Find** (`f`) and **Git** (`g`) — [which-key.md](./which-key.md).
 
@@ -71,7 +70,6 @@ Focus must be **in** the tree (click it or move with `<C-h>` if it’s on the le
 | `R` | Refresh the tree from disk |
 | `i` | Show file details |
 | `?` | Show neo-tree help (mapping list) |
-| `<` / `>` | Previous / next source (same destinations as the clickable source tabs) |
 
 ---
 
@@ -82,7 +80,8 @@ Focus must be **in** the tree (click it or move with `<C-h>` if it’s on the le
 | `hijack_netrw_behavior` | `open_default` | Opening a directory uses neo-tree instead of netrw |
 | `follow_current_file` | on | Tree tracks the file you’re editing |
 | `use_libuv_file_watcher` | on | Auto-refresh when files change outside Neovim |
-| Source selector | winbar | Click **Files / Buffers / Git**, or use `<` / `>` |
+| Active sources | filesystem only | Buffer picker and LazyGit replace the redundant Buffer/Git source views |
+| Source selector | off | No single-item Files tab consumes winbar space |
 | Opened-file markers | all | Files represented by open buffers use `NeoTreeFileNameOpened` styling |
 | Fuzzy filter reset | on file open | Reopening the tree does not retain a stale `/` filter |
 | `git_status_scope_to_path` | **true** | Faster when a monorepo worktree is above the displayed root; set the commented `false` alternate in `explorer.lua` if scoped results do not suit you |
