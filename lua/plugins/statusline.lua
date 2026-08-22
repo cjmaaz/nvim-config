@@ -124,10 +124,6 @@ local function dirty_flag()
   return vim.bo.modified and status_icons.dirty or ""
 end
 
-local function bubble_gap()
-  return " "
-end
-
 local function left_truncate(text, max_width)
   if vim.fn.strdisplaywidth(text) <= max_width then
     return text
@@ -352,11 +348,6 @@ return {
 
         -- 2–4. Workspace bubble, Git branch bubble, then standalone dirty flag.
         lualine_b = {
-          {
-            bubble_gap,
-            color = { fg = palette.bg, bg = palette.bg },
-            padding = 0,
-          },
           {
             workspace_name,
             color = { fg = palette.bg, bg = bubble_colors.file, gui = "bold" },
