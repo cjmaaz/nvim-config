@@ -20,8 +20,9 @@ local function lighten(hex, amount)
   return string.format("#%02X%02X%02X", red, green, blue)
 end
 
--- Lift footer accents 20% toward white while retaining the editor background.
-local footer_lighten = 0.20
+-- Lift footer accents 40% toward white while retaining the editor background.
+local footer_lighten = 0.40
+-- local footer_lighten = 0.20 -- previous brightness
 -- local footer_lighten = 0 -- use the original unlightened colors
 
 -- Shared neutral-Mocha accents; individual components own their bubble colors.
@@ -52,20 +53,22 @@ local bubble_colors = {
   path = lighten("#004066", footer_lighten),
   -- SF/LSP/language reuses the Normal-mode Peacock Blue.
   info = lighten("#00638B", footer_lighten),
+  -- Active mode and final info bubble text stays solid black.
+  text = "#000000",
 }
 
 -- Neutral sections let only the requested components render as bubbles.
 local catppuccin_theme = {
   normal = {
-    a = { fg = palette.fg, bg = bubble_colors.normal, gui = "bold" },
+    a = { fg = bubble_colors.text, bg = bubble_colors.normal, gui = "bold" },
     b = { fg = palette.muted, bg = palette.bg },
     c = { fg = palette.fg, bg = palette.bg },
   },
-  insert = { a = { fg = palette.bg, bg = bubble_colors.insert, gui = "bold" } },
-  visual = { a = { fg = palette.bg, bg = bubble_colors.visual, gui = "bold" } },
-  replace = { a = { fg = palette.bg, bg = bubble_colors.replace, gui = "bold" } },
-  command = { a = { fg = palette.bg, bg = bubble_colors.command, gui = "bold" } },
-  terminal = { a = { fg = palette.bg, bg = bubble_colors.terminal, gui = "bold" } },
+  insert = { a = { fg = bubble_colors.text, bg = bubble_colors.insert, gui = "bold" } },
+  visual = { a = { fg = bubble_colors.text, bg = bubble_colors.visual, gui = "bold" } },
+  replace = { a = { fg = bubble_colors.text, bg = bubble_colors.replace, gui = "bold" } },
+  command = { a = { fg = bubble_colors.text, bg = bubble_colors.command, gui = "bold" } },
+  terminal = { a = { fg = bubble_colors.text, bg = bubble_colors.terminal, gui = "bold" } },
   inactive = {
     a = { fg = palette.muted, bg = palette.bg, gui = "bold" },
     b = { fg = palette.muted, bg = palette.bg },
@@ -425,7 +428,7 @@ return {
         lualine_z = {
           {
             final_context,
-            color = { fg = palette.fg, bg = bubble_colors.info, gui = "bold" },
+            color = { fg = bubble_colors.text, bg = bubble_colors.info, gui = "bold" },
             separator = { left = bubble.left },
             cond = function()
               return vim.bo.filetype ~= ""
