@@ -20,33 +20,37 @@ local palette = {
 
 local bubble = vim.g.have_nerd_font and { left = "", right = "" } or { left = "", right = "" }
 local bubble_colors = {
-  -- Tigerlily shared by mode, workspace/file, and SF/LSP/language bubbles.
-  edge = "#E75B45",
-  file = "#E75B45",
-  -- edge = "#8F99CC", -- previous darker lavender edge
-  -- file = "#5570D2", -- previous indigo workspace/file bubble
+  -- Mode colors make each editing state recognizable at a glance.
+  normal = "#00638B", -- Peacock Blue
+  insert = "#008E00", -- Forest Green
+  visual = "#5570D2", -- Crayola Indigo
+  replace = "#D17B9A", -- Bordo rose
+  command = "#E75B45", -- Tigerlily
+  terminal = "#A8D866", -- Pale Olive Green
+  -- Project/file and position retain the requested Indigo.
+  file = "#5570D2",
   -- Indigo remains on the line:column + progress bubble.
   position = "#5570D2",
-  -- Pale olive green reserved for the Git branch bubble.
-  git = "#A8D866",
-  -- git = chrome.green, -- previous Catppuccin green
-  -- 15% darker Tigerlily keeps the unboxed center path readable.
-  path = "#C44D3B",
-  -- path = "#E75B45", -- undarkened Tigerlily
+  -- Git uses the requested Forest Green.
+  git = "#008E00",
+  -- Center relative path uses the requested dark Peacock shade.
+  path = "#004066",
+  -- SF/LSP/language reuses the Normal-mode Peacock Blue.
+  info = "#00638B",
 }
 
 -- Neutral sections let only the requested components render as bubbles.
 local catppuccin_theme = {
   normal = {
-    a = { fg = palette.bg, bg = bubble_colors.edge, gui = "bold" },
+    a = { fg = palette.fg, bg = bubble_colors.normal, gui = "bold" },
     b = { fg = palette.muted, bg = palette.bg },
     c = { fg = palette.fg, bg = palette.bg },
   },
-  insert = { a = { fg = palette.bg, bg = bubble_colors.edge, gui = "bold" } },
-  visual = { a = { fg = palette.bg, bg = bubble_colors.edge, gui = "bold" } },
-  replace = { a = { fg = palette.bg, bg = bubble_colors.edge, gui = "bold" } },
-  command = { a = { fg = palette.bg, bg = bubble_colors.edge, gui = "bold" } },
-  terminal = { a = { fg = palette.bg, bg = bubble_colors.edge, gui = "bold" } },
+  insert = { a = { fg = palette.bg, bg = bubble_colors.insert, gui = "bold" } },
+  visual = { a = { fg = palette.bg, bg = bubble_colors.visual, gui = "bold" } },
+  replace = { a = { fg = palette.bg, bg = bubble_colors.replace, gui = "bold" } },
+  command = { a = { fg = palette.bg, bg = bubble_colors.command, gui = "bold" } },
+  terminal = { a = { fg = palette.bg, bg = bubble_colors.terminal, gui = "bold" } },
   inactive = {
     a = { fg = palette.muted, bg = palette.bg, gui = "bold" },
     b = { fg = palette.muted, bg = palette.bg },
@@ -57,6 +61,10 @@ local catppuccin_theme = {
 local status_icons = vim.g.have_nerd_font
     and {
       mode = "",
+      insert = "",
+      visual = "",
+      replace = "",
+      command = "",
       terminal = "",
       folder = "",
       git = "",
@@ -67,6 +75,10 @@ local status_icons = vim.g.have_nerd_font
     }
   or {
     mode = "",
+    insert = "",
+    visual = "",
+    replace = "",
+    command = "",
     terminal = "",
     folder = "",
     git = "git:",
@@ -86,7 +98,20 @@ end
 
 local function mode_label()
   local mode = require("lualine.utils.mode").get_mode()
-  local icon = vim.fn.mode(1):sub(1, 1) == "t" and status_icons.terminal or status_icons.mode
+  local mode_code = vim.fn.mode(1):sub(1, 1)
+  local icon = ({
+    i = status_icons.insert,
+    v = status_icons.visual,
+    V = status_icons.visual,
+    ["\22"] = status_icons.visual,
+    s = status_icons.visual,
+    S = status_icons.visual,
+    ["\19"] = status_icons.visual,
+    R = status_icons.replace,
+    r = status_icons.replace,
+    c = status_icons.command,
+    t = status_icons.terminal,
+  })[mode_code] or status_icons.mode
   return with_icon(icon, mode)
 end
 
@@ -356,7 +381,7 @@ return {
         lualine_c = {
           {
             relative_file_context,
-            color = { fg = bubble_colors.path, bg = palette.bg },
+            color = { fg = bubble_colors.path, bg = palette.bg, gui = "bold" },
             padding = { left = 1, right = 1 },
           },
         },
@@ -394,7 +419,7 @@ return {
         lualine_z = {
           {
             final_context,
-            color = { fg = palette.bg, bg = bubble_colors.edge, gui = "bold" },
+            color = { fg = palette.fg, bg = bubble_colors.info, gui = "bold" },
             separator = { left = bubble.left },
             cond = function()
               return vim.bo.filetype ~= ""

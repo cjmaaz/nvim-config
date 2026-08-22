@@ -32,7 +32,7 @@ Optional later: enable `diagnostics = "nvim_lsp"` after LSP; Craftzdog-style `mo
 
 `lua/plugins/statusline.lua` keeps this exact left-to-right order: mode bubble (Vim or terminal icon), workspace bubble, Git-branch bubble, dirty flag, left-truncated relative file path plus nvim-navic method/property context, plain error/warning counts, a shared `line:column` + progress bubble, then one right bubble containing available Salesforce org/coverage, LSP client names, and the language icon.
 
-Left-side bubbles use a right curve (``); right-side bubbles use a left curve (``). Mode, workspace/file, and final SF/LSP/language use Tigerlily `#E75B45`; position remains Indigo `#5570D2`; Git remains pale olive `#A8D866`. The unboxed relative path uses darkened Tigerlily `#C44D3B`.
+Left-side bubbles use a right curve (``); right-side bubbles use a left curve (``). Normal mode and final SF/LSP/language use Peacock Blue `#00638B`; project and position use Indigo `#5570D2`; Git uses Forest Green `#008E00`; the center path uses `#004066`. Insert, Visual, Replace, Command, and Terminal modes use distinct pencil/eye/replace/prompt/terminal icons with green/Indigo/rose/Tigerlily/olive backgrounds.
 
 ---
 
