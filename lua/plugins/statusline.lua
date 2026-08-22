@@ -280,7 +280,8 @@ return {
     },
     config = function(_, opts)
       require("lualine").setup(opts)
-      require("config.winbar").setup()
+      -- Keep the top file/LSP context row hidden for now.
+      -- require("config.winbar").setup() -- restore the non-overlapping native winbar
     end,
   },
 }
