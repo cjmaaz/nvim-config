@@ -35,6 +35,10 @@ return {
         show_close_icon = false,
         -- show_close_icon = true,
 
+        -- Dirty state lives in the footer; top entries stay icon + filename only.
+        modified_icon = "",
+        -- modified_icon = "●", -- restore modified dots beside buffer names
+
         -- Thin rose marker reinforces the selected buffer without adding height.
         indicator = { icon = "▏", style = "icon" },
         -- indicator = { style = "underline" }, -- bottom edge instead of a side marker
@@ -42,7 +46,7 @@ return {
         diagnostics = false, -- turn on after LSP: "nvim_lsp"
         -- diagnostics = "nvim_lsp",
       },
-      -- Same warm Monokai layers as lualine; active buffer gets the bright divider.
+      -- Same neutral Catppuccin layers as lualine; active buffer gets the bright divider.
       highlights = {
         fill = { fg = chrome.muted_fg, bg = chrome.panel_bg },
         background = { fg = chrome.muted_fg, bg = chrome.panel_bg },

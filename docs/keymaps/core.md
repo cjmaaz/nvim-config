@@ -24,9 +24,15 @@ Commented alternates in config: force delete (`bdelete!`), `<leader>c` as buffer
 
 ### Bufferline (UI)
 
-Defined in `lua/plugins/bufferline.lua`. Visual bar of **buffers** (`mode = "buffers"`). Cycle still uses `<S-h>` / `<S-l>` above — not `gt` / `gT` (those remain tabpages). Close with `<leader>bd` (close icons are off).
+Defined in `lua/plugins/bufferline.lua`. Visual bar of **buffers** (`mode = "buffers"`). Entries show only the filetype icon and filename; the modified/dirty marker moved to lualine. Cycle still uses `<S-h>` / `<S-l>` above — not `gt` / `gT` (those remain tabpages). Close with `<leader>bd` (close icons are off).
 
 Optional later: enable `diagnostics = "nvim_lsp"` after LSP; Craftzdog-style `mode = "tabs"` is intentionally not used.
+
+### Statusline (UI)
+
+`lua/plugins/statusline.lua` keeps this exact left-to-right order: mode bubble (Vim or terminal icon), workspace bubble, Git-branch bubble, dirty flag, left-truncated relative file plus nvim-navic method/property context, plain error/warning counts, `line:column`, progress percentage, then one right bubble containing available Salesforce org/coverage, LSP client names, and language.
+
+Left-side bubbles use a right curve (``); the final right-side bubble uses a left curve (``). The center path/context remains unboxed so it can consume the flexible space.
 
 ---
 

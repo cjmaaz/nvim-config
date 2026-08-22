@@ -46,14 +46,14 @@ Defined in `init.lua`.
 
 | Area | How you use it today |
 | --- | --- |
-| Statusline (lualine) | Curved Monokai mode/file/folder caps with Vim, diagnostic, LSP, file, and folder icons |
-| Bufferline | Matching Monokai Pro active-buffer treatment; cycle with `<S-h>` / `<S-l>` — [core.md](./core.md) |
+| Statusline (lualine) | Mode · workspace · Git · dirty · file/symbol context · diagnostics · position · SF/LSP/language |
+| Bufferline | Catppuccin filetype icon + filename only; dirty state moved to footer — [core.md](./core.md) |
 | neo-tree | Filesystem only: `<leader>fe` · `<leader>fE` — [explorer.md](./explorer.md) |
 | Project workflows | `<leader>pn` scaffold · `<leader>pr` run/build/test — [project.md](./project.md) |
 | Markdown | `<leader>mr` inline render · `<leader>mp` side preview — [markdown.md](./markdown.md) |
 | Lazygit | `<leader>gg` · `<leader>gf` — [git.md](./git.md) |
 | Telescope | Rounded prompt/results/preview grid with icons; `<leader>sf` · `<leader>sg` · `<leader><leader>` — [telescope.md](./telescope.md) |
-| Floating windows | Rounded Monokai Pro frame by default; plugin-specific windows may override it |
+| Floating windows | Rounded neutral-Mocha frame by default; plugin-specific windows may override it |
 | Diagnostics | `]d`/`[d` · `<leader>e` · Trouble `<leader>xx` — [core.md](./core.md#diagnostics) · [qol.md](./qol.md) · [diagnostics/](../diagnostics/README.md) |
 | Treesitter / indent / pairs | Highlight, folds, guides, autopairs — [treesitter.md](./treesitter.md) |
 | LSP / format / blink | `gd`/`K`/`gr` · `<leader>cf` · `<C-y>` — [lsp.md](./lsp.md) |
@@ -61,7 +61,7 @@ Defined in `init.lua`.
 | Salesforce | `<leader>S…` · Vlocity `SV` · SOQL `SQ`/`Sq` · metadata `Su` · cancel `Sx` — [salesforce.md](./salesforce.md) |
 | Comment / TODO / context | `gcc` · `]t`/`[t` · `<leader>st`; native context winbar retained but disabled — [comment.md](./comment.md) |
 | QoL | Gremlins · sessions · Trouble · surround · flash · undotree · yanky · dial · rainbow · colorizer — [qol.md](./qol.md) |
-| Colorscheme | Monokai Pro (`pro` filter) on warm charcoal — `lua/plugins/colorscheme.lua` |
+| Colorscheme | Catppuccin Mocha accents on a neutral near-black background — `lua/plugins/colorscheme.lua` |
 | which-key | `<Space>` then wait — [which-key.md](./which-key.md) |
 | Plugin manager | `:Lazy` |
 

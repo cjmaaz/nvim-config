@@ -1,5 +1,5 @@
 --------------------------------------------------------------------------------
--- Statusline: compact Monokai Pro lualine + reference-style icons
+-- Statusline: ordered Catppuccin bubbles + centered file/symbol context
 -- Refs: CodeOSS ui.lua (standalone lualine + SF org/coverage); Craftzdog/LazyVim
 --   only tweak LazyVim's. Alternatives to lualine (pick one ecosystem):
 --   - echasnovski/mini.statusline  (lighter, mini.nvim family)
@@ -9,28 +9,25 @@
 
 local chrome = require("config.ui_chrome")
 
--- Shared Monokai Pro accents; curved separators form rounded edge caps.
+-- Shared neutral-Mocha accents; individual components own their bubble colors.
 local palette = {
   bg = chrome.base,
   -- bg = chrome.panel_bg, -- match which-key / neo-tree / Telescope
-  bg_alt = chrome.surface,
-  -- bg_alt = chrome.active_bg, -- brighter section contrast
   fg = chrome.panel_fg,
   muted = chrome.muted_fg,
   rose = chrome.red,
   orange = chrome.orange,
   yellow = chrome.yellow,
-  green = chrome.green,
   pine = chrome.green,
-  cyan = chrome.cyan,
-  blue = chrome.cyan,
   purple = chrome.magenta,
 }
 
--- Flat sections with a mode-colored cap on both ends.
-local monokai_theme = {
+local bubble = vim.g.have_nerd_font and { left = "", right = "" } or { left = "", right = "" }
+
+-- Neutral sections let only the requested components render as bubbles.
+local catppuccin_theme = {
   normal = {
-    a = { fg = palette.bg, bg = chrome.magenta, gui = "bold" },
+    a = { fg = palette.bg, bg = chrome.lavender, gui = "bold" },
     b = { fg = palette.muted, bg = palette.bg },
     c = { fg = palette.fg, bg = palette.bg },
   },
@@ -49,46 +46,110 @@ local monokai_theme = {
 local status_icons = vim.g.have_nerd_font
     and {
       mode = "",
-      diagnostics = { error = "● ", warn = "● ", info = "● ", hint = "● " },
-      lsp = "󰒋",
+      terminal = "",
       folder = "",
-      readonly = "",
+      git = "",
+      dirty = "●",
+      diagnostics = { error = " ", warn = " " },
+      salesforce = "󰢎",
+      lsp = "󰒋",
     }
   or {
     mode = "",
-    diagnostics = { error = "E:", warn = "W:", info = "I:", hint = "H:" },
-    lsp = "LSP:",
+    terminal = "",
     folder = "",
-    readonly = "RO",
+    git = "git:",
+    dirty = "[+]",
+    diagnostics = { error = "E:", warn = "W:" },
+    salesforce = "SF:",
+    lsp = "LSP:",
   }
 
---- Hide secondary components before they crowd the filename.
-local function min_columns(width)
-  return function()
-    return vim.o.columns >= width
-  end
+local function with_icon(icon, text)
+  return string.format("%s%s%s", icon, icon ~= "" and " " or "", text)
 end
 
-local function current_file()
-  local name = vim.fn.expand("%:t")
-  if name == "" then
-    name = "[No Name]"
+local function statusline_escape(text)
+  return text:gsub("%%", "%%%%")
+end
+
+local function mode_label()
+  local mode = require("lualine.utils.mode").get_mode()
+  local icon = vim.fn.mode(1):sub(1, 1) == "t" and status_icons.terminal or status_icons.mode
+  return with_icon(icon, mode)
+end
+
+local function workspace_name()
+  local name = vim.fn.fnamemodify(vim.fn.getcwd(0), ":t")
+  return statusline_escape(with_icon(status_icons.folder, name ~= "" and name or "/"))
+end
+
+local function dirty_flag()
+  return vim.bo.modified and status_icons.dirty or ""
+end
+
+local function left_truncate(text, max_width)
+  if vim.fn.strdisplaywidth(text) <= max_width then
+    return text
+  end
+  local suffix_width = math.max(1, max_width - 1)
+  local chars = vim.fn.strchars(text)
+  local start = 0
+  while start < chars and vim.fn.strdisplaywidth(vim.fn.strcharpart(text, start)) > suffix_width do
+    start = start + 1
+  end
+  return "…" .. vim.fn.strcharpart(text, start)
+end
+
+local function relative_path()
+  local path = vim.api.nvim_buf_get_name(0)
+  if path == "" then
+    return "[No Name]"
+  end
+  return vim.fs.relpath(vim.fn.getcwd(0), path) or vim.fn.fnamemodify(path, ":~")
+end
+
+local function file_context()
+  local text = relative_path()
+  local navic = package.loaded["nvim-navic"]
+  if navic and navic.is_available(0) then
+    local location = navic.get_location({
+      highlight = false,
+      separator = " > ",
+      depth_limit = 3,
+      lazy_update_context = true,
+    }, 0)
+    if location ~= "" then
+      text = text .. " > " .. location
+    end
+  end
+  return statusline_escape(left_truncate(text, math.max(24, math.floor(vim.o.columns * 0.36))))
+end
+
+local function lsp_names()
+  local names, seen = {}, {}
+  for _, client in ipairs(vim.lsp.get_clients({ bufnr = 0 })) do
+    if not seen[client.name] then
+      names[#names + 1] = client.name
+      seen[client.name] = true
+    end
+    if #names == 2 then
+      break
+    end
+  end
+  return table.concat(names, ",")
+end
+
+local function language_info()
+  local filetype = vim.bo.filetype
+  if filetype == "" then
+    return ""
   end
   local icon = ""
   if vim.g.have_nerd_font then
-    icon = require("nvim-web-devicons").get_icon(name, vim.fn.expand("%:e"), { default = true }) or ""
+    icon = require("nvim-web-devicons").get_icon_by_filetype(filetype, { default = true }) or ""
   end
-  local state = vim.bo.modified and " ●" or (vim.bo.readonly and (" " .. status_icons.readonly) or "")
-  return string.format("%s%s%s%s", icon, icon ~= "" and " " or "", name, state)
-end
-
-local function project_folder()
-  local name = vim.fn.fnamemodify(vim.fn.getcwd(0), ":t")
-  return string.format("%s%s%s", status_icons.folder, status_icons.folder ~= "" and " " or "", name)
-end
-
-local function has_lsp()
-  return #vim.lsp.get_clients({ bufnr = 0 }) > 0
+  return with_icon(icon, filetype)
 end
 
 -- Salesforce org + coverage (CodeOSS ui.lua).
@@ -110,7 +171,7 @@ local function salesforce_status()
   -- Target org alias (set via <leader>So / SF org fetch).
   local ok_org, org = pcall(sf.get_target_org)
   if ok_org and org and org ~= "" then
-    table.insert(parts, (vim.g.have_nerd_font and "󰢎 " or "SF:") .. org)
+    table.insert(parts, with_icon(status_icons.salesforce, org))
     -- table.insert(parts, org) -- text only, no prefix
   end
   -- if not ok_org then … end -- ignore errors (org unset is normal)
@@ -130,6 +191,69 @@ local function salesforce_status()
   -- return table.concat(parts, " · ") -- different separator
 end
 
+local function final_context()
+  local parts = {}
+  if package.loaded.sf then
+    local sf = salesforce_status()
+    if sf ~= "" then
+      parts[#parts + 1] = sf
+    end
+  end
+
+  local clients = lsp_names()
+  if clients ~= "" then
+    parts[#parts + 1] = with_icon(status_icons.lsp, clients)
+  end
+
+  local language = language_info()
+  if language ~= "" then
+    parts[#parts + 1] = language
+  end
+  return statusline_escape(table.concat(parts, "  "))
+end
+
+local function setup_navic()
+  local navic = require("nvim-navic")
+  navic.setup({
+    -- Keep context inline with the unstyled center path.
+    highlight = false,
+    -- highlight = true, -- use per-symbol highlight groups
+    -- Match the path/context separator used by the footer.
+    separator = " > ",
+    -- separator = " › ", -- softer single-glyph alternate
+    -- Keep only the nearest method/property chain.
+    depth_limit = 3,
+    -- depth_limit = 0, -- show every parent symbol
+    lazy_update_context = true,
+    -- lazy_update_context = false, -- recompute on every statusline evaluation
+  })
+
+  local function attach(client, bufnr)
+    if client.server_capabilities.documentSymbolProvider and not navic.is_available(bufnr) then
+      pcall(navic.attach, client, bufnr)
+    end
+  end
+
+  local group = vim.api.nvim_create_augroup("statusline_navic_attach", { clear = true })
+  vim.api.nvim_create_autocmd("LspAttach", {
+    group = group,
+    callback = function(event)
+      local client = vim.lsp.get_client_by_id(event.data.client_id)
+      if client then
+        attach(client, event.buf)
+      end
+    end,
+  })
+
+  for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
+    if vim.api.nvim_buf_is_loaded(bufnr) then
+      for _, client in ipairs(vim.lsp.get_clients({ bufnr = bufnr })) do
+        attach(client, bufnr)
+      end
+    end
+  end
+end
+
 return {
   {
     "nvim-lualine/lualine.nvim",
@@ -147,19 +271,19 @@ return {
         -- enabled = true, -- always try icons (may show tofu boxes without a Nerd Font)
         -- enabled = false, -- text-only statusline components
       },
-      -- "SmiteshP/nvim-navic", -- restore with config.winbar.setup() below
+      "SmiteshP/nvim-navic", -- method/property context in the center section
     },
     opts = {
       options = {
-        -- Warm Monokai palette with mode-colored rounded sections.
-        theme = monokai_theme,
+        -- Neutral Catppuccin palette; each bubble supplies its own background.
+        theme = catppuccin_theme,
         -- theme = "auto", -- follow the active colorscheme instead
 
-        -- Curved section transitions create the bubble look from the reference.
+        -- Components opt into one-sided curves instead of reordering whole sections.
         component_separators = { left = "", right = "" },
         -- component_separators = { left = "│", right = "│" }, -- vertical dividers (visually busy)
-        section_separators = { left = "", right = "" },
-        -- section_separators = { left = "", right = "" }, -- previous flat rectangles
+        section_separators = { left = "", right = "" },
+        -- section_separators = { left = "", right = "" }, -- curve every section boundary
         -- component_separators = { left = "", right = "" }, -- Powerline (needs Nerd Font)
         -- section_separators = { left = "", right = "" }, -- Powerline wedges
 
@@ -178,93 +302,80 @@ return {
         -- Layout: lualine_a .. _c (left) | lualine_x .. _z (right)
         -- Inactive windows use `inactive_sections` if you define it.
 
-        -- Mode indicator (NORMAL / INSERT / …).
+        -- 1. Vim/terminal mode bubble.
         lualine_a = {
           {
-            "mode",
-            icon = status_icons.mode,
+            mode_label,
+            separator = { right = bubble.right },
             padding = { left = 1, right = 1 },
-          }, -- Vim icon + full mode name in colored cap
+          },
         },
-        -- lualine_a = { { "mode", fmt = function(s) return s:sub(1, 1) end } }, -- first letter only
+        -- lualine_a = { "mode" }, -- text-only mode without a Vim/terminal icon
 
-        -- Match the reference: progress and cursor position follow the mode cap.
+        -- 2–4. Workspace bubble, Git branch bubble, then standalone dirty flag.
         lualine_b = {
-          { "progress", cond = min_columns(60) },
-          { "location", padding = { left = 0, right = 1 } },
+          {
+            workspace_name,
+            color = { fg = palette.bg, bg = chrome.cyan, gui = "bold" },
+            separator = { right = bubble.right },
+            padding = { left = 1, right = 1 },
+          },
+          {
+            "branch",
+            icon = status_icons.git,
+            color = { fg = palette.bg, bg = chrome.green, gui = "bold" },
+            separator = { right = bubble.right },
+            padding = { left = 1, right = 1 },
+          },
+          {
+            dirty_flag,
+            color = { fg = palette.yellow, bg = palette.bg },
+            padding = { left = 1, right = 1 },
+          },
         },
 
-        -- A second alignment marker keeps diagnostics centered like the reference.
+        -- 5. Relative file + nearest method/property; no bubble, left-truncated.
         lualine_c = {
           {
-            function()
-              return "%="
-            end,
-            padding = 0,
+            file_context,
+            color = { fg = palette.fg, bg = palette.bg },
+            padding = { left = 1, right = 1 },
           },
+        },
+        -- lualine_c = { { "filename", path = 1 } }, -- relative file without symbol context
+
+        -- 6–7. Plain diagnostics, line:column, then percentage through the file.
+        lualine_x = {
           {
             "diagnostics",
             sources = { "nvim_diagnostic" },
+            sections = { "error", "warn" },
             symbols = status_icons.diagnostics,
-            diagnostics_color = {
-              error = { fg = palette.rose },
-              warn = { fg = palette.yellow },
-              info = { fg = palette.blue },
-              hint = { fg = palette.cyan },
-            },
-          },
-        },
-        -- lualine_c = { { "filename", path = 1 } }, -- restore the relative path instead
-
-        lualine_x = {
-          {
-            salesforce_status,
-            color = { fg = palette.blue, gui = "bold" },
-            -- Only paint when sf.nvim is loaded and the screen has room.
-            cond = function()
-              return package.loaded.sf ~= nil
-                and require("config.project_context").is_salesforce(0)
-                and vim.o.columns >= 100
-            end,
-            -- cond = function() return package.loaded.sf ~= nil end, -- show at every width
-            -- icon = "󰢎", -- lualine can prefix an icon separately if you prefer
-          },
-          -- { salesforce_status }, -- no cond: still returns "" when unloaded
-          {
-            function()
-              return "Lsp"
-            end,
-            icon = status_icons.lsp,
-            color = { fg = palette.muted },
-            cond = function()
-              return vim.o.columns >= 90 and has_lsp()
-            end,
-          },
-          -- { "encoding", cond = min_columns(140) }, -- show utf-8 on very wide screens
-          -- { "fileformat", cond = min_columns(130) }, -- show unix/dos/mac
-        },
-
-        -- Rounded current-file chip with its devicon.
-        lualine_y = {
-          {
-            current_file,
-            color = { fg = palette.bg, bg = palette.rose, gui = "bold" },
-            cond = min_columns(70),
+            colored = false,
+            color = { fg = palette.muted, bg = palette.bg },
             padding = { left = 1, right = 1 },
           },
+          { "location", color = { fg = palette.muted, bg = palette.bg } },
+          { "progress", color = { fg = palette.muted, bg = palette.bg } },
         },
-        -- lualine_y = { "filetype" }, -- language name instead of filename
 
-        -- Project/cwd folder chip at the far-right edge.
+        lualine_y = {},
+
+        -- 8. Salesforce, LSP clients, and language share the final right bubble.
         lualine_z = {
           {
-            project_folder,
-            color = { fg = palette.bg, bg = palette.orange, gui = "bold" },
-            cond = min_columns(110),
+            final_context,
+            color = { fg = palette.bg, bg = chrome.lavender, gui = "bold" },
+            separator = { left = bubble.left },
+            cond = function()
+              return vim.bo.filetype ~= ""
+                or package.loaded.sf ~= nil
+                or #vim.lsp.get_clients({ bufnr = 0 }) > 0
+            end,
             padding = { left = 1, right = 1 },
           },
         },
-        -- lualine_z = {}, -- hide the project folder chip
+        -- lualine_z = { "filetype" }, -- language only, without SF/LSP data
       },
 
       -- Shown in windows that are not current (only matters if globalstatus = false).
@@ -281,6 +392,7 @@ return {
       -- extensions = { "lazy", "fugitive", "nvim-tree", "trouble" }, -- nicer sections inside those UIs
     },
     config = function(_, opts)
+      setup_navic()
       require("lualine").setup(opts)
       -- Keep the top file/LSP context row hidden for now.
       -- require("config.winbar").setup() -- restore the non-overlapping native winbar

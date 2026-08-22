@@ -44,7 +44,7 @@ Also: `:TodoQuickFix` · `:TodoLocList` · `:TodoTelescope`.
 
 ## Disabled native window context
 
-`lua/config/winbar.lua` is retained, but its `setup()` call and nvim-navic dependency are commented in `lua/plugins/statusline.lua`. Uncomment both lines to restore the compact, left-aligned file and LSP-symbol row.
+`lua/config/winbar.lua` is retained, but its rendering `setup()` call is commented in `lua/plugins/statusline.lua`. nvim-navic remains active because the footer now appends the current method/property to its relative file path.
 
 When enabled, it uses Neovim's native winbar row, so it never floats over or hides the first line of code.
 
