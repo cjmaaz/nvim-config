@@ -1,11 +1,10 @@
 --------------------------------------------------------------------------------
--- Indent guides (indent-blankline / ibl) + current-scope “reverse L”
+-- Indent guides (indent-blankline / ibl) + thin current-scope vertical line
 -- Refs: CodeOSS ui.lua; Kickstart plugins/indent_line.lua (empty opts).
 -- Alts: mini.indentscope · snacks indent · none (treesitter indent only).
 --
 -- Scope line colors match rainbow brackets via lua/config/rainbow_palette.lua.
--- show_start + show_end draw underlines at the block edges → reverse-L look
--- with the vertical scope guide.
+-- Horizontal start/end caps remain available as commented alternates below.
 --------------------------------------------------------------------------------
 
 local palette = require("config.rainbow_palette")
@@ -93,15 +92,13 @@ return {
           -- char = "┃", -- heavy centered bar
           -- char = "▌", -- full left half block (very obvious)
 
-          -- Reverse-L underlines share the indent cell with the bar (terminal is
-          -- cell-grid only — no true sub-pixel inset). show_exact_scope jumps the
-          -- underline to the TS node (often under the keyword) and gaps the L.
-          show_start = true, -- top of the “L” / underline at scope start
-          show_end = true, -- bottom underline at scope end
-          -- show_start = false, -- vertical bar only (old look)
-          -- show_end = false,
+          -- Keep the active scope as a vertical line without horizontal caps.
+          show_start = false,
+          show_end = false,
+          -- show_start = true, -- restore the top reverse-L underline
+          -- show_end = true, -- restore the bottom reverse-L underline
 
-          show_exact_scope = false, -- underline from indent column (keeps reverse-L)
+          show_exact_scope = false, -- only matters when a scope underline is enabled
           -- show_exact_scope = true, -- underline from exact TS node (more to the right)
 
           injected_languages = true, -- scopes inside injections (JS in HTML, …)
