@@ -1,5 +1,5 @@
 --------------------------------------------------------------------------------
--- Statusline: curved Catppuccin Mocha lualine + file icons
+-- Statusline: compact Monokai Pro lualine + reference-style icons
 -- Refs: CodeOSS ui.lua (standalone lualine + SF org/coverage); Craftzdog/LazyVim
 --   only tweak LazyVim's. Alternatives to lualine (pick one ecosystem):
 --   - echasnovski/mini.statusline  (lighter, mini.nvim family)
@@ -9,7 +9,7 @@
 
 local chrome = require("config.ui_chrome")
 
--- Shared neutral-Mocha accents; curved separators form rounded bubbles.
+-- Shared Monokai Pro accents; curved separators form rounded edge caps.
 local palette = {
   bg = chrome.base,
   -- bg = chrome.panel_bg, -- match which-key / neo-tree / Telescope
@@ -28,13 +28,13 @@ local palette = {
 }
 
 -- Flat sections with a mode-colored cap on both ends.
-local catppuccin_theme = {
+local monokai_theme = {
   normal = {
-    a = { fg = palette.bg, bg = chrome.lavender, gui = "bold" },
-    b = { fg = palette.fg, bg = palette.bg_alt },
+    a = { fg = palette.bg, bg = chrome.magenta, gui = "bold" },
+    b = { fg = palette.muted, bg = palette.bg },
     c = { fg = palette.fg, bg = palette.bg },
   },
-  insert = { a = { fg = palette.fg, bg = palette.pine, gui = "bold" } },
+  insert = { a = { fg = palette.bg, bg = palette.pine, gui = "bold" } },
   visual = { a = { fg = palette.bg, bg = palette.purple, gui = "bold" } },
   replace = { a = { fg = palette.bg, bg = palette.rose, gui = "bold" } },
   command = { a = { fg = palette.bg, bg = palette.yellow, gui = "bold" } },
@@ -48,17 +48,17 @@ local catppuccin_theme = {
 
 local status_icons = vim.g.have_nerd_font
     and {
-      branch = "",
-      diff = { added = " ", modified = " ", removed = " " },
-      diagnostics = { error = " ", warn = " ", info = " ", hint = "󰌵 " },
-      lsp = "",
+      mode = "",
+      diagnostics = { error = "● ", warn = "● ", info = "● ", hint = "● " },
+      lsp = "󰒋",
+      folder = "",
       readonly = "",
     }
   or {
-    branch = "git:",
-    diff = { added = "+", modified = "~", removed = "-" },
+    mode = "",
     diagnostics = { error = "E:", warn = "W:", info = "I:", hint = "H:" },
     lsp = "LSP:",
+    folder = "",
     readonly = "RO",
   }
 
@@ -69,9 +69,26 @@ local function min_columns(width)
   end
 end
 
---- Keep unusually long branch names from taking over the left side.
-local function compact_branch(branch)
-  return #branch > 24 and branch:sub(1, 21) .. "…" or branch
+local function current_file()
+  local name = vim.fn.expand("%:t")
+  if name == "" then
+    name = "[No Name]"
+  end
+  local icon = ""
+  if vim.g.have_nerd_font then
+    icon = require("nvim-web-devicons").get_icon(name, vim.fn.expand("%:e"), { default = true }) or ""
+  end
+  local state = vim.bo.modified and " ●" or (vim.bo.readonly and (" " .. status_icons.readonly) or "")
+  return string.format("%s%s%s%s", icon, icon ~= "" and " " or "", name, state)
+end
+
+local function project_folder()
+  local name = vim.fn.fnamemodify(vim.fn.getcwd(0), ":t")
+  return string.format("%s%s%s", status_icons.folder, status_icons.folder ~= "" and " " or "", name)
+end
+
+local function has_lsp()
+  return #vim.lsp.get_clients({ bufnr = 0 }) > 0
 end
 
 -- Salesforce org + coverage (CodeOSS ui.lua).
@@ -130,12 +147,12 @@ return {
         -- enabled = true, -- always try icons (may show tofu boxes without a Nerd Font)
         -- enabled = false, -- text-only statusline components
       },
-      "SmiteshP/nvim-navic", -- current LSP class/function context in native winbar
+      -- "SmiteshP/nvim-navic", -- restore with config.winbar.setup() below
     },
     opts = {
       options = {
-        -- Neutral Catppuccin palette with mode-colored rounded sections.
-        theme = catppuccin_theme,
+        -- Warm Monokai palette with mode-colored rounded sections.
+        theme = monokai_theme,
         -- theme = "auto", -- follow the active colorscheme instead
 
         -- Curved section transitions create the bubble look from the reference.
@@ -152,7 +169,7 @@ return {
 
         -- disabled_filetypes = { statusline = { "alpha", "dashboard" } }, -- hide on splash screens
         -- ignore_focus = { "NvimTree", "neo-tree" }, -- keep showing "last" file in sidebars
-        always_divide_middle = true, -- protect the filename from right-side growth
+        always_divide_middle = true, -- hold the right-side icon chips at the edge
         -- always_divide_middle = false, -- let sections consume all available width
         icons_enabled = vim.g.have_nerd_font, -- avoid tofu when the host font lacks icons
         -- icons_enabled = false, -- force text-only components
@@ -163,54 +180,41 @@ return {
 
         -- Mode indicator (NORMAL / INSERT / …).
         lualine_a = {
-          { "mode", padding = { left = 1, right = 1 } }, -- full mode name in colored cap
+          {
+            "mode",
+            icon = status_icons.mode,
+            padding = { left = 1, right = 1 },
+          }, -- Vim icon + full mode name in colored cap
         },
         -- lualine_a = { { "mode", fmt = function(s) return s:sub(1, 1) end } }, -- first letter only
 
+        -- Match the reference: progress and cursor position follow the mode cap.
         lualine_b = {
-          {
-            "branch", -- git branch; empty outside a repo
-            icon = status_icons.branch,
-            fmt = compact_branch,
-          },
-          {
-            "diff", -- +/-/~ counts; richer when gitsigns is loaded
-            symbols = status_icons.diff,
-            diff_color = {
-              added = { fg = palette.green },
-              modified = { fg = palette.yellow },
-              removed = { fg = palette.rose },
-            },
-          },
-          -- { "diff", symbols = { added = "+", modified = "~", removed = "-" } }, -- ASCII-only
+          { "progress", cond = min_columns(60) },
+          { "location", padding = { left = 0, right = 1 } },
         },
 
+        -- A second alignment marker keeps diagnostics centered like the reference.
         lualine_c = {
           {
-            "filename",
-            -- How much of the path to show.
-            path = 1, -- relative to cwd, as before dropbar
-            -- path = 0, -- filename only (dropbar already carries the path above)
-            -- path = 2, -- absolute
-            -- path = 3, -- absolute with ~ for home
-            -- file_status = true, -- show [+] modified, [-] readonly, etc. (default on)
-            newfile_status = true, -- flag buffers not yet written
-            -- newfile_status = false, -- show no distinct new-file marker
-            -- Reserve room for the other sections; shorten parent directories first.
-            shorting_target = 40, -- e.g. very/long/path/file.lua → v/l/p/file.lua
-            -- shorting_target = 0, -- never shorten the displayed path
-            symbols = {
-              modified = "●",
-              readonly = status_icons.readonly,
-              unnamed = "[No Name]",
-              newfile = "[New]",
+            function()
+              return "%="
+            end,
+            padding = 0,
+          },
+          {
+            "diagnostics",
+            sources = { "nvim_diagnostic" },
+            symbols = status_icons.diagnostics,
+            diagnostics_color = {
+              error = { fg = palette.rose },
+              warn = { fg = palette.yellow },
+              info = { fg = palette.blue },
+              hint = { fg = palette.cyan },
             },
           },
-          -- Previous breadcrumbs (navic); uncomment after restoring breadcrumbs.lua:
-          -- { "navic", color_correction = "dynamic", navic_opts = { highlight = true } },
-          -- "filesize", -- optional mid component
-          -- { "searchcount", maxcount = 999 }, -- match count while searching
         },
+        -- lualine_c = { { "filename", path = 1 } }, -- restore the relative path instead
 
         lualine_x = {
           {
@@ -227,42 +231,40 @@ return {
           },
           -- { salesforce_status }, -- no cond: still returns "" when unloaded
           {
-            "diagnostics", -- counts by severity
-            sources = { "nvim_diagnostic" },
-            symbols = status_icons.diagnostics,
-            diagnostics_color = {
-              error = { fg = palette.rose },
-              warn = { fg = palette.yellow },
-              info = { fg = palette.blue },
-              hint = { fg = palette.cyan },
-            },
-          },
-          {
-            "lsp_status", -- active client names + progress
+            function()
+              return "Lsp"
+            end,
             icon = status_icons.lsp,
-            color = { fg = palette.cyan },
-            cond = min_columns(120),
-          },
-          {
-            "filetype", -- name + devicon
-            color = { fg = palette.yellow },
-            cond = min_columns(90),
+            color = { fg = palette.muted },
+            cond = function()
+              return vim.o.columns >= 90 and has_lsp()
+            end,
           },
           -- { "encoding", cond = min_columns(140) }, -- show utf-8 on very wide screens
           -- { "fileformat", cond = min_columns(130) }, -- show unix/dos/mac
         },
 
-        -- Progress through the buffer.
+        -- Rounded current-file chip with its devicon.
         lualine_y = {
-          { "progress", cond = min_columns(80) }, -- percent through file
+          {
+            current_file,
+            color = { fg = palette.bg, bg = palette.rose, gui = "bold" },
+            cond = min_columns(70),
+            padding = { left = 1, right = 1 },
+          },
         },
-        -- lualine_y = { "selectioncount" }, -- visual-selection size instead
+        -- lualine_y = { "filetype" }, -- language name instead of filename
 
-        -- Cursor position.
+        -- Project/cwd folder chip at the far-right edge.
         lualine_z = {
-          { "location", padding = { left = 1, right = 1 } }, -- line:col in mode cap
+          {
+            project_folder,
+            color = { fg = palette.bg, bg = palette.orange, gui = "bold" },
+            cond = min_columns(110),
+            padding = { left = 1, right = 1 },
+          },
         },
-        -- lualine_z = { { "location", padding = { left = 0, right = 1 } } }, -- tighter padding
+        -- lualine_z = {}, -- hide the project folder chip
       },
 
       -- Shown in windows that are not current (only matters if globalstatus = false).

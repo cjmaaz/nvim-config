@@ -2,7 +2,7 @@ local M = {}
 
 local winbar_expression = "%{%v:lua.require'config.winbar'.render()%}"
 local navic_opts = {
-  -- Preserve Catppuccin colors for each LSP symbol kind.
+  -- Preserve colorscheme colors for each LSP symbol kind.
   highlight = true,
   -- highlight = false, -- render the whole symbol chain in WinBar text color
   -- Use the same compact separator as the reference.

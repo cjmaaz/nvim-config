@@ -42,11 +42,11 @@ Also: `:TodoQuickFix` · `:TodoLocList` · `:TodoTelescope`.
 
 ---
 
-## Window context (Lualine winbar + nvim-navic)
+## Disabled native window context
 
-`lua/config/winbar.lua`, loaded by `lua/plugins/statusline.lua`, shows a compact, left-aligned file label in each editor window. The focused window follows it with up to three LSP class/function/method symbols.
+`lua/config/winbar.lua` is retained, but its `setup()` call and nvim-navic dependency are commented in `lua/plugins/statusline.lua`. Uncomment both lines to restore the compact, left-aligned file and LSP-symbol row.
 
-It uses Neovim's native winbar row, so the context stays visually compact while never floating over or hiding the first line of code.
+When enabled, it uses Neovim's native winbar row, so it never floats over or hides the first line of code.
 
 ### Disabled Dropbar alternate
 

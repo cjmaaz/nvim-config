@@ -5,7 +5,7 @@
 -- Active alternate: nvim-navic in Lualine's native winbar (statusline.lua).
 --------------------------------------------------------------------------------
 
---- Neutral Catppuccin menu chrome retained for the disabled Dropbar alternate.
+--- Neutral theme-aware menu chrome retained for the disabled Dropbar alternate.
 local function apply_dropbar_hl()
   local chrome = require("config.ui_chrome")
   local bg, fg = chrome.panel_bg, chrome.panel_fg

@@ -4,22 +4,24 @@
 -- theme, then switches — and lualine's theme = "auto" would lag behind.
 --
 -- Alternatives (enable only one colorscheme plugin at a time):
---   - loctvl842/monokai-pro.nvim      (previous warm-charcoal theme; retained below)
+--   - loctvl842/monokai-pro.nvim      (active warm-charcoal theme)
+--   - catppuccin/nvim                 (previous neutral Mocha; retained below)
 --   - rose-pine/neovim               (previous Rosé Pine Main; retained below)
 --   - talha-akram/noctis.nvim         (previous Noctis Bordo; retained below)
 --   - rebelot/kanagawa.nvim          (Kanagawa dragon — commented below)
 --   - folke/tokyonight.nvim          (LazyVim default)
 --   - craftzdog/solarized-osaka.nvim (Craftzdog)
---   - catppuccin/nvim
 --   - edenEast/nightfox.nvim
 --   - Built-in: :colorscheme habamax / desert / … (no plugin)
 --------------------------------------------------------------------------------
 
 return {
-  -- Active: Catppuccin Mocha accents on a neutral near-black background.
+  -- Inactive alternate: Catppuccin Mocha.
   {
     "catppuccin/nvim",
     name = "catppuccin",
+    enabled = false, -- retain Catppuccin without loading it
+    -- enabled = true, -- switch back after disabling Monokai Pro below
     lazy = false, -- paint before UI plugins so curved separators inherit colors
     -- lazy = true, -- wrong for themes: bubbles can initialize with black edges
     priority = 1000,
@@ -127,11 +129,11 @@ return {
     end,
   },
 
-  -- Inactive alternate: Monokai Pro.
+  -- Active: Monokai Pro — warm charcoal background + vivid balanced accents.
   {
     "loctvl842/monokai-pro.nvim",
-    enabled = false, -- retain the previous theme without loading it
-    -- enabled = true, -- switch back after disabling Catppuccin above
+    enabled = true,
+    -- enabled = false, -- disable before restoring Catppuccin above
     lazy = false, -- paint before UI plugins to avoid startup flash
     -- lazy = true, -- wrong for themes: bars/floats initialize against defaults
     priority = 1000,
@@ -202,7 +204,7 @@ return {
     "rose-pine/neovim",
     name = "rose-pine",
     enabled = false, -- retain the previous theme without loading it
-    -- enabled = true, -- switch back after disabling Catppuccin above
+    -- enabled = true, -- switch back after disabling Monokai Pro above
     lazy = false, -- paint before UI plugins to avoid startup flash
     -- lazy = true, -- wrong for themes: bars/floats initialize against defaults
     priority = 1000,
@@ -271,7 +273,7 @@ return {
   {
     "talha-akram/noctis.nvim",
     enabled = false, -- keep the previous theme available without loading it
-    -- enabled = true, -- switch back after disabling Catppuccin above
+    -- enabled = true, -- switch back after disabling Monokai Pro above
     -- Load timing: colorschemes should paint before other UI plugins.
     lazy = false, -- load at startup (required for colorschemes)
     -- lazy = true, -- wrong for themes: UI would flash the default first

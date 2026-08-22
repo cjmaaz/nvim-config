@@ -1,33 +1,33 @@
 --------------------------------------------------------------------------------
--- Catppuccin Mocha chrome with neutral near-black background overrides.
+-- Monokai Pro chrome — warm neutral surfaces + vivid semantic accents.
 --------------------------------------------------------------------------------
 
 local M = {}
 
-M.base = "#18181B"
-M.surface = "#141417"
-M.overlay = "#27272C"
-M.muted = "#71717A"
-M.subtle = "#A6ADC8"
-M.text = "#CDD6F4"
-M.red = "#F38BA8"
-M.orange = "#FAB387"
-M.yellow = "#F9E2AF"
-M.green = "#A6E3A1"
-M.cyan = "#89DCEB"
-M.teal = "#94E2D5"
-M.magenta = "#CBA6F7"
-M.pink = "#F5C2E7"
-M.lavender = "#B4BEFE"
-M.white = "#CDD6F4"
-M.dimmed1 = "#BAC2DE"
-M.dimmed2 = "#A6ADC8"
-M.dimmed3 = "#7F849C"
-M.dimmed4 = "#585B70"
-M.dimmed5 = "#45475A"
-M.highlight_low = "#27272C"
-M.highlight_med = "#3F3F46"
-M.highlight_high = "#52525B"
+M.base = "#221F22"
+M.surface = "#19181A"
+M.overlay = "#403E41"
+M.muted = "#727072"
+M.subtle = "#939293"
+M.text = "#FCFCFA"
+M.red = "#FF6188"
+M.orange = "#FC9867"
+M.yellow = "#FFD866"
+M.green = "#A9DC76"
+M.cyan = "#78DCE8"
+M.teal = "#78DCE8"
+M.magenta = "#AB9DF2"
+M.pink = "#FF6188"
+M.lavender = "#AB9DF2"
+M.white = "#FCFCFA"
+M.dimmed1 = "#C1C0C0"
+M.dimmed2 = "#939293"
+M.dimmed3 = "#727072"
+M.dimmed4 = "#5B595C"
+M.dimmed5 = "#403E41"
+M.highlight_low = "#2D2A2E"
+M.highlight_med = M.dimmed4
+M.highlight_high = M.dimmed3
 
 -- Compatibility semantic names used by existing UI modules.
 M.love = M.red
@@ -42,7 +42,7 @@ M.panel_bg = M.surface
 -- M.panel_bg = M.overlay -- brighter panels with stronger separation
 M.panel_fg = M.dimmed1
 -- M.panel_fg = M.text -- maximum text contrast
-M.border_fg = M.lavender
+M.border_fg = M.orange
 -- M.border_fg = M.red -- stronger warning-like borders
 M.title_fg = M.yellow
 M.muted_fg = M.subtle
