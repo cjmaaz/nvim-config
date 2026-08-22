@@ -131,13 +131,13 @@ Smarter `<C-a>` / `<C-x>`: numbers, dates (`YYYY-MM-DD`), bools, `and`/`or`, `&&
 
 ## Rainbow brackets (`lua/plugins/rainbow.lua`)
 
-`rainbow-delimiters.nvim` — **10** high-contrast nesting colors. Shared palette: `lua/config/rainbow_palette.lua` (also drives the **indent scope** bar so brackets and the active vertical guide match by depth).
+`rainbow-delimiters.nvim` — **10** high-contrast, non-bold nesting colors. The active scope reuses these exact `RainbowDelimiterCustom*` groups so its depth color matches the enclosing bracket.
 
 ---
 
 ## Indent scope / vertical guide (`lua/plugins/indent.lua`)
 
-Passive guides stay **dim**; the current treesitter scope uses the rainbow color for that depth. `show_start` and `show_end` are off, leaving only the non-bold hairline **`│`** glyph without horizontal caps. The previous `▏` remains commented in `indent.lua`. Explicit `class_body` entries keep outer JS/TS classes visible, and custom Apex nodes fill ibl’s missing Apex scope map.
+Passive guides stay **dim**; the current treesitter scope uses the exact same non-bold highlight group as the enclosing rainbow bracket. `show_start` and `show_end` are off, leaving only the hairline **`│`** glyph without horizontal caps. The previous `▏` remains commented in `indent.lua`. Explicit `class_body` entries keep outer JS/TS classes visible, and custom Apex nodes fill ibl’s missing Apex scope map.
 
 ---
 

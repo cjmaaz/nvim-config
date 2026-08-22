@@ -15,24 +15,24 @@ local palette = {
   -- bg = chrome.panel_bg, -- match which-key / neo-tree / Telescope
   fg = chrome.panel_fg,
   muted = chrome.muted_fg,
-  rose = chrome.red,
-  orange = chrome.orange,
   yellow = chrome.yellow,
-  pine = chrome.green,
-  purple = chrome.magenta,
 }
 
 local bubble = vim.g.have_nerd_font and { left = "", right = "" } or { left = "", right = "" }
 local bubble_colors = {
-  -- Slightly darker than stock Catppuccin lavender for edge bubbles.
-  edge = "#8F99CC",
-  -- edge = chrome.lavender, -- original lighter edge bubble
-  -- Indigo shared by workspace/file and position bubbles.
-  workspace = "#5570D2",
-  -- workspace = chrome.cyan, -- original lighter workspace bubble
+  -- Tigerlily shared by mode, workspace/file, and SF/LSP/language bubbles.
+  edge = "#E75B45",
+  file = "#E75B45",
+  -- edge = "#8F99CC", -- previous darker lavender edge
+  -- file = "#5570D2", -- previous indigo workspace/file bubble
+  -- Indigo remains on the line:column + progress bubble.
+  position = "#5570D2",
   -- Pale olive green reserved for the Git branch bubble.
   git = "#A8D866",
   -- git = chrome.green, -- previous Catppuccin green
+  -- 15% darker Tigerlily keeps the unboxed center path readable.
+  path = "#C44D3B",
+  -- path = "#E75B45", -- undarkened Tigerlily
 }
 
 -- Neutral sections let only the requested components render as bubbles.
@@ -42,11 +42,11 @@ local catppuccin_theme = {
     b = { fg = palette.muted, bg = palette.bg },
     c = { fg = palette.fg, bg = palette.bg },
   },
-  insert = { a = { fg = palette.bg, bg = palette.pine, gui = "bold" } },
-  visual = { a = { fg = palette.bg, bg = palette.purple, gui = "bold" } },
-  replace = { a = { fg = palette.bg, bg = palette.rose, gui = "bold" } },
-  command = { a = { fg = palette.bg, bg = palette.yellow, gui = "bold" } },
-  terminal = { a = { fg = palette.bg, bg = palette.orange, gui = "bold" } },
+  insert = { a = { fg = palette.bg, bg = bubble_colors.edge, gui = "bold" } },
+  visual = { a = { fg = palette.bg, bg = bubble_colors.edge, gui = "bold" } },
+  replace = { a = { fg = palette.bg, bg = bubble_colors.edge, gui = "bold" } },
+  command = { a = { fg = palette.bg, bg = bubble_colors.edge, gui = "bold" } },
+  terminal = { a = { fg = palette.bg, bg = bubble_colors.edge, gui = "bold" } },
   inactive = {
     a = { fg = palette.muted, bg = palette.bg, gui = "bold" },
     b = { fg = palette.muted, bg = palette.bg },
@@ -99,6 +99,10 @@ local function dirty_flag()
   return vim.bo.modified and status_icons.dirty or ""
 end
 
+local function bubble_gap()
+  return " "
+end
+
 local function left_truncate(text, max_width)
   if vim.fn.strdisplaywidth(text) <= max_width then
     return text
@@ -112,33 +116,13 @@ local function left_truncate(text, max_width)
   return "…" .. vim.fn.strcharpart(text, start)
 end
 
-local function file_breadcrumb()
+local function relative_file_context()
   local path = vim.api.nvim_buf_get_name(0)
   if path == "" then
     return "[No Name]"
   end
 
-  local crumbs = {}
-  local filename = vim.fs.basename(path)
-  local parent_path = vim.fs.dirname(path)
-  local parent = parent_path and vim.fs.basename(parent_path) or ""
-  local grandparent_path = parent_path and vim.fs.dirname(parent_path) or nil
-  local grandparent = grandparent_path and vim.fs.basename(grandparent_path) or ""
-
-  if grandparent ~= "" and grandparent ~= "/" then
-    crumbs[#crumbs + 1] = grandparent
-  end
-  if parent ~= "" and parent ~= "/" then
-    crumbs[#crumbs + 1] = parent
-  end
-
-  local icon = ""
-  if vim.g.have_nerd_font then
-    icon = require("nvim-web-devicons").get_icon(filename, vim.fn.fnamemodify(filename, ":e"), { default = true })
-      or ""
-  end
-  crumbs[#crumbs + 1] = with_icon(icon, filename)
-
+  local text = vim.fs.relpath(vim.fn.getcwd(0), path) or vim.fn.fnamemodify(path, ":~")
   local navic = package.loaded["nvim-navic"]
   if navic and navic.is_available(0) then
     local location = navic.get_location({
@@ -148,12 +132,11 @@ local function file_breadcrumb()
       lazy_update_context = true,
     }, 0)
     if location ~= "" then
-      crumbs[#crumbs + 1] = location
+      text = text .. " > " .. location
     end
   end
 
-  local text = table.concat(crumbs, " > ")
-  return statusline_escape(left_truncate(text, math.max(18, math.floor(vim.o.columns * 0.36) - 6)))
+  return statusline_escape(left_truncate(text, math.max(24, math.floor(vim.o.columns * 0.36))))
 end
 
 local function lsp_names()
@@ -179,7 +162,7 @@ local function language_info()
   if vim.g.have_nerd_font then
     icon = require("nvim-web-devicons").get_icon_by_filetype(filetype, { default = true }) or ""
   end
-  return with_icon(icon, filetype)
+  return icon ~= "" and icon or filetype
 end
 
 -- Salesforce org + coverage (CodeOSS ui.lua).
@@ -345,8 +328,13 @@ return {
         -- 2–4. Workspace bubble, Git branch bubble, then standalone dirty flag.
         lualine_b = {
           {
+            bubble_gap,
+            color = { fg = palette.bg, bg = palette.bg },
+            padding = 0,
+          },
+          {
             workspace_name,
-            color = { fg = palette.bg, bg = bubble_colors.workspace, gui = "bold" },
+            color = { fg = palette.bg, bg = bubble_colors.file, gui = "bold" },
             separator = { right = bubble.right },
             padding = { left = 1, right = 1 },
           },
@@ -364,11 +352,11 @@ return {
           },
         },
 
-        -- 5. Grandparent > parent > icon/file > method/property; left-truncated.
+        -- 5. Relative path > method/property; no bubble, left-truncated.
         lualine_c = {
           {
-            file_breadcrumb,
-            color = { fg = palette.fg, bg = palette.bg },
+            relative_file_context,
+            color = { fg = bubble_colors.path, bg = palette.bg },
             padding = { left = 1, right = 1 },
           },
         },
@@ -391,13 +379,13 @@ return {
         lualine_y = {
           {
             "location",
-            color = { fg = palette.bg, bg = bubble_colors.workspace, gui = "bold" },
+            color = { fg = palette.bg, bg = bubble_colors.position, gui = "bold" },
             separator = { left = bubble.left },
             padding = { left = 1, right = 0 },
           },
           {
             "progress",
-            color = { fg = palette.bg, bg = bubble_colors.workspace, gui = "bold" },
+            color = { fg = palette.bg, bg = bubble_colors.position, gui = "bold" },
             padding = { left = 1, right = 1 },
           },
         },

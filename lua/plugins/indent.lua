@@ -21,19 +21,13 @@ return {
     },
     config = function()
       local hooks = require("ibl.hooks")
-      local scope_names = {}
-      for index in ipairs(palette.palette) do
-        scope_names[index] = "IblScopeRainbow" .. index
-      end
+      local rainbow_names = palette.names()
 
       -- Dim passive guides; brighten / sync scope via palette (and ColorScheme).
       local function apply_indent_highlights()
         local chrome = require("config.ui_chrome")
-        palette.apply({ bold = true }) -- retain bold rainbow brackets
-        -- palette.apply({ bold = false }) -- make brackets lighter too
-        for index, item in ipairs(palette.palette) do
-          vim.api.nvim_set_hl(0, scope_names[index], { fg = item[2], bold = false, nocombine = true })
-        end
+        palette.apply({ bold = false }) -- exact same non-bold groups as rainbow brackets
+        -- palette.apply({ bold = true }) -- stronger brackets and active scope
 
         -- Non-active indent columns — same “quiet but visible” weight as listchars
         -- space dots. Active scope stays bright.
@@ -111,8 +105,8 @@ return {
           injected_languages = true, -- scopes inside injections (JS in HTML, …)
           -- injected_languages = false,
 
-          -- Same colors as rainbow brackets, but separate non-bold hairline groups.
-          highlight = scope_names,
+          -- Reuse the exact bracket groups so ibl's extmark hook finds the same depth color.
+          highlight = rainbow_names,
           -- highlight = "IblScope", -- single bright color instead of rainbow
           -- highlight = { "IblScope" },
 

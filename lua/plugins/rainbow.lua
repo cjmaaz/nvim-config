@@ -18,14 +18,14 @@ return {
       "nvim-treesitter/nvim-treesitter", -- needs parsers for the language
     },
     config = function()
-      palette.apply({ bold = true })
-      -- palette.apply({ bold = false }) -- quieter brackets
+      palette.apply({ bold = false }) -- match the non-bold active scope hairline
+      -- palette.apply({ bold = true }) -- stronger brackets and scope guide
 
       -- Re-apply after colorscheme changes (themes wipe unknown groups).
       vim.api.nvim_create_autocmd("ColorScheme", {
         group = vim.api.nvim_create_augroup("user_rainbow_delimiters", { clear = true }),
         callback = function()
-          palette.apply({ bold = true })
+          palette.apply({ bold = false })
         end,
       })
 
