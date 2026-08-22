@@ -4,11 +4,11 @@
 -- theme, then switches — and lualine's theme = "auto" would lag behind.
 --
 -- Alternatives (enable only one colorscheme plugin at a time):
---   - olimorris/onedarkpro.nvim       (active OneDark syntax; retained charcoal)
+--   - talha-akram/noctis.nvim         (active Bordo syntax; retained charcoal)
+--   - olimorris/onedarkpro.nvim       (previous OneDark; retained below)
 --   - catppuccin/nvim                 (previous neutral Mocha; retained below)
 --   - loctvl842/monokai-pro.nvim      (previous warm-charcoal theme; retained below)
 --   - rose-pine/neovim               (previous Rosé Pine Main; retained below)
---   - talha-akram/noctis.nvim         (previous Noctis Bordo; retained below)
 --   - rebelot/kanagawa.nvim          (Kanagawa dragon — commented below)
 --   - folke/tokyonight.nvim          (LazyVim default)
 --   - craftzdog/solarized-osaka.nvim (Craftzdog)
@@ -17,11 +17,11 @@
 --------------------------------------------------------------------------------
 
 return {
-  -- Active: OneDarkPro syntax with the existing neutral-charcoal background.
+  -- Inactive alternate: OneDarkPro.
   {
     "olimorris/onedarkpro.nvim",
-    enabled = true,
-    -- enabled = false, -- disable before restoring Catppuccin below
+    enabled = false, -- retain the previous theme without loading it
+    -- enabled = true, -- switch back after disabling Noctis Bordo below
     lazy = false, -- paint before UI plugins to avoid startup flash
     -- lazy = true, -- wrong for themes: bars/floats initialize against defaults
     priority = 1000,
@@ -91,7 +91,7 @@ return {
     "catppuccin/nvim",
     name = "catppuccin",
     enabled = false, -- retain the previous theme without loading it
-    -- enabled = true, -- switch back after disabling OneDarkPro above
+    -- enabled = true, -- switch back after disabling Noctis Bordo below
     lazy = false, -- paint before UI plugins so curved separators inherit colors
     -- lazy = true, -- wrong for themes: bubbles can initialize with black edges
     priority = 1000,
@@ -203,7 +203,7 @@ return {
   {
     "loctvl842/monokai-pro.nvim",
     enabled = false, -- retain the previous theme without loading it
-    -- enabled = true, -- switch back after disabling OneDarkPro above
+    -- enabled = true, -- switch back after disabling Noctis Bordo below
     lazy = false, -- paint before UI plugins to avoid startup flash
     -- lazy = true, -- wrong for themes: bars/floats initialize against defaults
     priority = 1000,
@@ -274,7 +274,7 @@ return {
     "rose-pine/neovim",
     name = "rose-pine",
     enabled = false, -- retain the previous theme without loading it
-    -- enabled = true, -- switch back after disabling OneDarkPro above
+    -- enabled = true, -- switch back after disabling Noctis Bordo below
     lazy = false, -- paint before UI plugins to avoid startup flash
     -- lazy = true, -- wrong for themes: bars/floats initialize against defaults
     priority = 1000,
@@ -336,14 +336,14 @@ return {
     end,
   },
 
-  -- Inactive alternate: VS Code Noctis Bordo (warm rose / burgundy).
+  -- Active: VS Code Noctis Bordo syntax on the retained neutral background.
   -- talha-akram/noctis.nvim has no plugin setup()/opts API (unlike kanagawa).
   -- The `opts` table below mirrors the kanagawa knobs we care about and is
   -- applied with nvim_set_hl after :colorscheme.
   {
     "talha-akram/noctis.nvim",
-    enabled = false, -- keep the previous theme available without loading it
-    -- enabled = true, -- switch back after disabling OneDarkPro above
+    enabled = true,
+    -- enabled = false, -- disable before restoring another theme above
     -- Load timing: colorschemes should paint before other UI plugins.
     lazy = false, -- load at startup (required for colorschemes)
     -- lazy = true, -- wrong for themes: UI would flash the default first
@@ -364,8 +364,8 @@ return {
       -- transparent = true, -- clear Normal / SignColumn / etc.
 
       -- Dim unfocused windows.
-      dimInactive = true, -- fade NormalNC when another window is focused
-      -- dimInactive = false, -- same brightness in all windows
+      dimInactive = false, -- retain the same neutral background in every split
+      -- dimInactive = true, -- fade NormalNC when another window is focused
 
       -- Push a Bordo-ish 16-color palette into :terminal.
       terminalColors = true, -- tint :terminal to match the theme
@@ -412,11 +412,13 @@ return {
       -- vim.cmd.colorscheme("noctis_lilac")
       -- vim.cmd.colorscheme("noctis_hibernus")
 
-      -- Palette snippets from noctis_bordo (for overrides / terminal).
+      local chrome = require("config.ui_chrome")
+
+      -- Bordo syntax accents over the retained neutral background ladder.
       local pal = {
-        bg0 = "#312A2D",
-        bg1 = "#3C2F34",
-        bg2 = "#2B2528",
+        bg0 = chrome.base,
+        bg1 = chrome.surface,
+        bg2 = chrome.base,
         fg = "#C9BEC2",
         red = "#D17B9A",
         orange = "#C5663F",
@@ -430,7 +432,6 @@ return {
       }
 
       local hl = vim.api.nvim_set_hl
-      local chrome = require("config.ui_chrome")
       local function has(style_tbl, key)
         return style_tbl and style_tbl[key] == true
       end
@@ -444,6 +445,18 @@ return {
         -- hl(0, "FloatBorder", { fg = chrome.border_fg, bg = float_bg }) -- rose outline
         hl(0, "FloatTitle", { fg = chrome.title_fg, bg = float_bg, bold = true })
         hl(0, "FloatFooter", { fg = chrome.muted_fg, bg = float_bg })
+      end
+
+      -- Keep the editor plane on the same neutral background used by the bars.
+      local function apply_editor_background()
+        local editor_bg = opts.transparent and "NONE" or chrome.base
+        hl(0, "Normal", { fg = pal.fg, bg = editor_bg })
+        hl(0, "NormalNC", { fg = opts.dimInactive and pal.light_grey or pal.fg, bg = editor_bg })
+        hl(0, "SignColumn", { bg = editor_bg })
+        hl(0, "FoldColumn", { bg = editor_bg })
+        hl(0, "LineNr", { fg = pal.grey, bg = editor_bg })
+        hl(0, "CursorLineNr", { fg = pal.yellow, bg = editor_bg, bold = true })
+        hl(0, "EndOfBuffer", { fg = opts.transparent and pal.grey or chrome.base, bg = editor_bg })
       end
 
       -- Comments → italic
@@ -549,10 +562,16 @@ return {
       end
 
       -- Apply after transparent/theme overrides; re-apply after runtime switches.
+      apply_editor_background()
       apply_float_chrome()
       vim.api.nvim_create_autocmd("ColorScheme", {
         group = vim.api.nvim_create_augroup("user_float_chrome", { clear = true }),
-        callback = apply_float_chrome,
+        callback = function()
+          if vim.g.colors_name == "noctis_bordo" then
+            apply_editor_background()
+          end
+          apply_float_chrome()
+        end,
       })
     end,
   },

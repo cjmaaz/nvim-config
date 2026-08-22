@@ -27,9 +27,12 @@ local bubble_colors = {
   -- Slightly darker than stock Catppuccin lavender for edge bubbles.
   edge = "#8F99CC",
   -- edge = chrome.lavender, -- original lighter edge bubble
-  -- Darker cyan shared by workspace and position bubbles.
-  workspace = "#5F929C",
+  -- Indigo shared by workspace/file and position bubbles.
+  workspace = "#5570D2",
   -- workspace = chrome.cyan, -- original lighter workspace bubble
+  -- Pale olive green reserved for the Git branch bubble.
+  git = "#A8D866",
+  -- git = chrome.green, -- previous Catppuccin green
 }
 
 -- Neutral sections let only the requested components render as bubbles.
@@ -109,16 +112,33 @@ local function left_truncate(text, max_width)
   return "…" .. vim.fn.strcharpart(text, start)
 end
 
-local function relative_path()
+local function file_breadcrumb()
   local path = vim.api.nvim_buf_get_name(0)
   if path == "" then
     return "[No Name]"
   end
-  return vim.fs.relpath(vim.fn.getcwd(0), path) or vim.fn.fnamemodify(path, ":~")
-end
 
-local function file_context()
-  local text = relative_path()
+  local crumbs = {}
+  local filename = vim.fs.basename(path)
+  local parent_path = vim.fs.dirname(path)
+  local parent = parent_path and vim.fs.basename(parent_path) or ""
+  local grandparent_path = parent_path and vim.fs.dirname(parent_path) or nil
+  local grandparent = grandparent_path and vim.fs.basename(grandparent_path) or ""
+
+  if grandparent ~= "" and grandparent ~= "/" then
+    crumbs[#crumbs + 1] = grandparent
+  end
+  if parent ~= "" and parent ~= "/" then
+    crumbs[#crumbs + 1] = parent
+  end
+
+  local icon = ""
+  if vim.g.have_nerd_font then
+    icon = require("nvim-web-devicons").get_icon(filename, vim.fn.fnamemodify(filename, ":e"), { default = true })
+      or ""
+  end
+  crumbs[#crumbs + 1] = with_icon(icon, filename)
+
   local navic = package.loaded["nvim-navic"]
   if navic and navic.is_available(0) then
     local location = navic.get_location({
@@ -128,10 +148,12 @@ local function file_context()
       lazy_update_context = true,
     }, 0)
     if location ~= "" then
-      text = text .. " > " .. location
+      crumbs[#crumbs + 1] = location
     end
   end
-  return statusline_escape(left_truncate(text, math.max(24, math.floor(vim.o.columns * 0.36))))
+
+  local text = table.concat(crumbs, " > ")
+  return statusline_escape(left_truncate(text, math.max(18, math.floor(vim.o.columns * 0.36) - 6)))
 end
 
 local function lsp_names()
@@ -331,7 +353,7 @@ return {
           {
             "branch",
             icon = status_icons.git,
-            color = { fg = palette.bg, bg = chrome.green, gui = "bold" },
+            color = { fg = palette.bg, bg = bubble_colors.git, gui = "bold" },
             separator = { right = bubble.right },
             padding = { left = 1, right = 1 },
           },
@@ -342,10 +364,10 @@ return {
           },
         },
 
-        -- 5. Relative file + nearest method/property; no bubble, left-truncated.
+        -- 5. Grandparent > parent > icon/file > method/property; left-truncated.
         lualine_c = {
           {
-            file_context,
+            file_breadcrumb,
             color = { fg = palette.fg, bg = palette.bg },
             padding = { left = 1, right = 1 },
           },

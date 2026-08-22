@@ -1,5 +1,5 @@
 --------------------------------------------------------------------------------
--- Indent guides (indent-blankline / ibl) + thin current-scope vertical line
+-- Indent guides (indent-blankline / ibl) + hairline current-scope guide
 -- Refs: CodeOSS ui.lua; Kickstart plugins/indent_line.lua (empty opts).
 -- Alts: mini.indentscope · snacks indent · none (treesitter indent only).
 --
@@ -21,12 +21,19 @@ return {
     },
     config = function()
       local hooks = require("ibl.hooks")
-      local rainbow_names = palette.names()
+      local scope_names = {}
+      for index in ipairs(palette.palette) do
+        scope_names[index] = "IblScopeRainbow" .. index
+      end
 
       -- Dim passive guides; brighten / sync scope via palette (and ColorScheme).
       local function apply_indent_highlights()
         local chrome = require("config.ui_chrome")
-        palette.apply({ bold = true })
+        palette.apply({ bold = true }) -- retain bold rainbow brackets
+        -- palette.apply({ bold = false }) -- make brackets lighter too
+        for index, item in ipairs(palette.palette) do
+          vim.api.nvim_set_hl(0, scope_names[index], { fg = item[2], bold = false, nocombine = true })
+        end
 
         -- Non-active indent columns — same “quiet but visible” weight as listchars
         -- space dots. Active scope stays bright.
@@ -38,7 +45,7 @@ return {
 
         -- Fallback single-color scope (used only if scope.highlight is a string / IblScope).
         -- When using the rainbow list below, depth colors come from RainbowDelimiterCustom*.
-        vim.api.nvim_set_hl(0, "IblScope", { fg = chrome.iris, bold = true, nocombine = true })
+        vim.api.nvim_set_hl(0, "IblScope", { fg = chrome.iris, bold = false, nocombine = true })
         -- vim.api.nvim_set_hl(0, "IblScope", { fg = "#8BE9FD", bold = true }) -- cyan
         -- vim.api.nvim_set_hl(0, "IblScope", { fg = "#FFB86C", bold = true }) -- orange
         -- vim.api.nvim_set_hl(0, "IblScope", { link = "Identifier" }) -- follow theme
@@ -57,21 +64,21 @@ return {
         indent = {
           -- Keep indent.char and scope.char on the same left/right bias so the
           -- column doesn’t jump when the bright scope replaces a dim guide.
-          char = "▏", -- U+258F left eighth — thinnest solid guide
-          -- char = "▎", -- previous: thicker left quarter
+          char = "│", -- U+2502 single-stroke hairline
+          -- char = "▏", -- previous: left-edge eighth block
+          -- char = "▎", -- thicker left quarter
           -- char = "▍", -- U+258D left three-eighths (nudge further right)
-          -- char = "│", -- centered box-drawing
           -- char = "┊", -- lighter dotted guide
           -- char = "¦",
           -- char = " ", -- invisible passive guides (scope-only mode)
           -- char = "▕", -- right edge of the indent cell
-          tab_char = "▏", -- same thin glyph as spaces (keep in sync with char)
-          -- tab_char = "│",
+          tab_char = "│", -- same hairline glyph as spaces (keep in sync with char)
+          -- tab_char = "▏", -- previous left-edge block
           -- tab_char = "┊",
           -- tab_char = "→",
           highlight = "IblIndent", -- dim passive columns (see apply_indent_highlights)
           -- highlight = "Whitespace", -- force same hl group as space dots
-          -- highlight = rainbow_names, -- rainbow every indent column (noisier)
+          -- highlight = palette.names(), -- rainbow every indent column (noisier)
           -- smart_indent_cap = true, -- default-ish: cap indent depth oddly
         },
 
@@ -85,10 +92,10 @@ return {
           -- enabled = false, -- guides only, no current-block emphasis
 
           -- Match indent.char so the active color changes without a width jump.
-          char = "▏", -- U+258F left eighth keeps the active scope thin
-          -- char = "▎", -- previous: thicker left quarter
+          char = "│", -- U+2502 + non-bold highlight keeps the scope thinnest
+          -- char = "▏", -- previous: left-edge eighth block
+          -- char = "▎", -- thicker left quarter
           -- char = "▍", -- thicker still
-          -- char = "│", -- centered (felt too far right before)
           -- char = "┃", -- heavy centered bar
           -- char = "▌", -- full left half block (very obvious)
 
@@ -104,8 +111,8 @@ return {
           injected_languages = true, -- scopes inside injections (JS in HTML, …)
           -- injected_languages = false,
 
-          -- Same palette as rainbow brackets → scope depth matches bracket color.
-          highlight = rainbow_names,
+          -- Same colors as rainbow brackets, but separate non-bold hairline groups.
+          highlight = scope_names,
           -- highlight = "IblScope", -- single bright color instead of rainbow
           -- highlight = { "IblScope" },
 
