@@ -9,34 +9,49 @@
 
 local chrome = require("config.ui_chrome")
 
+local function lighten(hex, amount)
+  local value = assert(tonumber(hex:sub(2), 16), "invalid hex color: " .. hex)
+  local function lift(channel)
+    return math.floor(channel + (255 - channel) * amount + 0.5)
+  end
+  local red = lift(math.floor(value / 0x10000) % 0x100)
+  local green = lift(math.floor(value / 0x100) % 0x100)
+  local blue = lift(value % 0x100)
+  return string.format("#%02X%02X%02X", red, green, blue)
+end
+
+-- Lift footer accents 20% toward white while retaining the editor background.
+local footer_lighten = 0.20
+-- local footer_lighten = 0 -- use the original unlightened colors
+
 -- Shared neutral-Mocha accents; individual components own their bubble colors.
 local palette = {
   bg = chrome.base,
   -- bg = chrome.panel_bg, -- match which-key / neo-tree / Telescope
-  fg = chrome.panel_fg,
-  muted = chrome.muted_fg,
-  yellow = chrome.yellow,
+  fg = lighten(chrome.panel_fg, footer_lighten),
+  muted = lighten(chrome.muted_fg, footer_lighten),
+  yellow = lighten(chrome.yellow, footer_lighten),
 }
 
 local bubble = vim.g.have_nerd_font and { left = "", right = "" } or { left = "", right = "" }
 local bubble_colors = {
   -- Mode colors make each editing state recognizable at a glance.
-  normal = "#00638B", -- Peacock Blue
-  insert = "#008E00", -- Forest Green
-  visual = "#5570D2", -- Crayola Indigo
-  replace = "#D17B9A", -- Bordo rose
-  command = "#E75B45", -- Tigerlily
-  terminal = "#A8D866", -- Pale Olive Green
+  normal = lighten("#00638B", footer_lighten), -- Peacock Blue
+  insert = lighten("#008E00", footer_lighten), -- Forest Green
+  visual = lighten("#7060EB", footer_lighten), -- distinct Noctis purple
+  replace = lighten("#D17B9A", footer_lighten), -- Bordo rose
+  command = lighten("#E75B45", footer_lighten), -- Tigerlily
+  terminal = lighten("#A8D866", footer_lighten), -- Pale Olive Green
   -- Project/file and position retain the requested Indigo.
-  file = "#5570D2",
+  file = lighten("#5570D2", footer_lighten),
   -- Indigo remains on the line:column + progress bubble.
-  position = "#5570D2",
+  position = lighten("#5570D2", footer_lighten),
   -- Git uses the requested Forest Green.
-  git = "#008E00",
+  git = lighten("#008E00", footer_lighten),
   -- Center relative path uses the requested dark Peacock shade.
-  path = "#004066",
+  path = lighten("#004066", footer_lighten),
   -- SF/LSP/language reuses the Normal-mode Peacock Blue.
-  info = "#00638B",
+  info = lighten("#00638B", footer_lighten),
 }
 
 -- Neutral sections let only the requested components render as bubbles.

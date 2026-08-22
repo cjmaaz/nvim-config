@@ -46,7 +46,7 @@ Defined in `init.lua`.
 
 | Area | How you use it today |
 | --- | --- |
-| Statusline (lualine) | Peacock Normal/info · Indigo project/position · Forest Git · mode-specific icons/colors |
+| Statusline (lualine) | 20%-lightened palette with distinct purple Visual mode and mode-specific icons |
 | Bufferline | Filetype icon + filename only; dirty state moved to footer — [core.md](./core.md) |
 | neo-tree | Filesystem only: `<leader>fe` · `<leader>fE` — [explorer.md](./explorer.md) |
 | Project workflows | `<leader>pn` scaffold · `<leader>pr` run/build/test — [project.md](./project.md) |
