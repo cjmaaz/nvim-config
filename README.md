@@ -66,8 +66,8 @@ nvim-config/
     │       └── query.lua # SOQL builder and SFTerm runner
     └── plugins/          # one plugin (or small family) per file
         ├── init.lua      # empty list; keeps `import = "plugins"` valid
-        ├── colorscheme.lua # neutral-background Catppuccin Mocha
-        ├── statusline.lua  # ordered Catppuccin bubble footer
+        ├── colorscheme.lua # OneDarkPro + retained theme alternates
+        ├── statusline.lua  # ordered dark bubble footer
         ├── bufferline.lua # matching buffer bar (not tabpages)
         ├── cursor.lua     # calm smear animation across buffers/windows
         ├── explorer.lua  # filesystem-only neo-tree

@@ -4,7 +4,8 @@
 -- theme, then switches — and lualine's theme = "auto" would lag behind.
 --
 -- Alternatives (enable only one colorscheme plugin at a time):
---   - catppuccin/nvim                 (active neutral Mocha theme)
+--   - olimorris/onedarkpro.nvim       (active OneDark syntax; retained charcoal)
+--   - catppuccin/nvim                 (previous neutral Mocha; retained below)
 --   - loctvl842/monokai-pro.nvim      (previous warm-charcoal theme; retained below)
 --   - rose-pine/neovim               (previous Rosé Pine Main; retained below)
 --   - talha-akram/noctis.nvim         (previous Noctis Bordo; retained below)
@@ -16,12 +17,81 @@
 --------------------------------------------------------------------------------
 
 return {
-  -- Active: Catppuccin Mocha accents on a neutral near-black background.
+  -- Active: OneDarkPro syntax with the existing neutral-charcoal background.
+  {
+    "olimorris/onedarkpro.nvim",
+    enabled = true,
+    -- enabled = false, -- disable before restoring Catppuccin below
+    lazy = false, -- paint before UI plugins to avoid startup flash
+    -- lazy = true, -- wrong for themes: bars/floats initialize against defaults
+    priority = 1000,
+    -- priority = 50, -- too late for statusline/chrome consumers
+    opts = {
+      -- Keep the editor plane identical while OneDark owns syntax colors.
+      colors = {
+        onedark = { bg = "#18181B" },
+        -- onedark = { bg = "#282C34" }, -- stock OneDark background
+      },
+      styles = {
+        types = "NONE",
+        methods = "NONE",
+        numbers = "NONE",
+        strings = "NONE",
+        comments = "italic",
+        keywords = "NONE",
+        constants = "NONE",
+        functions = "NONE",
+        operators = "NONE",
+        variables = "NONE",
+        parameters = "NONE",
+        conditionals = "NONE",
+        virtual_text = "NONE",
+      },
+      options = {
+        cursorline = false,
+        -- cursorline = true, -- use OneDark's cursor-line tint
+        transparency = false,
+        -- transparency = true, -- use the terminal background
+        terminal_colors = true,
+        lualine_transparency = false,
+        highlight_inactive_windows = false,
+        -- highlight_inactive_windows = true, -- dim unfocused splits
+      },
+    },
+    config = function(_, opts)
+      require("onedarkpro").setup(opts)
+      vim.cmd.colorscheme("onedark")
+
+      -- Re-assert shared float/markup chrome after the syntax theme loads.
+      local chrome = require("config.ui_chrome")
+      local hl = vim.api.nvim_set_hl
+      local function apply_overrides()
+        hl(0, "NormalFloat", { fg = chrome.panel_fg, bg = chrome.panel_bg })
+        -- hl(0, "NormalFloat", { link = "Normal" }) -- blend floats into editor
+        hl(0, "FloatBorder", { fg = chrome.divider_fg, bg = chrome.panel_bg })
+        -- hl(0, "FloatBorder", { fg = chrome.red, bg = chrome.panel_bg }) -- vivid edge
+        hl(0, "FloatTitle", { fg = chrome.title_fg, bg = chrome.panel_bg, bold = true })
+        hl(0, "FloatFooter", { fg = chrome.muted_fg, bg = chrome.panel_bg })
+        hl(0, "@markup.strong", { bold = true })
+        hl(0, "@markup.italic", { italic = true })
+        hl(0, "@markup.strikethrough", { strikethrough = true })
+        hl(0, "@lsp.mod.deprecated", { strikethrough = true, italic = true })
+        hl(0, "DiagnosticDeprecated", { strikethrough = true })
+      end
+      apply_overrides()
+      vim.api.nvim_create_autocmd("ColorScheme", {
+        group = vim.api.nvim_create_augroup("user_float_chrome", { clear = true }),
+        callback = apply_overrides,
+      })
+    end,
+  },
+
+  -- Inactive alternate: Catppuccin Mocha.
   {
     "catppuccin/nvim",
     name = "catppuccin",
-    enabled = true,
-    -- enabled = false, -- disable before restoring Monokai Pro below
+    enabled = false, -- retain the previous theme without loading it
+    -- enabled = true, -- switch back after disabling OneDarkPro above
     lazy = false, -- paint before UI plugins so curved separators inherit colors
     -- lazy = true, -- wrong for themes: bubbles can initialize with black edges
     priority = 1000,
@@ -133,7 +203,7 @@ return {
   {
     "loctvl842/monokai-pro.nvim",
     enabled = false, -- retain the previous theme without loading it
-    -- enabled = true, -- switch back after disabling Catppuccin above
+    -- enabled = true, -- switch back after disabling OneDarkPro above
     lazy = false, -- paint before UI plugins to avoid startup flash
     -- lazy = true, -- wrong for themes: bars/floats initialize against defaults
     priority = 1000,
@@ -204,7 +274,7 @@ return {
     "rose-pine/neovim",
     name = "rose-pine",
     enabled = false, -- retain the previous theme without loading it
-    -- enabled = true, -- switch back after disabling Catppuccin above
+    -- enabled = true, -- switch back after disabling OneDarkPro above
     lazy = false, -- paint before UI plugins to avoid startup flash
     -- lazy = true, -- wrong for themes: bars/floats initialize against defaults
     priority = 1000,
@@ -273,7 +343,7 @@ return {
   {
     "talha-akram/noctis.nvim",
     enabled = false, -- keep the previous theme available without loading it
-    -- enabled = true, -- switch back after disabling Catppuccin above
+    -- enabled = true, -- switch back after disabling OneDarkPro above
     -- Load timing: colorschemes should paint before other UI plugins.
     lazy = false, -- load at startup (required for colorschemes)
     -- lazy = true, -- wrong for themes: UI would flash the default first

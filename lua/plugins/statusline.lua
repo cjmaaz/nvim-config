@@ -23,11 +23,19 @@ local palette = {
 }
 
 local bubble = vim.g.have_nerd_font and { left = "", right = "" } or { left = "", right = "" }
+local bubble_colors = {
+  -- Slightly darker than stock Catppuccin lavender for edge bubbles.
+  edge = "#8F99CC",
+  -- edge = chrome.lavender, -- original lighter edge bubble
+  -- Darker cyan shared by workspace and position bubbles.
+  workspace = "#5F929C",
+  -- workspace = chrome.cyan, -- original lighter workspace bubble
+}
 
 -- Neutral sections let only the requested components render as bubbles.
 local catppuccin_theme = {
   normal = {
-    a = { fg = palette.bg, bg = chrome.lavender, gui = "bold" },
+    a = { fg = palette.bg, bg = bubble_colors.edge, gui = "bold" },
     b = { fg = palette.muted, bg = palette.bg },
     c = { fg = palette.fg, bg = palette.bg },
   },
@@ -316,7 +324,7 @@ return {
         lualine_b = {
           {
             workspace_name,
-            color = { fg = palette.bg, bg = chrome.cyan, gui = "bold" },
+            color = { fg = palette.bg, bg = bubble_colors.workspace, gui = "bold" },
             separator = { right = bubble.right },
             padding = { left = 1, right = 1 },
           },
@@ -344,7 +352,7 @@ return {
         },
         -- lualine_c = { { "filename", path = 1 } }, -- relative file without symbol context
 
-        -- 6–7. Plain diagnostics, line:column, then percentage through the file.
+        -- 6. Plain diagnostics without a bubble.
         lualine_x = {
           {
             "diagnostics",
@@ -355,17 +363,28 @@ return {
             color = { fg = palette.muted, bg = palette.bg },
             padding = { left = 1, right = 1 },
           },
-          { "location", color = { fg = palette.muted, bg = palette.bg } },
-          { "progress", color = { fg = palette.muted, bg = palette.bg } },
         },
 
-        lualine_y = {},
+        -- 7. Line:column and progress share one darkened workspace-color bubble.
+        lualine_y = {
+          {
+            "location",
+            color = { fg = palette.bg, bg = bubble_colors.workspace, gui = "bold" },
+            separator = { left = bubble.left },
+            padding = { left = 1, right = 0 },
+          },
+          {
+            "progress",
+            color = { fg = palette.bg, bg = bubble_colors.workspace, gui = "bold" },
+            padding = { left = 1, right = 1 },
+          },
+        },
 
         -- 8. Salesforce, LSP clients, and language share the final right bubble.
         lualine_z = {
           {
             final_context,
-            color = { fg = palette.bg, bg = chrome.lavender, gui = "bold" },
+            color = { fg = palette.bg, bg = bubble_colors.edge, gui = "bold" },
             separator = { left = bubble.left },
             cond = function()
               return vim.bo.filetype ~= ""
