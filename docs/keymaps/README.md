@@ -59,7 +59,7 @@ Defined in `init.lua`.
 | LSP / format / blink | `gd`/`K`/`gr` · `<leader>cf` · `<C-y>` — [lsp.md](./lsp.md) |
 | Lint (nvim-lint) | `<leader>cl` · `<leader>tl` toggle auto · lazy Mason — [lsp.md](./lsp.md#linting-luapluginslintinglua) |
 | Salesforce | `<leader>S…` · Vlocity `SV` · SOQL `SQ`/`Sq` · metadata `Su` · cancel `Sx` — [salesforce.md](./salesforce.md) |
-| Comment / TODO / context | `gcc` · `]t`/`[t` · `<leader>st`; Incline shows file + current LSP symbols — [comment.md](./comment.md) |
+| Comment / TODO / context | `gcc` · `]t`/`[t` · `<leader>st`; native winbar shows file + current LSP symbols — [comment.md](./comment.md) |
 | QoL | Gremlins · sessions · Trouble · surround · flash · undotree · yanky · dial · rainbow · colorizer — [qol.md](./qol.md) |
 | Colorscheme | Catppuccin Mocha accents on a neutral near-black background — `lua/plugins/colorscheme.lua` |
 | which-key | `<Space>` then wait — [which-key.md](./which-key.md) |

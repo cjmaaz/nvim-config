@@ -1,6 +1,6 @@
 # Explorer (neo-tree)
 
-Defined in `lua/plugins/explorer.lua`. Neo-tree is now a filesystem-only sidebar (not netrw / oil) with auto-expanding width for long names. Buffer selection stays on `<leader><leader>` and Git browsing stays in LazyGit; filesystem Git badges remain enabled. Press `?` inside the tree for neo-tree’s own help. Shared neutral Catppuccin chrome matches bufferline, Incline, which-key, and Telescope.
+Defined in `lua/plugins/explorer.lua`. Neo-tree is now a filesystem-only sidebar (not netrw / oil) with auto-expanding width for long names. Buffer selection stays on `<leader><leader>` and Git browsing stays in LazyGit; filesystem Git badges remain enabled. Press `?` inside the tree for neo-tree’s own help. Shared neutral Catppuccin chrome matches bufferline, the native winbar, which-key, and Telescope.
 
 Nav: [index](./README.md) · [core](./core.md) · [git](./git.md) · [telescope](./telescope.md) · [treesitter](./treesitter.md) · [lsp](./lsp.md) · [which-key](./which-key.md)
 

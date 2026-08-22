@@ -130,8 +130,7 @@ return {
         -- enabled = true, -- always try icons (may show tofu boxes without a Nerd Font)
         -- enabled = false, -- text-only statusline components
       },
-      -- Previous breadcrumbs (navic); uncomment after restoring breadcrumbs.lua:
-      -- "SmiteshP/nvim-navic",
+      "SmiteshP/nvim-navic", -- current LSP class/function context in native winbar
     },
     opts = {
       options = {
@@ -272,12 +271,16 @@ return {
       --   lualine_x = { "location" },
       -- },
 
-      -- Extra bars (usually leave empty while learning):
+      -- Extra bars are kept separate; config.winbar owns the native winbar.
       -- tabline = {},
-      -- winbar = {},
+      -- winbar = {}, -- use Lualine sections instead of the plain native context row
       -- inactive_winbar = {},
 
       -- extensions = { "lazy", "fugitive", "nvim-tree", "trouble" }, -- nicer sections inside those UIs
     },
+    config = function(_, opts)
+      require("lualine").setup(opts)
+      require("config.winbar").setup()
+    end,
   },
 }

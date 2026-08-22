@@ -2,7 +2,7 @@
 -- Breadcrumbs — clickable path + symbol navigation in the winbar (dropbar.nvim)
 -- Sources: path plus LSP / Treesitter / Markdown fallbacks, chosen automatically.
 -- Needs: Neovim 0.11+; icons and fzf-native are optional enhancements.
--- Alts: nvim-navic in lualine (revert block below) · barbecue.nvim · skip.
+-- Active alternate: nvim-navic in Lualine's native winbar (statusline.lua).
 --------------------------------------------------------------------------------
 
 --- Neutral Catppuccin menu chrome retained for the disabled Dropbar alternate.
@@ -86,16 +86,4 @@ return {
       })
     end,
   },
-
-  -- Previous breadcrumbs (navic): replace the active spec above with this block,
-  -- then uncomment the matching dependency/component in statusline.lua.
-  -- {
-  --   "SmiteshP/nvim-navic",
-  --   opts = {
-  --     lsp = { auto_attach = true },
-  --     highlight = true,
-  --     separator = " › ",
-  --     depth_limit = 5,
-  --   },
-  -- },
 }

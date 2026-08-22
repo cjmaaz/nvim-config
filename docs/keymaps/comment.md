@@ -42,11 +42,11 @@ Also: `:TodoQuickFix` · `:TodoLocList` · `:TodoTelescope`.
 
 ---
 
-## Window context (incline.nvim + nvim-navic)
+## Window context (Lualine winbar + nvim-navic)
 
-`lua/plugins/incline.lua` shows a compact rounded label at the top-right of each editor window. Every label contains the file icon/name and modified state; the focused window also shows up to the last three LSP class/function/method symbols.
+`lua/config/winbar.lua`, loaded by `lua/plugins/statusline.lua`, shows a compact, left-aligned file label in each editor window. The focused window follows it with up to three LSP class/function/method symbols.
 
-Unlike a built-in full-width winbar, Incline consumes only the width of its content and leaves the rest of the top row available for code.
+It uses Neovim's native winbar row, so the context stays visually compact while never floating over or hiding the first line of code.
 
 ### Disabled Dropbar alternate
 

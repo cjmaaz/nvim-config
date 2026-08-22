@@ -51,6 +51,7 @@ nvim-config/
     │   ├── project_context.lua # lightweight Salesforce root gate
     │   ├── gremlins.lua  # invisible/confusable Unicode diagnostics
     │   ├── autocmds.lua  # yank, trim, final newline (Apex exempt), filetypes
+    │   ├── winbar.lua    # non-overlapping file + LSP context row
     │   ├── lazy.lua      # bootstrap lazy.nvim + import plugins/
     │   ├── telescope/
     │   │   └── multigrep.lua # content grep + raw file-glob mode
@@ -66,11 +67,10 @@ nvim-config/
     └── plugins/          # one plugin (or small family) per file
         ├── init.lua      # empty list; keeps `import = "plugins"` valid
         ├── colorscheme.lua # neutral-background Catppuccin Mocha
-        ├── statusline.lua  # responsive curved Catppuccin lualine
+        ├── statusline.lua  # curved lualine + non-overlapping native winbar
         ├── bufferline.lua # matching buffer bar (not tabpages)
         ├── cursor.lua     # calm smear animation across buffers/windows
         ├── explorer.lua  # filesystem-only neo-tree
-        ├── incline.lua   # rounded file + current-symbol window labels
         ├── markdown.lua  # rendered Markdown + side preview
         ├── telescope.lua # fuzzy find / grep / buffers
         ├── treesitter.lua # parsers, highlight, folds, autotag
