@@ -24,6 +24,8 @@ end
 local footer_lighten = 0.40
 -- local footer_lighten = 0.20 -- previous brightness
 -- local footer_lighten = 0 -- use the original unlightened colors
+local visual_lighten = 0.20 -- darker than adjacent Indigo project bubble
+-- local visual_lighten = footer_lighten -- match the other footer accents
 
 -- Shared neutral-Mocha accents; individual components own their bubble colors.
 local palette = {
@@ -39,7 +41,7 @@ local bubble_colors = {
   -- Mode colors make each editing state recognizable at a glance.
   normal = lighten("#00638B", footer_lighten), -- Peacock Blue
   insert = lighten("#008E00", footer_lighten), -- Forest Green
-  visual = lighten("#7060EB", footer_lighten), -- distinct Noctis purple
+  visual = lighten("#7060EB", visual_lighten), -- distinct darker Noctis purple
   replace = lighten("#D17B9A", footer_lighten), -- Bordo rose
   command = lighten("#E75B45", footer_lighten), -- Tigerlily
   terminal = lighten("#A8D866", footer_lighten), -- Pale Olive Green

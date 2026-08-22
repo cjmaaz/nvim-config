@@ -46,7 +46,7 @@ Defined in `init.lua`.
 
 | Area | How you use it today |
 | --- | --- |
-| Statusline (lualine) | 40%-lightened palette, distinct mode colors/icons, black mode/info text |
+| Statusline (lualine) | 40%-lightened palette, darker purple Visual mode, black mode/info text |
 | Bufferline | Filetype icon + filename only; dirty state moved to footer — [core.md](./core.md) |
 | neo-tree | Filesystem only: `<leader>fe` · `<leader>fE` — [explorer.md](./explorer.md) |
 | Project workflows | `<leader>pn` scaffold · `<leader>pr` run/build/test — [project.md](./project.md) |
