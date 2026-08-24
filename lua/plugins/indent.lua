@@ -1,9 +1,9 @@
 --------------------------------------------------------------------------------
--- Indent guides (indent-blankline / ibl) + hairline current-scope guide
+-- Indent guides (indent-blankline / ibl) + muted current-scope number gutter
 -- Refs: CodeOSS ui.lua; Kickstart plugins/indent_line.lua (empty opts).
 -- Alts: mini.indentscope · snacks indent · none (treesitter indent only).
 --
--- Scope line colors match rainbow brackets via lua/config/rainbow_palette.lua.
+-- Scope gutter derives muted colors from matching rainbow bracket depth.
 -- Horizontal start/end caps remain available as commented alternates below.
 --------------------------------------------------------------------------------
 
@@ -22,15 +22,50 @@ return {
     config = function()
       local hooks = require("ibl.hooks")
       local rainbow_names = palette.names()
+      local gutter_names = {}
+      local gutter_namespace = vim.api.nvim_create_namespace("ibl_scope_gutter")
+      local gutter_generation = {}
+      for index in ipairs(palette.palette) do
+        gutter_names[index] = "IblScopeGutter" .. index
+      end
 
-      -- Dim passive guides; brighten / sync scope via palette (and ColorScheme).
+      local function blend(foreground, background, strength)
+        local fg = assert(tonumber(foreground:sub(2), 16))
+        local bg = assert(tonumber(background:sub(2), 16))
+        local function channel(value, shift)
+          return math.floor(value / shift) % 0x100
+        end
+        local function mixed(fg_channel, bg_channel)
+          return math.floor(fg_channel * strength + bg_channel * (1 - strength) + 0.5)
+        end
+        return string.format(
+          "#%02X%02X%02X",
+          mixed(channel(fg, 0x10000), channel(bg, 0x10000)),
+          mixed(channel(fg, 0x100), channel(bg, 0x100)),
+          mixed(channel(fg, 1), channel(bg, 1))
+        )
+      end
+
+      -- Muted scope gutter uses 55% of the matching bracket color.
+      local gutter_strength = 0.55
+      -- local gutter_strength = 0.70 -- stronger bracket-color tint
+      -- local gutter_strength = 0.40 -- quieter gutter tint
+
+      -- Dim passive guides; sync the muted gutter palette on ColorScheme.
       local function apply_indent_highlights()
         local chrome = require("config.ui_chrome")
         palette.apply({ bold = false }) -- exact same non-bold groups as rainbow brackets
         -- palette.apply({ bold = true }) -- stronger brackets and active scope
+        for index, item in ipairs(palette.palette) do
+          vim.api.nvim_set_hl(0, gutter_names[index], {
+            fg = blend(item[2], chrome.base, gutter_strength),
+            bold = false,
+            nocombine = true,
+          })
+        end
 
         -- Non-active indent columns — same “quiet but visible” weight as listchars
-        -- space dots. Active scope stays bright.
+        -- space dots. Active scope color moves to the number gutter.
         vim.api.nvim_set_hl(0, "IblIndent", { fg = chrome.highlight_med, nocombine = true })
         -- vim.api.nvim_set_hl(0, "IblIndent", { fg = "#2a2833", nocombine = true }) -- near-invisible
         -- vim.api.nvim_set_hl(0, "IblIndent", { fg = "#4a4654", nocombine = true }) -- stronger guides
@@ -54,10 +89,69 @@ return {
         callback = apply_indent_highlights,
       })
 
+      local function clear_scope_gutter(bufnr)
+        gutter_generation[bufnr] = (gutter_generation[bufnr] or 0) + 1
+        if vim.api.nvim_buf_is_valid(bufnr) then
+          vim.api.nvim_buf_clear_namespace(bufnr, gutter_namespace, 0, -1)
+        end
+      end
+
+      local function paint_scope_gutter(bufnr, scope, highlight_index)
+        local start_row = select(1, scope:start())
+        local end_row = select(1, scope:end_())
+        local generation = gutter_generation[bufnr] or 0
+        local group = gutter_names[((highlight_index - 1) % #gutter_names) + 1]
+
+        vim.schedule(function()
+          if not vim.api.nvim_buf_is_valid(bufnr) or (gutter_generation[bufnr] or 0) ~= generation then
+            return
+          end
+          local winid = vim.api.nvim_get_current_win()
+          if not vim.api.nvim_win_is_valid(winid) or vim.api.nvim_win_get_buf(winid) ~= bufnr then
+            return
+          end
+          local visible = vim.api.nvim_win_call(winid, function()
+            return { vim.fn.line("w0") - 1, vim.fn.line("w$") - 1 }
+          end)
+          local first_visible, last_visible = visible[1], visible[2]
+          vim.api.nvim_buf_clear_namespace(bufnr, gutter_namespace, 0, -1)
+          local first_row = math.max(0, start_row, first_visible)
+          local last_row = math.min(end_row, last_visible, vim.api.nvim_buf_line_count(bufnr) - 1)
+          for row = first_row, last_row do
+            vim.api.nvim_buf_set_extmark(bufnr, gutter_namespace, row, 0, {
+              number_hl_group = group,
+              priority = 120,
+              strict = false,
+            })
+          end
+        end)
+      end
+
+      local gutter_group = vim.api.nvim_create_augroup("user_ibl_scope_gutter", { clear = true })
+      vim.api.nvim_create_autocmd({
+        "BufEnter",
+        "BufLeave",
+        "CursorMoved",
+        "CursorMovedI",
+        "TextChanged",
+        "TextChangedI",
+        "WinScrolled",
+      }, {
+        group = gutter_group,
+        callback = function(event)
+          clear_scope_gutter(event.buf)
+        end,
+      })
+      vim.api.nvim_create_autocmd("BufDelete", {
+        group = gutter_group,
+        callback = function(event)
+          gutter_generation[event.buf] = nil
+        end,
+      })
+
       require("ibl").setup({
         indent = {
-          -- Keep indent.char and scope.char on the same left/right bias so the
-          -- column doesn’t jump when the bright scope replaces a dim guide.
+          -- Passive guides remain in-code; active scope is rendered in the gutter.
           char = "│", -- U+2502 single-stroke hairline
           -- char = "▏", -- previous: left-edge eighth block
           -- char = "▎", -- thicker left quarter
@@ -85,15 +179,16 @@ return {
           enabled = true, -- highlight the treesitter scope under the cursor
           -- enabled = false, -- guides only, no current-block emphasis
 
-          -- Match indent.char so the active color changes without a width jump.
-          char = "│", -- U+2502 + non-bold highlight keeps the scope thinnest
+          -- Hide the in-code scope glyph; active scope moves to the number gutter.
+          char = " ",
+          -- char = "│", -- restore the in-code hairline
           -- char = "▏", -- previous: left-edge eighth block
           -- char = "▎", -- thicker left quarter
           -- char = "▍", -- thicker still
           -- char = "┃", -- heavy centered bar
           -- char = "▌", -- full left half block (very obvious)
 
-          -- Keep the active scope as a vertical line without horizontal caps.
+          -- Horizontal caps stay off while the active glyph itself is hidden.
           show_start = false,
           show_end = false,
           -- show_start = true, -- restore the top reverse-L underline
@@ -173,9 +268,12 @@ return {
         },
       })
 
-      -- Map treesitter scope depth → rainbow highlight index (bracket sync).
-      hooks.register(hooks.type.SCOPE_HIGHLIGHT, hooks.builtin.scope_highlight_from_extmark)
-      -- Without this hook, a multi-name scope.highlight list won’t track nesting as well.
+      -- Match the enclosing bracket depth, then paint that muted color in the number gutter.
+      hooks.register(hooks.type.SCOPE_HIGHLIGHT, function(tick, bufnr, scope, scope_index)
+        local highlight_index = hooks.builtin.scope_highlight_from_extmark(tick, bufnr, scope, scope_index)
+        paint_scope_gutter(bufnr, scope, highlight_index)
+        return highlight_index
+      end)
     end,
   },
 

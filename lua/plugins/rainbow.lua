@@ -18,8 +18,8 @@ return {
       "nvim-treesitter/nvim-treesitter", -- needs parsers for the language
     },
     config = function()
-      palette.apply({ bold = false }) -- match the non-bold active scope hairline
-      -- palette.apply({ bold = true }) -- stronger brackets and scope guide
+      palette.apply({ bold = false }) -- match the non-bold active scope gutter source
+      -- palette.apply({ bold = true }) -- stronger brackets and scope gutter
 
       -- Re-apply after colorscheme changes (themes wipe unknown groups).
       vim.api.nvim_create_autocmd("ColorScheme", {
