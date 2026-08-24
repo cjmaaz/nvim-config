@@ -137,7 +137,7 @@ Smarter `<C-a>` / `<C-x>`: numbers, dates (`YYYY-MM-DD`), bools, `and`/`or`, `&&
 
 ## Indent scope / colored gutter (`lua/plugins/indent.lua`)
 
-Passive indent guides stay **dim**, but the active scope no longer draws a line inside the code. Instead, visible line numbers in the current treesitter scope receive a 55%-strength tint of the matching rainbow bracket color and repaint on cursor movement or scrolling. This uses `number_hl_group`, so it does not compete with Gitsigns or diagnostics in the sign column. Explicit `class_body` entries keep outer JS/TS classes visible, and custom Apex nodes fill ibl’s missing Apex scope map.
+Both passive and active in-code guide glyphs are hidden with `char = " "`; the previous `│` values remain commented in `indent.lua` for restoration. Visible line numbers in the current treesitter scope receive a 55%-strength tint of the matching rainbow bracket color and repaint on cursor movement or scrolling. This uses `number_hl_group`, so it does not compete with Gitsigns or diagnostics in the sign column. Explicit `class_body` entries keep outer JS/TS classes visible, and custom Apex nodes fill ibl’s missing Apex scope map.
 
 ---
 

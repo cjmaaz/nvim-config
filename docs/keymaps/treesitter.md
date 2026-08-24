@@ -9,11 +9,11 @@ Nav: [index](./README.md) · [core](./core.md) · [git](./git.md) · [explorer](
 | Piece | File | What you get |
 | --- | --- | --- |
 | Treesitter | `lua/plugins/treesitter.lua` | Syntax highlight, indentexpr, expr folds (`foldlevel` 99 = open). Parsers include Lua/web, **Java** (`java`, `xml`, `properties`, `groovy`), **Salesforce** (`apex`, `soql`, `sosl`, `sflog`), **rust** / **cpp**. Autotag closes/renames HTML/JSX tags. |
-| Indent guides | `lua/plugins/indent.lua` | Dim passive guides; active scope moves out of code into a muted line-number gutter; Apex via `scope.include.node_type.apex`. |
+| Indent guides | `lua/plugins/indent.lua` | Passive/active in-code glyphs hidden; active scope uses a muted line-number gutter; Apex via `scope.include.node_type.apex`. |
 | Rainbow brackets | `lua/plugins/rainbow.lua` | Depth-colored `()` / `[]` / `{}`; active gutter derives its tint from the enclosing bracket |
 | Autopairs | `lua/plugins/autopairs.lua` | Auto-close brackets/quotes in insert; `check_ts` when Treesitter is on |
 
-**Scope look:** lines in the current treesitter scope receive a muted, bracket-depth-matched line-number color. No active vertical or horizontal scope line is drawn inside the code; passive indent guides remain dim.
+**Scope look:** lines in the current treesitter scope receive a muted, bracket-depth-matched line-number color. No passive or active vertical/horizontal guides are drawn inside the code.
 
 Host tools: Neovim **0.12+**, `tree-sitter` CLI, C compiler — [TOOLS.md](../TOOLS.md). After install: `:Lazy sync`, then `:checkhealth nvim-treesitter`.
 

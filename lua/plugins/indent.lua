@@ -1,5 +1,5 @@
 --------------------------------------------------------------------------------
--- Indent guides (indent-blankline / ibl) + muted current-scope number gutter
+-- Scope engine (indent-blankline / ibl) + muted current-scope number gutter
 -- Refs: CodeOSS ui.lua; Kickstart plugins/indent_line.lua (empty opts).
 -- Alts: mini.indentscope · snacks indent · none (treesitter indent only).
 --
@@ -64,8 +64,7 @@ return {
           })
         end
 
-        -- Non-active indent columns — same “quiet but visible” weight as listchars
-        -- space dots. Active scope color moves to the number gutter.
+        -- Dormant passive-guide color, used only if a glyph is restored below.
         vim.api.nvim_set_hl(0, "IblIndent", { fg = chrome.highlight_med, nocombine = true })
         -- vim.api.nvim_set_hl(0, "IblIndent", { fg = "#2a2833", nocombine = true }) -- near-invisible
         -- vim.api.nvim_set_hl(0, "IblIndent", { fg = "#4a4654", nocombine = true }) -- stronger guides
@@ -151,8 +150,9 @@ return {
 
       require("ibl").setup({
         indent = {
-          -- Passive guides remain in-code; active scope is rendered in the gutter.
-          char = "│", -- U+2502 single-stroke hairline
+          -- Hide passive in-code guides while retaining ibl's scope calculation.
+          char = " ",
+          -- char = "│", -- restore the single-stroke passive guide
           -- char = "▏", -- previous: left-edge eighth block
           -- char = "▎", -- thicker left quarter
           -- char = "▍", -- U+258D left three-eighths (nudge further right)
@@ -160,11 +160,12 @@ return {
           -- char = "¦",
           -- char = " ", -- invisible passive guides (scope-only mode)
           -- char = "▕", -- right edge of the indent cell
-          tab_char = "│", -- same hairline glyph as spaces (keep in sync with char)
+          tab_char = " ", -- hide passive tab guides too
+          -- tab_char = "│", -- restore the single-stroke tab guide
           -- tab_char = "▏", -- previous left-edge block
           -- tab_char = "┊",
           -- tab_char = "→",
-          highlight = "IblIndent", -- dim passive columns (see apply_indent_highlights)
+          highlight = "IblIndent", -- applies if a passive glyph is restored above
           -- highlight = "Whitespace", -- force same hl group as space dots
           -- highlight = palette.names(), -- rainbow every indent column (noisier)
           -- smart_indent_cap = true, -- default-ish: cap indent depth oddly
