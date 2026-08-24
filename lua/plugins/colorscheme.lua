@@ -4,7 +4,7 @@
 -- theme, then switches — and lualine's theme = "auto" would lag behind.
 --
 -- Alternatives (enable only one colorscheme plugin at a time):
---   - talha-akram/noctis.nvim         (active Minimus; retained charcoal)
+--   - talha-akram/noctis.nvim         (active Bordo syntax; retained charcoal)
 --   - olimorris/onedarkpro.nvim       (previous OneDark; retained below)
 --   - catppuccin/nvim                 (previous neutral Mocha; retained below)
 --   - loctvl842/monokai-pro.nvim      (previous warm-charcoal theme; retained below)
@@ -21,7 +21,7 @@ return {
   {
     "olimorris/onedarkpro.nvim",
     enabled = false, -- retain the previous theme without loading it
-    -- enabled = true, -- switch back after disabling Noctis below
+    -- enabled = true, -- switch back after disabling Noctis Bordo below
     lazy = false, -- paint before UI plugins to avoid startup flash
     -- lazy = true, -- wrong for themes: bars/floats initialize against defaults
     priority = 1000,
@@ -91,7 +91,7 @@ return {
     "catppuccin/nvim",
     name = "catppuccin",
     enabled = false, -- retain the previous theme without loading it
-    -- enabled = true, -- switch back after disabling Noctis below
+    -- enabled = true, -- switch back after disabling Noctis Bordo below
     lazy = false, -- paint before UI plugins so curved separators inherit colors
     -- lazy = true, -- wrong for themes: bubbles can initialize with black edges
     priority = 1000,
@@ -203,7 +203,7 @@ return {
   {
     "loctvl842/monokai-pro.nvim",
     enabled = false, -- retain the previous theme without loading it
-    -- enabled = true, -- switch back after disabling Noctis below
+    -- enabled = true, -- switch back after disabling Noctis Bordo below
     lazy = false, -- paint before UI plugins to avoid startup flash
     -- lazy = true, -- wrong for themes: bars/floats initialize against defaults
     priority = 1000,
@@ -274,7 +274,7 @@ return {
     "rose-pine/neovim",
     name = "rose-pine",
     enabled = false, -- retain the previous theme without loading it
-    -- enabled = true, -- switch back after disabling Noctis below
+    -- enabled = true, -- switch back after disabling Noctis Bordo below
     lazy = false, -- paint before UI plugins to avoid startup flash
     -- lazy = true, -- wrong for themes: bars/floats initialize against defaults
     priority = 1000,
@@ -336,7 +336,7 @@ return {
     end,
   },
 
-  -- Active: Noctis Minimus syntax on the retained neutral background.
+  -- Active: VS Code Noctis Bordo syntax on the retained neutral background.
   -- talha-akram/noctis.nvim has no plugin setup()/opts API (unlike kanagawa).
   -- The `opts` table below mirrors the kanagawa knobs we care about and is
   -- applied with nvim_set_hl after :colorscheme.
@@ -351,6 +351,9 @@ return {
     -- priority = 50, -- too late; statusline/theme plugins may paint first
 
     opts = {
+      -- Reference typography: cursive comments/keywords/types/properties,
+      -- bold control flow/parameters, and plain functions/methods.
+
       -- Spell + diagnostic underlines (not the same as strikethrough).
       undercurl = true, -- undercurl for spell/diagnostics
       -- undercurl = false, -- plain underlines / no special underline style
@@ -363,27 +366,46 @@ return {
       dimInactive = false, -- retain the same neutral background in every split
       -- dimInactive = true, -- fade NormalNC when another window is focused
 
-      -- Push the stock Noctis accent palette into :terminal.
+      -- Push a Bordo-ish 16-color palette into :terminal.
       terminalColors = true, -- tint :terminal to match the theme
       -- terminalColors = false, -- leave the terminal's own palette alone
 
-      -- Typography: comments/keywords italic; functions/types/statements plain.
-      commentStyle = { italic = true },
+      -- Italic (soft / secondary meaning)
+      commentStyle = { italic = true }, -- almost universal
       -- commentStyle = {}, -- plain comments
-      keywordStyle = { italic = true },
-      -- keywordStyle = {}, -- stock Minimus bold keywords
-      statementStyle = {},
-      -- statementStyle = { bold = true }, -- heavier statements
-      functionStyle = {},
-      -- functionStyle = { bold = true }, -- stock Minimus emphasis
-      typeStyle = {},
-      -- typeStyle = { bold = true }, -- stock Minimus emphasis
+      -- commentStyle = { bold = true }, -- rare; heavy comments
+
+      keywordStyle = { italic = true }, -- Tokyo Night–style
+      -- keywordStyle = {}, -- Catppuccin-style plain keywords
+      -- keywordStyle = { bold = true }, -- heavier keywords
+
+      statementStyle = { italic = true }, -- soft generic statements
+      -- statementStyle = {}, -- plain statements
+
+      functionStyle = {}, -- neither bold nor italic
+      -- functionStyle = { bold = true }, -- emphasize function names
+      -- functionStyle = { italic = true }, -- soft functions
+
+      typeStyle = { italic = true }, -- cursive type annotations / builtins
+      -- typeStyle = { bold = true }, -- stock Noctis emphasis
+      parameterStyle = { bold = true }, -- constructor/function parameters
+      -- parameterStyle = {}, -- plain parameters
+      propertyStyle = { italic = true }, -- object fields / members
+      -- propertyStyle = {}, -- plain properties
+      controlStyle = { bold = true }, -- if/else/loops/return/exception flow
+      -- controlStyle = { italic = true }, -- softer control flow
+      builtinStyle = { italic = true }, -- this/super/self
+      -- builtinStyle = {}, -- plain builtin variables
+
+      -- Markup / LSP only (see config apply below)
+      -- strikethrough: @markup.strikethrough, @lsp.mod.deprecated
+      -- bold: @markup.strong
+      -- italic: @markup.italic
     },
     config = function(_, opts)
       -- Active Noctis variant.
-      vim.cmd.colorscheme("noctis_minimus") -- muted, desaturated Noctis
-      -- vim.cmd.colorscheme("noctis") -- default teal-leaning Noctis
-      -- vim.cmd.colorscheme("noctis_bordo") -- warm rose / burgundy
+      vim.cmd.colorscheme("noctis_bordo") -- warm rose / burgundy
+      -- vim.cmd.colorscheme("noctis") -- default Noctis
       -- vim.cmd.colorscheme("noctis_azureus") -- blue-leaning
       -- vim.cmd.colorscheme("noctis_minimus")
       -- vim.cmd.colorscheme("noctis_uva")
@@ -396,21 +418,21 @@ return {
 
       local chrome = require("config.ui_chrome")
 
-      -- Stock Minimus accents over the retained neutral background ladder.
+      -- Bordo syntax accents over the retained neutral background ladder.
       local pal = {
         bg0 = chrome.base,
         bg1 = chrome.surface,
         bg2 = chrome.base,
-        fg = "#C6CDD2",
-        red = "#BF8FA1",
-        orange = "#B8785B",
-        yellow = "#CEB796",
-        green = "#84BEA1",
-        cyan = "#51828B",
-        blue = "#608BAE",
-        purple = "#6F68AC",
-        grey = "#4B575F",
-        light_grey = "#637785",
+        fg = "#C9BEC2",
+        red = "#D17B9A",
+        orange = "#C5663F",
+        yellow = "#F6C38A",
+        green = "#7BE6AB",
+        cyan = "#4CA1B3",
+        blue = "#64AAE4",
+        purple = "#7060eb",
+        grey = "#5C5457",
+        light_grey = "#87757C",
       }
 
       local hl = vim.api.nvim_set_hl
@@ -418,7 +440,7 @@ return {
         return style_tbl and style_tbl[key] == true
       end
 
-      -- Give unowned floats the same retained panel chrome used by plugin UIs.
+      -- Give unowned floats the same inset Bordo panel used by plugin UIs.
       local function apply_float_chrome()
         local float_bg = opts.transparent and "NONE" or chrome.panel_bg
         hl(0, "NormalFloat", { fg = chrome.panel_fg, bg = float_bg })
@@ -434,58 +456,77 @@ return {
         local editor_bg = opts.transparent and "NONE" or chrome.base
         hl(0, "Normal", { fg = pal.fg, bg = editor_bg })
         hl(0, "NormalNC", { fg = opts.dimInactive and pal.light_grey or pal.fg, bg = editor_bg })
-        hl(0, "SignColumn", { fg = pal.fg, bg = editor_bg })
-        hl(0, "FoldColumn", { fg = pal.grey, bg = editor_bg })
+        hl(0, "SignColumn", { bg = editor_bg })
+        hl(0, "FoldColumn", { bg = editor_bg })
         hl(0, "LineNr", { fg = pal.grey, bg = editor_bg })
-        hl(0, "CursorLineNr", { fg = pal.fg, bg = editor_bg })
+        hl(0, "CursorLineNr", { fg = pal.yellow, bg = editor_bg, bold = true })
         hl(0, "EndOfBuffer", { fg = opts.transparent and pal.grey or chrome.base, bg = editor_bg })
       end
 
+      local function styled(group, fg, style)
+        hl(0, group, {
+          fg = fg,
+          italic = has(style, "italic"),
+          bold = has(style, "bold"),
+        })
+      end
+
       local function apply_typography()
-        -- Apply configured typography after Minimus sets its stock bold groups.
-        hl(0, "Comment", {
-          fg = pal.light_grey,
-          italic = has(opts.commentStyle, "italic"),
-          bold = has(opts.commentStyle, "bold"),
-        })
+        styled("Comment", pal.light_grey, opts.commentStyle)
         hl(0, "@comment", { link = "Comment" })
+        hl(0, "@comment.documentation", { link = "Comment" })
 
-        hl(0, "Keyword", {
-          fg = pal.red,
-          italic = has(opts.keywordStyle, "italic"),
-          bold = has(opts.keywordStyle, "bold"),
-        })
+        styled("Keyword", pal.red, opts.keywordStyle)
         hl(0, "@keyword", { link = "Keyword" })
+        styled("Statement", pal.red, opts.statementStyle)
 
-        hl(0, "Statement", {
-          fg = pal.red,
-          italic = has(opts.statementStyle, "italic"),
-          bold = has(opts.statementStyle, "bold"),
-        })
+        styled("Function", pal.green, opts.functionStyle)
+        for _, group in ipairs({
+          "@function",
+          "@function.call",
+          "@function.method",
+          "@function.method.call",
+        }) do
+          hl(0, group, { link = "Function" })
+        end
 
-        hl(0, "Function", {
-          fg = pal.green,
-          italic = has(opts.functionStyle, "italic"),
-          bold = has(opts.functionStyle, "bold"),
-        })
-        hl(0, "@function", { link = "Function" })
+        styled("Type", pal.yellow, opts.typeStyle)
+        for _, group in ipairs({ "@type", "@type.builtin", "@type.definition" }) do
+          hl(0, group, { link = "Type" })
+        end
 
-        hl(0, "Type", {
-          fg = pal.yellow,
-          italic = has(opts.typeStyle, "italic"),
-          bold = has(opts.typeStyle, "bold"),
-        })
-        hl(0, "@type", { link = "Type" })
+        styled("@variable.parameter", pal.fg, opts.parameterStyle)
+        styled("@variable.member", pal.blue, opts.propertyStyle)
+        styled("@property", pal.blue, opts.propertyStyle)
+        styled("@variable.builtin", pal.orange, opts.builtinStyle)
 
-        -- Keep modern markup/deprecation attributes missing from the older theme.
+        for _, group in ipairs({
+          "@keyword.conditional",
+          "@keyword.repeat",
+          "@keyword.return",
+          "@keyword.exception",
+        }) do
+          styled(group, pal.red, opts.controlStyle)
+        end
+        for _, group in ipairs({ "@keyword.import", "@keyword.operator", "@keyword.coroutine" }) do
+          styled(group, pal.red, opts.keywordStyle)
+        end
+        styled("@keyword.modifier", pal.orange, opts.keywordStyle)
+        styled("@keyword.type", pal.orange, {})
+        styled("@keyword.function", pal.orange, {})
+        styled("@constructor", pal.orange, {})
+
+        -- Markup (Treesitter): bold / italic / strike only where the document asks.
         hl(0, "@markup.strong", { bold = true })
         hl(0, "@markup.italic", { italic = true })
         hl(0, "@markup.strikethrough", { strikethrough = true })
+
+        -- Deprecated symbols (LSP) → strikethrough, not normal keywords.
         hl(0, "@lsp.mod.deprecated", { strikethrough = true, italic = true })
         hl(0, "DiagnosticDeprecated", { strikethrough = true })
       end
 
-      -- Optional transparent-background alternate.
+      -- transparent (kanagawa.transparent)
       if opts.transparent then
         for _, group in ipairs({
           "Normal",
@@ -502,7 +543,7 @@ return {
         end
       end
 
-      -- Optional inactive-window dimming.
+      -- dimInactive (kanagawa.dimInactive)
       if opts.dimInactive then
         hl(0, "NormalNC", {
           fg = pal.light_grey,
@@ -510,7 +551,7 @@ return {
         })
       end
 
-      -- Re-assert diagnostic/spell undercurls when requested.
+      -- undercurl: re-assert diagnostic/spell undercurls when requested
       if opts.undercurl then
         hl(0, "DiagnosticUnderlineError", { undercurl = true, sp = pal.red })
         hl(0, "DiagnosticUnderlineWarn", { undercurl = true, sp = pal.orange })
@@ -520,7 +561,7 @@ return {
         hl(0, "SpellCap", { undercurl = true, sp = pal.yellow })
       end
 
-      -- Approximate stock Noctis 16-color terminal map.
+      -- terminalColors (kanagawa.terminalColors) — approximate 16-color map
       if opts.terminalColors then
         vim.g.terminal_color_0 = pal.bg0
         vim.g.terminal_color_1 = pal.red
@@ -547,7 +588,7 @@ return {
       vim.api.nvim_create_autocmd("ColorScheme", {
         group = vim.api.nvim_create_augroup("user_noctis_overrides", { clear = true }),
         callback = function()
-          if vim.g.colors_name == "noctis_minimus" then
+          if vim.g.colors_name == "noctis_bordo" then
             apply_editor_background()
             apply_typography()
           end
