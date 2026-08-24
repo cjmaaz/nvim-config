@@ -61,7 +61,7 @@ Defined in `init.lua`.
 | Salesforce | `<leader>S…` · Vlocity `SV` · SOQL `SQ`/`Sq` · metadata `Su` · cancel `Sx` — [salesforce.md](./salesforce.md) |
 | Comment / TODO / context | `gcc` · `]t`/`[t` · `<leader>st`; native context winbar retained but disabled — [comment.md](./comment.md) |
 | QoL | Gremlins · sessions · Trouble · surround · flash · undotree · yanky · dial · rainbow · colorizer — [qol.md](./qol.md) |
-| Colorscheme | Noctis Bordo syntax on the retained neutral `#18181B` background — `lua/plugins/colorscheme.lua` |
+| Colorscheme | Default Noctis syntax on the retained neutral `#18181B` background — `lua/plugins/colorscheme.lua` |
 | which-key | `<Space>` then wait — [which-key.md](./which-key.md) |
 | Plugin manager | `:Lazy` |
 
