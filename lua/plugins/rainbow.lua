@@ -37,6 +37,7 @@ return {
         },
         query = {
           [""] = "rainbow-delimiters", -- default delimiters
+          apex = "rainbow-delimiters", -- local queries/apex fallback (not shipped upstream)
           -- lua = "rainbow-blocks", -- also color Lua do/end / function blocks
           -- tsx = "rainbow-parens", -- parens only (skip JSX tags) if tags feel noisy
           -- javascript = "rainbow-parens",

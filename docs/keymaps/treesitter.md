@@ -10,7 +10,7 @@ Nav: [index](./README.md) · [core](./core.md) · [git](./git.md) · [explorer](
 | --- | --- | --- |
 | Treesitter | `lua/plugins/treesitter.lua` | Syntax highlight, indentexpr, expr folds (`foldlevel` 99 = open). Parsers include Lua/web, **Java** (`java`, `xml`, `properties`, `groovy`), **Salesforce** (`apex`, `soql`, `sosl`, `sflog`), **rust** / **cpp**. Autotag closes/renames HTML/JSX tags. |
 | Indent guides | `lua/plugins/indent.lua` | Passive/active in-code glyphs hidden; active scope colors line numbers from its bracket depth; Apex via `scope.include.node_type.apex`. |
-| Rainbow brackets | `lua/plugins/rainbow.lua` | Depth-colored `()` / `[]` / `{}`; active gutter reuses the enclosing bracket’s exact color |
+| Rainbow brackets | `lua/plugins/rainbow.lua` + `queries/apex/rainbow-delimiters.scm` | Depth-colored `()` / `[]` / `{}` including Apex; active gutter reuses the enclosing bracket’s exact color |
 | Autopairs | `lua/plugins/autopairs.lua` | Auto-close brackets/quotes in insert; `check_ts` when Treesitter is on |
 
 **Scope look:** lines in the current treesitter scope receive the enclosing bracket’s original depth color in the number gutter. No passive or active vertical/horizontal guides are drawn inside the code.

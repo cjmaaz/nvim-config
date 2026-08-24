@@ -131,7 +131,7 @@ Smarter `<C-a>` / `<C-x>`: numbers, dates (`YYYY-MM-DD`), bools, `and`/`or`, `&&
 
 ## Rainbow brackets (`lua/plugins/rainbow.lua`)
 
-`rainbow-delimiters.nvim` — **10** high-contrast, non-bold nesting colors. The active scope finds the enclosing bracket’s exact depth and reuses that color in the number gutter.
+`rainbow-delimiters.nvim` — **10** high-contrast, non-bold nesting colors. Apex is supported by the local `queries/apex/rainbow-delimiters.scm` fallback because the plugin does not ship an Apex query. The active scope finds the enclosing bracket’s exact depth and reuses that color in the number gutter.
 
 ---
 

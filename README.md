@@ -42,6 +42,9 @@ nvim-config/
 │   └── COMMITIZEN.md     # optional cz helper
 ├── init.lua              # entry: loader, leaders, require config.*
 ├── lazy-lock.json        # pinned plugin commits (commit this)
+├── queries/
+│   └── apex/
+│       └── rainbow-delimiters.scm # missing upstream Apex rainbow query
 └── lua/
     ├── config/           # editor core — load before plugins
     │   ├── options.lua   # everyday editing options
