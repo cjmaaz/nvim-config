@@ -22,76 +22,73 @@ Things outside this repo that make the config work well. Install on the **host**
 
 If you skip a Nerd Font, set `vim.g.have_nerd_font = false` in `init.lua` and prefer the ASCII gitsigns block in `lua/plugins/git.lua`.
 
-## Noctis screenshot typography
+## Noctis screenshot-style typography (free setup)
 
-The original Noctis screenshots use two fonts:
+The original screenshot used Hasklig regular text with commercial Cartograph italics. The free practical replacement is:
 
-- Regular text: [Hasklig](https://github.com/i-tu/Hasklig/releases)
-- Cursive italics: [Cartograph Mono CF](https://connary.com/fonts/cartograph/)
-  Cartograph is commercial; purchase/download it from the official foundry. Do not use unofficial redistributions.
+- Regular/bold: [Cascadia Code](https://github.com/microsoft/cascadia-code/releases) — already installed on the current hosts
+- Cursive italic/bold-italic: [Victor Mono](https://rubjo.github.io/victor-mono/) — free under the [SIL Open Font License](https://github.com/rubjo/victor-mono/blob/master/LICENSE)
 
-The author confirmed this pairing in [Noctis issue #2](https://github.com/liviuschera/noctis/issues/2). Neovim only emits `bold` / `italic` attributes; the terminal chooses the actual font face.
+Victor Mono provides the flowing cursive italics needed by the active Noctis typography. Neovim only emits `bold` / `italic` attributes; the terminal chooses these font faces.
 
-For the same regular design with statusline icons, use the Nerd Font–patched Hasklig named **Hasklug Nerd Font Mono**:
+For statusline icons, use the patched families **CaskaydiaCove Nerd Font Mono** and **VictorMono Nerd Font Mono**:
 
 ```sh
 # macOS
-brew install --cask font-hasklug-nerd-font
+brew install --cask font-caskaydia-cove-nerd-font font-victor-mono-nerd-font
+
+# Arch Linux
+sudo pacman -S ttf-cascadia-code-nerd ttf-victor-mono-nerd
 ```
 
-On macOS, install the purchased Cartograph `.otf` files by opening them in **Font Book**. On Linux, copy both font families into the per-user font directory:
+Other Linux distributions can download `CascadiaCode` and `VictorMono` archives from [Nerd Fonts releases](https://github.com/ryanoasis/nerd-fonts/releases), copy the font files into `~/.local/share/fonts`, then refresh the cache:
 
 ```sh
-mkdir -p ~/.local/share/fonts
-cp ~/Downloads/Cartograph*.otf ~/.local/share/fonts/
-cp ~/Downloads/HasklugNerdFontMono*.otf ~/.local/share/fonts/
 fc-cache -fv
-fc-list : family style | rg -i 'Hask|Cartograph'
+fc-list : family style | rg -i 'Cascadia|Caskaydia|Victor'
 ```
 
-Download Hasklug archives from [Nerd Fonts releases](https://github.com/ryanoasis/nerd-fonts/releases) when not using Homebrew.
-
-### Alacritty (exact mixed-family setup)
+### Alacritty (recommended mixed-family setup)
 
 Alacritty supports separate families per style. In `alacritty.toml`, use the family names reported by `fc-list`:
 
 ```toml
 [font.normal]
-family = "Hasklug Nerd Font Mono"
+family = "CaskaydiaCove Nerd Font Mono"
 style = "Regular"
 
 [font.bold]
-family = "Hasklug Nerd Font Mono"
+family = "CaskaydiaCove Nerd Font Mono"
 style = "Bold"
 
 [font.italic]
-family = "Cartograph Mono CF"
+family = "VictorMono Nerd Font Mono"
 style = "Italic"
 
 [font.bold_italic]
-family = "Cartograph Mono CF"
+family = "VictorMono Nerd Font Mono"
 style = "Bold Italic"
 ```
 
+Use `family = "Cascadia Code"` for normal/bold if the existing unpatched installation already gets Nerd glyphs through font fallback.
+
 ### iTerm2 (macOS)
 
-iTerm2 selects one regular ASCII family and automatically uses that family’s italic face; it cannot assign Cartograph only to italic ASCII text.
+iTerm2 selects one ASCII family and automatically uses that same family’s italic face; it cannot combine Cascadia regular with Victor italic.
 
 1. Open **Settings → Profiles → Text**.
-2. Select **Cartograph Mono CF** to use its regular and cursive italic faces.
+2. Select **VictorMono Nerd Font Mono** for the closest free all-in-one cursive result, or keep **Cascadia Code** when its regular design is more important.
 3. Enable **Draw italic text in italic font**.
-4. Set the **Non-ASCII Font** to **Hasklug Nerd Font Mono** for Nerd Font glyphs.
-
-This gives the Cartograph cursive look and preserves private-use statusline icons, but it is not the original Hasklig-regular/Cartograph-italic mix.
+4. Optionally set **Non-ASCII Font** to **CaskaydiaCove Nerd Font Mono** for private-use glyphs.
 
 ### Konsole (Linux)
 
 Konsole also selects one primary family rather than separate regular/italic families. Under **Settings → Edit Current Profile → Appearance → Font**, choose:
 
-- **Cartograph Mono CF** for the screenshot’s cursive italic style, or
-- **Hasklug Nerd Font Mono** for built-in Nerd Font glyphs.
+- **VictorMono Nerd Font Mono** for cursive italics and icons, or
+- **CaskaydiaCove Nerd Font Mono** to retain Cascadia’s design.
 
-Use Alacritty when you want the exact mixed-family setup without creating a custom merged font.
+Use Alacritty for the exact Cascadia-regular/Victor-italic pairing.
 
 ---
 
@@ -152,7 +149,7 @@ For an isolated `cmake-init` install, install `pipx` first with `brew install pi
 | Config area | Relies on |
 | --- | --- |
 | `lua/config/lazy.lua` | `git`, network (first clone of lazy.nvim) |
-| `lua/plugins/statusline.lua` | Nerd Font (icons) when `have_nerd_font`; optional Hasklug/Cartograph terminal pairing above; SF org once sf.nvim loaded |
+| `lua/plugins/statusline.lua` | Nerd Font icons; optional Cascadia/Victor terminal pairing above; SF org once sf.nvim loaded |
 | `lua/plugins/git.lua` | `git` repo + Nerd Font signs (or ASCII fallback) |
 | `lua/plugins/lazygit.lua` | host **`lazygit`** (`brew` / `pacman`) |
 | `lua/plugins/persistence.lua` | (none beyond Neovim state dir) |
