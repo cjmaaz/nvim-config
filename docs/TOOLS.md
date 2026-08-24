@@ -22,6 +22,77 @@ Things outside this repo that make the config work well. Install on the **host**
 
 If you skip a Nerd Font, set `vim.g.have_nerd_font = false` in `init.lua` and prefer the ASCII gitsigns block in `lua/plugins/git.lua`.
 
+## Noctis screenshot typography
+
+The original Noctis screenshots use two fonts:
+
+- Regular text: [Hasklig](https://github.com/i-tu/Hasklig/releases)
+- Cursive italics: [Cartograph Mono CF](https://connary.com/fonts/cartograph/)
+  Cartograph is commercial; purchase/download it from the official foundry. Do not use unofficial redistributions.
+
+The author confirmed this pairing in [Noctis issue #2](https://github.com/liviuschera/noctis/issues/2). Neovim only emits `bold` / `italic` attributes; the terminal chooses the actual font face.
+
+For the same regular design with statusline icons, use the Nerd Font–patched Hasklig named **Hasklug Nerd Font Mono**:
+
+```sh
+# macOS
+brew install --cask font-hasklug-nerd-font
+```
+
+On macOS, install the purchased Cartograph `.otf` files by opening them in **Font Book**. On Linux, copy both font families into the per-user font directory:
+
+```sh
+mkdir -p ~/.local/share/fonts
+cp ~/Downloads/Cartograph*.otf ~/.local/share/fonts/
+cp ~/Downloads/HasklugNerdFontMono*.otf ~/.local/share/fonts/
+fc-cache -fv
+fc-list : family style | rg -i 'Hask|Cartograph'
+```
+
+Download Hasklug archives from [Nerd Fonts releases](https://github.com/ryanoasis/nerd-fonts/releases) when not using Homebrew.
+
+### Alacritty (exact mixed-family setup)
+
+Alacritty supports separate families per style. In `alacritty.toml`, use the family names reported by `fc-list`:
+
+```toml
+[font.normal]
+family = "Hasklug Nerd Font Mono"
+style = "Regular"
+
+[font.bold]
+family = "Hasklug Nerd Font Mono"
+style = "Bold"
+
+[font.italic]
+family = "Cartograph Mono CF"
+style = "Italic"
+
+[font.bold_italic]
+family = "Cartograph Mono CF"
+style = "Bold Italic"
+```
+
+### iTerm2 (macOS)
+
+iTerm2 selects one regular ASCII family and automatically uses that family’s italic face; it cannot assign Cartograph only to italic ASCII text.
+
+1. Open **Settings → Profiles → Text**.
+2. Select **Cartograph Mono CF** to use its regular and cursive italic faces.
+3. Enable **Draw italic text in italic font**.
+4. Set the **Non-ASCII Font** to **Hasklug Nerd Font Mono** for Nerd Font glyphs.
+
+This gives the Cartograph cursive look and preserves private-use statusline icons, but it is not the original Hasklig-regular/Cartograph-italic mix.
+
+### Konsole (Linux)
+
+Konsole also selects one primary family rather than separate regular/italic families. Under **Settings → Edit Current Profile → Appearance → Font**, choose:
+
+- **Cartograph Mono CF** for the screenshot’s cursive italic style, or
+- **Hasklug Nerd Font Mono** for built-in Nerd Font glyphs.
+
+Use Alacritty when you want the exact mixed-family setup without creating a custom merged font.
+
 ---
 
 ## Strongly recommended (Telescope / Treesitter / Salesforce pickers)
@@ -81,7 +152,7 @@ For an isolated `cmake-init` install, install `pipx` first with `brew install pi
 | Config area | Relies on |
 | --- | --- |
 | `lua/config/lazy.lua` | `git`, network (first clone of lazy.nvim) |
-| `lua/plugins/statusline.lua` | Nerd Font (icons) when `have_nerd_font`; SF org once sf.nvim loaded |
+| `lua/plugins/statusline.lua` | Nerd Font (icons) when `have_nerd_font`; optional Hasklug/Cartograph terminal pairing above; SF org once sf.nvim loaded |
 | `lua/plugins/git.lua` | `git` repo + Nerd Font signs (or ASCII fallback) |
 | `lua/plugins/lazygit.lua` | host **`lazygit`** (`brew` / `pacman`) |
 | `lua/plugins/persistence.lua` | (none beyond Neovim state dir) |
