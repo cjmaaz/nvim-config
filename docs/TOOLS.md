@@ -24,14 +24,52 @@ If you skip a Nerd Font, set `vim.g.have_nerd_font = false` in `init.lua` and pr
 
 ## Noctis screenshot-style typography (free setup)
 
-The original screenshot used Hasklig regular text with commercial Cartograph italics. The free practical replacement is:
+The original screenshot used Hasklig regular text with commercial Cartograph italics. Neovim only emits `bold` / `italic` attributes; the terminal chooses the actual font faces.
 
-- Regular/bold: [Cascadia Code](https://github.com/microsoft/cascadia-code/releases) — already installed on the current hosts
-- Cursive italic/bold-italic: [Victor Mono](https://rubjo.github.io/victor-mono/) — free under the [SIL Open Font License](https://github.com/rubjo/victor-mono/blob/master/LICENSE)
+### Recommended single-family option: Maple Mono NF
 
-Victor Mono provides the flowing cursive italics needed by the active Noctis typography. Neovim only emits `bold` / `italic` attributes; the terminal chooses these font faces.
+[Maple Mono](https://font.subf.dev/en/) is free under the SIL Open Font License and is the closest simple replacement: modern rounded forms similar to Cascadia Code, cursive italics, ligatures, and built-in Nerd Font icons.
 
-For statusline icons, use the patched families **CaskaydiaCove Nerd Font Mono** and **VictorMono Nerd Font Mono**:
+```sh
+# macOS
+brew install --cask font-maple-mono-nf
+
+# Arch Linux / AUR
+paru -S maplemono-nf
+```
+
+Other Linux distributions can use the official [Maple Mono downloads](https://font.subf.dev/en/download/), copy the font files into `~/.local/share/fonts`, then refresh the cache:
+
+```sh
+fc-cache -fv
+fc-list : family style | rg -i 'Maple Mono'
+```
+
+Use **Maple Mono NF** as the primary font in iTerm2 (**Settings → Profiles → Text**) or Konsole (**Settings → Edit Current Profile → Appearance → Font**). Enable iTerm2’s **Draw italic text in italic font** option.
+
+For Alacritty:
+
+```toml
+[font.normal]
+family = "Maple Mono NF"
+style = "Regular"
+
+[font.bold]
+family = "Maple Mono NF"
+style = "Bold"
+
+[font.italic]
+family = "Maple Mono NF"
+style = "Italic"
+
+[font.bold_italic]
+family = "Maple Mono NF"
+style = "Bold Italic"
+```
+
+### Optional Alacritty mix: Cascadia + Victor Mono
+
+To retain the existing Cascadia Code regular design, pair it with free [Victor Mono](https://rubjo.github.io/victor-mono/) cursive italics. Alacritty supports separate families per style:
 
 ```sh
 # macOS
@@ -40,17 +78,6 @@ brew install --cask font-caskaydia-cove-nerd-font font-victor-mono-nerd-font
 # Arch Linux
 sudo pacman -S ttf-cascadia-code-nerd ttf-victor-mono-nerd
 ```
-
-Other Linux distributions can download `CascadiaCode` and `VictorMono` archives from [Nerd Fonts releases](https://github.com/ryanoasis/nerd-fonts/releases), copy the font files into `~/.local/share/fonts`, then refresh the cache:
-
-```sh
-fc-cache -fv
-fc-list : family style | rg -i 'Cascadia|Caskaydia|Victor'
-```
-
-### Alacritty (recommended mixed-family setup)
-
-Alacritty supports separate families per style. In `alacritty.toml`, use the family names reported by `fc-list`:
 
 ```toml
 [font.normal]
@@ -70,25 +97,7 @@ family = "VictorMono Nerd Font Mono"
 style = "Bold Italic"
 ```
 
-Use `family = "Cascadia Code"` for normal/bold if the existing unpatched installation already gets Nerd glyphs through font fallback.
-
-### iTerm2 (macOS)
-
-iTerm2 selects one ASCII family and automatically uses that same family’s italic face; it cannot combine Cascadia regular with Victor italic.
-
-1. Open **Settings → Profiles → Text**.
-2. Select **VictorMono Nerd Font Mono** for the closest free all-in-one cursive result, or keep **Cascadia Code** when its regular design is more important.
-3. Enable **Draw italic text in italic font**.
-4. Optionally set **Non-ASCII Font** to **CaskaydiaCove Nerd Font Mono** for private-use glyphs.
-
-### Konsole (Linux)
-
-Konsole also selects one primary family rather than separate regular/italic families. Under **Settings → Edit Current Profile → Appearance → Font**, choose:
-
-- **VictorMono Nerd Font Mono** for cursive italics and icons, or
-- **CaskaydiaCove Nerd Font Mono** to retain Cascadia’s design.
-
-Use Alacritty for the exact Cascadia-regular/Victor-italic pairing.
+iTerm2 and Konsole cannot assign a different family only for italic ASCII text, so use Maple Mono NF or VictorMono Nerd Font Mono as a single family there.
 
 ---
 
@@ -149,7 +158,7 @@ For an isolated `cmake-init` install, install `pipx` first with `brew install pi
 | Config area | Relies on |
 | --- | --- |
 | `lua/config/lazy.lua` | `git`, network (first clone of lazy.nvim) |
-| `lua/plugins/statusline.lua` | Nerd Font icons; optional Cascadia/Victor terminal pairing above; SF org once sf.nvim loaded |
+| `lua/plugins/statusline.lua` | Nerd Font icons; Maple Mono NF or optional Cascadia/Victor pairing above; SF org once sf.nvim loaded |
 | `lua/plugins/git.lua` | `git` repo + Nerd Font signs (or ASCII fallback) |
 | `lua/plugins/lazygit.lua` | host **`lazygit`** (`brew` / `pacman`) |
 | `lua/plugins/persistence.lua` | (none beyond Neovim state dir) |
