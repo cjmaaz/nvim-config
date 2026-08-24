@@ -1,9 +1,9 @@
 --------------------------------------------------------------------------------
--- Scope engine (indent-blankline / ibl) + muted current-scope number gutter
+-- Scope engine (indent-blankline / ibl) + bracket-colored scope number gutter
 -- Refs: CodeOSS ui.lua; Kickstart plugins/indent_line.lua (empty opts).
 -- Alts: mini.indentscope · snacks indent · none (treesitter indent only).
 --
--- Scope gutter derives muted colors from matching rainbow bracket depth.
+-- Scope gutter reuses the matching rainbow bracket depth color.
 -- Horizontal start/end caps remain available as commented alternates below.
 --------------------------------------------------------------------------------
 
@@ -46,12 +46,12 @@ return {
         )
       end
 
-      -- Muted scope gutter uses 55% of the matching bracket color.
-      local gutter_strength = 0.55
-      -- local gutter_strength = 0.70 -- stronger bracket-color tint
-      -- local gutter_strength = 0.40 -- quieter gutter tint
+      -- Scope gutter uses 100% of the matching bracket color.
+      local gutter_strength = 1.00
+      -- local gutter_strength = 0.70 -- softer bracket-color tint
+      -- local gutter_strength = 0.40 -- muted gutter tint
 
-      -- Dim passive guides; sync the muted gutter palette on ColorScheme.
+      -- Sync the scope gutter palette on ColorScheme.
       local function apply_indent_highlights()
         local chrome = require("config.ui_chrome")
         palette.apply({ bold = false }) -- exact same non-bold groups as rainbow brackets
@@ -269,7 +269,7 @@ return {
         },
       })
 
-      -- Match the enclosing bracket depth, then paint that muted color in the number gutter.
+      -- Match the enclosing bracket depth, then paint that exact color in the number gutter.
       hooks.register(hooks.type.SCOPE_HIGHLIGHT, function(tick, bufnr, scope, scope_index)
         local highlight_index = hooks.builtin.scope_highlight_from_extmark(tick, bufnr, scope, scope_index)
         paint_scope_gutter(bufnr, scope, highlight_index)
