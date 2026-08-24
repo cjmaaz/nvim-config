@@ -4,7 +4,7 @@
 -- theme, then switches — and lualine's theme = "auto" would lag behind.
 --
 -- Alternatives (enable only one colorscheme plugin at a time):
---   - talha-akram/noctis.nvim         (active default Noctis; retained charcoal)
+--   - talha-akram/noctis.nvim         (active Minimus; retained charcoal)
 --   - olimorris/onedarkpro.nvim       (previous OneDark; retained below)
 --   - catppuccin/nvim                 (previous neutral Mocha; retained below)
 --   - loctvl842/monokai-pro.nvim      (previous warm-charcoal theme; retained below)
@@ -336,7 +336,7 @@ return {
     end,
   },
 
-  -- Active: default VS Code Noctis syntax on the retained neutral background.
+  -- Active: Noctis Minimus syntax on the retained neutral background.
   -- talha-akram/noctis.nvim has no plugin setup()/opts API (unlike kanagawa).
   -- The `opts` table below mirrors the kanagawa knobs we care about and is
   -- applied with nvim_set_hl after :colorscheme.
@@ -367,17 +367,23 @@ return {
       terminalColors = true, -- tint :terminal to match the theme
       -- terminalColors = false, -- leave the terminal's own palette alone
 
-      -- Previous custom typography knobs; uncomment with the override block below.
-      -- commentStyle = { italic = true } -- use {} for plain comments
-      -- keywordStyle = { italic = true } -- use {} for stock/plain keywords
-      -- statementStyle = {} -- or { bold = true } / { italic = true }
-      -- functionStyle = {} -- or { bold = true } / { italic = true }
-      -- typeStyle = {} -- or { bold = true } / { italic = true }
+      -- Typography: comments/keywords italic; functions/types/statements plain.
+      commentStyle = { italic = true },
+      -- commentStyle = {}, -- plain comments
+      keywordStyle = { italic = true },
+      -- keywordStyle = {}, -- stock Minimus bold keywords
+      statementStyle = {},
+      -- statementStyle = { bold = true }, -- heavier statements
+      functionStyle = {},
+      -- functionStyle = { bold = true }, -- stock Minimus emphasis
+      typeStyle = {},
+      -- typeStyle = { bold = true }, -- stock Minimus emphasis
     },
     config = function(_, opts)
       -- Active Noctis variant.
-      vim.cmd.colorscheme("noctis") -- default teal-leaning Noctis
-      -- vim.cmd.colorscheme("noctis_bordo") -- previous warm rose / burgundy
+      vim.cmd.colorscheme("noctis_minimus") -- muted, desaturated Noctis
+      -- vim.cmd.colorscheme("noctis") -- default teal-leaning Noctis
+      -- vim.cmd.colorscheme("noctis_bordo") -- warm rose / burgundy
       -- vim.cmd.colorscheme("noctis_azureus") -- blue-leaning
       -- vim.cmd.colorscheme("noctis_minimus")
       -- vim.cmd.colorscheme("noctis_uva")
@@ -390,28 +396,27 @@ return {
 
       local chrome = require("config.ui_chrome")
 
-      -- Stock Noctis accents over the retained neutral background ladder.
+      -- Stock Minimus accents over the retained neutral background ladder.
       local pal = {
         bg0 = chrome.base,
         bg1 = chrome.surface,
         bg2 = chrome.base,
-        fg = "#B7C9CC",
-        red = "#D17B9A",
-        orange = "#D66D41",
-        yellow = "#DDB988",
-        green = "#78E0A6",
-        cyan = "#4CA1B3",
-        blue = "#64AAE4",
-        purple = "#6D61E3",
-        grey = "#455B5F",
-        light_grey = "#64848A",
+        fg = "#C6CDD2",
+        red = "#BF8FA1",
+        orange = "#B8785B",
+        yellow = "#CEB796",
+        green = "#84BEA1",
+        cyan = "#51828B",
+        blue = "#608BAE",
+        purple = "#6F68AC",
+        grey = "#4B575F",
+        light_grey = "#637785",
       }
 
       local hl = vim.api.nvim_set_hl
-      -- Previous custom-typography helper; uncomment with the block below.
-      -- local function has(style_tbl, key)
-      --   return style_tbl and style_tbl[key] == true
-      -- end
+      local function has(style_tbl, key)
+        return style_tbl and style_tbl[key] == true
+      end
 
       -- Give unowned floats the same retained panel chrome used by plugin UIs.
       local function apply_float_chrome()
@@ -436,49 +441,49 @@ return {
         hl(0, "EndOfBuffer", { fg = opts.transparent and pal.grey or chrome.base, bg = editor_bg })
       end
 
-      -- Previous custom typography; uncomment this block + opts above to replace stock Noctis.
-      -- hl(0, "Comment", {
-      --   fg = pal.light_grey,
-      --   italic = has(opts.commentStyle, "italic"),
-      --   bold = has(opts.commentStyle, "bold"),
-      -- })
-      -- hl(0, "@comment", { link = "Comment" })
-      --
-      -- hl(0, "Keyword", {
-      --   fg = pal.red,
-      --   italic = has(opts.keywordStyle, "italic"),
-      --   bold = has(opts.keywordStyle, "bold"),
-      -- })
-      -- hl(0, "@keyword", { link = "Keyword" })
-      --
-      -- hl(0, "Statement", {
-      --   fg = pal.red,
-      --   italic = has(opts.statementStyle, "italic"),
-      --   bold = has(opts.statementStyle, "bold"),
-      -- })
-      --
-      -- hl(0, "Function", {
-      --   fg = pal.green,
-      --   italic = has(opts.functionStyle, "italic"),
-      --   bold = has(opts.functionStyle, "bold"),
-      -- })
-      -- hl(0, "@function", { link = "Function" })
-      --
-      -- hl(0, "Type", {
-      --   fg = pal.yellow,
-      --   italic = has(opts.typeStyle, "italic"),
-      --   bold = has(opts.typeStyle, "bold"),
-      -- })
-      -- hl(0, "@type", { link = "Type" })
+      local function apply_typography()
+        -- Apply configured typography after Minimus sets its stock bold groups.
+        hl(0, "Comment", {
+          fg = pal.light_grey,
+          italic = has(opts.commentStyle, "italic"),
+          bold = has(opts.commentStyle, "bold"),
+        })
+        hl(0, "@comment", { link = "Comment" })
 
-      -- Keep modern markup/deprecation attributes missing from the older theme.
-      hl(0, "@markup.strong", { bold = true })
-      hl(0, "@markup.italic", { italic = true })
-      hl(0, "@markup.strikethrough", { strikethrough = true })
+        hl(0, "Keyword", {
+          fg = pal.red,
+          italic = has(opts.keywordStyle, "italic"),
+          bold = has(opts.keywordStyle, "bold"),
+        })
+        hl(0, "@keyword", { link = "Keyword" })
 
-      -- Deprecated symbols (LSP) → strikethrough, not normal keywords
-      hl(0, "@lsp.mod.deprecated", { strikethrough = true, italic = true })
-      hl(0, "DiagnosticDeprecated", { strikethrough = true })
+        hl(0, "Statement", {
+          fg = pal.red,
+          italic = has(opts.statementStyle, "italic"),
+          bold = has(opts.statementStyle, "bold"),
+        })
+
+        hl(0, "Function", {
+          fg = pal.green,
+          italic = has(opts.functionStyle, "italic"),
+          bold = has(opts.functionStyle, "bold"),
+        })
+        hl(0, "@function", { link = "Function" })
+
+        hl(0, "Type", {
+          fg = pal.yellow,
+          italic = has(opts.typeStyle, "italic"),
+          bold = has(opts.typeStyle, "bold"),
+        })
+        hl(0, "@type", { link = "Type" })
+
+        -- Keep modern markup/deprecation attributes missing from the older theme.
+        hl(0, "@markup.strong", { bold = true })
+        hl(0, "@markup.italic", { italic = true })
+        hl(0, "@markup.strikethrough", { strikethrough = true })
+        hl(0, "@lsp.mod.deprecated", { strikethrough = true, italic = true })
+        hl(0, "DiagnosticDeprecated", { strikethrough = true })
+      end
 
       -- Optional transparent-background alternate.
       if opts.transparent then
@@ -537,12 +542,14 @@ return {
 
       -- Apply after transparent/theme overrides; re-apply after runtime switches.
       apply_editor_background()
+      apply_typography()
       apply_float_chrome()
       vim.api.nvim_create_autocmd("ColorScheme", {
-        group = vim.api.nvim_create_augroup("user_float_chrome", { clear = true }),
+        group = vim.api.nvim_create_augroup("user_noctis_overrides", { clear = true }),
         callback = function()
-          if vim.g.colors_name == "noctis" then
+          if vim.g.colors_name == "noctis_minimus" then
             apply_editor_background()
+            apply_typography()
           end
           apply_float_chrome()
         end,
