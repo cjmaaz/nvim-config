@@ -332,6 +332,7 @@ return {
 
           -------------------------------------------------------------- Misc
           { pattern = "undotree", icon = "󰕌", color = "purple" },
+          { pattern = "toggle word wrap", icon = "󰖶", color = "azure" },
           { pattern = "toggle", icon = "", color = "yellow" },
           { pattern = "format", icon = "", color = "cyan" },
           { pattern = "lint", icon = "󱉶", color = "yellow" },

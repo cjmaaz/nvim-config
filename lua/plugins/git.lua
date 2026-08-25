@@ -143,7 +143,7 @@ return {
         -- Toggle extras (live under <leader>t… with FoS/lint/inlays).
         map("n", "<leader>tb", gs.toggle_current_line_blame, "Toggle line blame")
         -- map("n", "<leader>tb", function() gs.toggle_current_line_blame() end, "…") -- same
-        -- map("n", "<leader>tw", gs.toggle_word_diff, "Toggle word diff")
+        -- map("n", "<leader>tW", gs.toggle_word_diff, "Toggle word diff") -- tw is word wrap
         -- map("n", "<leader>td", gs.toggle_deleted, "Toggle deleted lines") -- show removed lines as virtual text
 
         -- Optional quickfix exports:

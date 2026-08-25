@@ -66,6 +66,18 @@ end, { desc = "Gremlins quickfix" })
 -- Clear search highlight (pairs with hlsearch in options).
 map("n", "<Esc>", "<cmd>nohlsearch<CR>", { desc = "Clear search highlight" })
 
+-- Toggle soft wrapping in the current window without changing the file.
+map("n", "<leader>tw", function()
+  local enabled = not vim.wo.wrap
+  vim.wo.wrap = enabled
+  if enabled then
+    vim.wo.linebreak = true
+    vim.wo.breakindent = true
+  end
+  vim.notify("Word wrap " .. (enabled and "enabled" or "disabled"), vim.log.levels.INFO, { title = "Options" })
+end, { desc = "Toggle word wrap" })
+-- map("n", "<leader>uw", "<cmd>setlocal wrap!<CR>", { desc = "Toggle word wrap" }) -- LazyVim; u is Undotree here
+
 -- Window focus (splits) — different from buffer cycle.
 map("n", "<C-h>", "<C-w>h", { desc = "Focus left window" })
 map("n", "<C-l>", "<C-w>l", { desc = "Focus right window" })

@@ -29,7 +29,7 @@ Nav: [index](./README.md) · [core](./core.md) · [git](./git.md) · [explorer](
 | `<leader>S` | Salesforce | `lua/plugins/salesforce.lua` (`Sp`, `Sx`, …) | [salesforce.md](./salesforce.md) |
 | `<leader>c` | Code | `formatting.lua` (`cf`); `linting.lua` (`cl`); LSP `ca` | [lsp.md](./lsp.md) |
 | `<leader>p` | Project | `project_scaffold.lua` (`pn`); `project_runner.lua` (`pr`) | [project.md](./project.md) |
-| `<leader>t` | Toggle | `tf` FoS · `tl` lint · `th` inlays · `tb` blame · `tg`/`tG` Gremlins | [lsp.md](./lsp.md) · [git.md](./git.md) · [qol.md](./qol.md) |
+| `<leader>t` | Toggle | `tw` wrap · `tf` FoS · `tl` lint · `th` inlays · `tb` blame · `tg`/`tG` Gremlins | [core.md](./core.md) · [lsp.md](./lsp.md) · [git.md](./git.md) · [qol.md](./qol.md) |
 | `<leader>q` | Session | `persistence.lua` (`qs`, `qS`, `ql`, `qd`) | [qol.md](./qol.md) |
 | `<leader>x` | Trouble | `trouble.lua` (`xx`, `xX`, …) | [qol.md](./qol.md) |
 | `<leader>u` | Undotree | `undotree.lua` | [qol.md](./qol.md) |

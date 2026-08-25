@@ -49,6 +49,14 @@ Left-side bubbles use a right curve (``); right-side bubbles use a left curve
 
 `<C-hjkl>` and `s`+hjkl do the same focus — pick one muscle memory. `ss`/`sv` may delay one-key `s` (substitute) by `timeoutlen` (300 ms).
 
+### Word wrap
+
+| Key | Mode | Action |
+| --- | --- | --- |
+| `<leader>tw` | n | Toggle soft word wrap in the current window |
+
+Enabling wrap also keeps `linebreak` and `breakindent` on, so text wraps at word boundaries with the original indentation. It does not modify the file. Find the mapping through `<leader>sk` by searching “word wrap.” LazyVim commonly uses `<leader>uw`, but this config reserves `<leader>u` for Undotree.
+
 ---
 
 ## Black-hole delete
