@@ -15,12 +15,14 @@ Nav: [index](./README.md) · [git](./git.md) · [explorer](./explorer.md) · [te
 | `<S-h>` | n | Previous buffer (`:bprevious`) |
 | `<S-l>` | n | Next buffer (`:bnext`) |
 | `]b` / `[b` | n | Next / previous buffer |
-| `]B` / `[B` | n | Last / first buffer |
+| `]B` / `[B` | n | Move current buffer right / left in bufferline |
 | `]a` / `[a` | n | Next / previous argument (`:next` / `:previous`) |
 | `]A` / `[A` | n | Last / first argument |
 | `<leader>bd` | n | Delete current buffer (`:bdelete`) |
 
-Commented alternates in config: force delete (`bdelete!`), `<leader>c` as buffer-delete, wipeout.
+`[B` / `]B` follows LazyVim’s bufferline-reorder convention and is discoverable through `<leader>sk` by searching “Move buffer.” The previous first/last-buffer behavior and `<A-h>` / `<A-l>` reorder alternatives remain commented in config.
+
+Other commented alternates: force delete (`bdelete!`), `<leader>c` as buffer-delete, wipeout.
 
 ### Bufferline (UI)
 

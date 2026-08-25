@@ -16,6 +16,13 @@ return {
     dependencies = {
       { "nvim-tree/nvim-web-devicons", enabled = vim.g.have_nerd_font },
     },
+    keys = {
+      -- LazyVim convention: uppercase buffer motions reorder instead of navigate.
+      { "[B", "<cmd>BufferLineMovePrev<CR>", desc = "Move buffer left" },
+      { "]B", "<cmd>BufferLineMoveNext<CR>", desc = "Move buffer right" },
+      -- { "<A-h>", "<cmd>BufferLineMovePrev<CR>", desc = "Move buffer left" }, -- common alt
+      -- { "<A-l>", "<cmd>BufferLineMoveNext<CR>", desc = "Move buffer right" }, -- common alt
+    },
     opts = {
       options = {
         -- What the bar shows.

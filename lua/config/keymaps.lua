@@ -23,8 +23,9 @@ map("n", "<S-l>", "<cmd>bnext<CR>", { desc = "Next buffer" }) -- Shift+l
 -- Unimpaired-style ]/[ families (same color within a/A and b/B in which-key).
 map("n", "]b", "<cmd>bnext<CR>", { desc = "Next buffer" })
 map("n", "[b", "<cmd>bprevious<CR>", { desc = "Previous buffer" })
-map("n", "]B", "<cmd>blast<CR>", { desc = "Last buffer" })
-map("n", "[B", "<cmd>bfirst<CR>", { desc = "First buffer" })
+-- Uppercase [B/]B are owned by bufferline.lua for visual reordering.
+-- map("n", "]B", "<cmd>blast<CR>", { desc = "Last buffer" }) -- previous behavior
+-- map("n", "[B", "<cmd>bfirst<CR>", { desc = "First buffer" }) -- previous behavior
 map("n", "]a", "<cmd>next<CR>", { desc = "Next argument" })
 map("n", "[a", "<cmd>previous<CR>", { desc = "Previous argument" })
 map("n", "]A", "<cmd>last<CR>", { desc = "Last argument" })
