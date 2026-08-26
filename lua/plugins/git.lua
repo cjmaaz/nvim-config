@@ -144,7 +144,7 @@ return {
         map("n", "<leader>tb", gs.toggle_current_line_blame, "Toggle line blame")
         -- map("n", "<leader>tb", function() gs.toggle_current_line_blame() end, "…") -- same
         -- map("n", "<leader>tW", gs.toggle_word_diff, "Toggle word diff") -- tw is word wrap
-        -- map("n", "<leader>td", gs.toggle_deleted, "Toggle deleted lines") -- show removed lines as virtual text
+        -- map("n", "<leader>tD", gs.toggle_deleted, "Toggle deleted lines") -- td is inline diagnostics
 
         -- Optional quickfix exports:
         -- map("n", "<leader>hq", gs.setqflist, "Quickfix current-file changes")

@@ -183,6 +183,7 @@ return {
           { pattern = "lsp: document symbols", icon = "󰈙", color = "purple" },
           { pattern = "lsp: workspace symbols", icon = "󰒓", color = "purple" },
           { pattern = "toggle inlay", icon = "󰔢", color = "yellow" },
+          { pattern = "toggle inline diagnostics", icon = "󱖫", color = "red" },
           { pattern = "lsp:", icon = "", color = "purple" },
           { pattern = "pick symbols in winbar", icon = "󰒓", color = "cyan" },
           { pattern = "go to start of current context", icon = "󰁍", color = "azure" },

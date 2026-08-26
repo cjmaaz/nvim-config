@@ -134,10 +134,11 @@ Defined in `lua/config/keymaps.lua` (`vim.diagnostic.config` + maps). Works befo
 | `]d` | n | Next diagnostic (float on jump) |
 | `[d` | n | Previous diagnostic (float on jump) |
 | `<leader>e` | n | Show diagnostic float at cursor |
+| `<leader>td` | n | Toggle inline diagnostic virtual text |
 
 **Lists:** use [Trouble](./qol.md#trouble-luapluginstroublelua) (`<leader>xx` / `xX` / `xl`) instead of the old `<leader>q` loclist. `<leader>q…` is now [sessions](./qol.md#sessions-luapluginspersistencelua).
 
-Display: virtual text on, underline from WARN+, severity-sorted, Nerd Font / ASCII signs. Commented alts in config: `virtual_lines`, full underline.
+Display: virtual text on, underline from WARN+, severity-sorted, Nerd Font / ASCII signs. `<leader>td` hides only end-of-line messages; signs, underlines and `<leader>e` floats remain available. Search `<leader>sk` for “inline diagnostics.” Commented alts in config: `virtual_lines`, full underline.
 
 **Deeper guide** (display settings, quieting noise, Java non-project): [diagnostics/](../diagnostics/README.md).
 

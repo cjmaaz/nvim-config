@@ -175,6 +175,20 @@ vim.diagnostic.config({
   },
 })
 
+-- Hide/show end-of-line messages while keeping signs, underlines, and floats.
+local previous_virtual_text
+map("n", "<leader>td", function()
+  local current = vim.diagnostic.config().virtual_text
+  if current == false then
+    vim.diagnostic.config({ virtual_text = previous_virtual_text or true })
+    vim.notify("Inline diagnostics enabled", vim.log.levels.INFO, { title = "Diagnostics" })
+  else
+    previous_virtual_text = current
+    vim.diagnostic.config({ virtual_text = false })
+    vim.notify("Inline diagnostics disabled", vim.log.levels.INFO, { title = "Diagnostics" })
+  end
+end, { desc = "Toggle inline diagnostics" })
+
 map("n", "]d", function()
   vim.diagnostic.jump({ count = 1 })
 end, { desc = "Next diagnostic" })
