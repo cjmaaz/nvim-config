@@ -207,7 +207,12 @@ local function language_info()
 end
 
 local function encoding_info()
-  return vim.bo.fileencoding ~= "" and vim.bo.fileencoding or vim.o.encoding
+  local encoding = vim.bo.fileencoding ~= "" and vim.bo.fileencoding or vim.o.encoding
+  local normalized = encoding:lower():gsub("_", "-")
+  if normalized == "utf-8" or normalized == "utf8" then
+    return ""
+  end
+  return encoding
 end
 
 -- Salesforce org + coverage (CodeOSS ui.lua).
@@ -267,7 +272,10 @@ local function final_context()
   if language ~= "" then
     parts[#parts + 1] = language
   end
-  parts[#parts + 1] = encoding_info()
+  local encoding = encoding_info()
+  if encoding ~= "" then
+    parts[#parts + 1] = encoding
+  end
   return statusline_escape(table.concat(parts, "  "))
 end
 
@@ -437,6 +445,12 @@ return {
             final_context,
             color = { fg = bubble_colors.text, bg = bubble_colors.info, gui = "bold" },
             separator = { left = bubble.left },
+            cond = function()
+              return vim.bo.filetype ~= ""
+                or package.loaded.sf ~= nil
+                or #vim.lsp.get_clients({ bufnr = 0 }) > 0
+                or encoding_info() ~= ""
+            end,
             padding = { left = 1, right = 1 },
           },
         },
