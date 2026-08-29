@@ -206,6 +206,10 @@ local function language_info()
   return icon ~= "" and icon or filetype
 end
 
+local function encoding_info()
+  return vim.bo.fileencoding ~= "" and vim.bo.fileencoding or vim.o.encoding
+end
+
 -- Salesforce org + coverage (CodeOSS ui.lua).
 -- package.loaded avoids requiring sf.nvim on every statusline refresh — the
 -- component stays empty until a Salesforce command/file loads the plugin.
@@ -263,6 +267,7 @@ local function final_context()
   if language ~= "" then
     parts[#parts + 1] = language
   end
+  parts[#parts + 1] = encoding_info()
   return statusline_escape(table.concat(parts, "  "))
 end
 
@@ -426,17 +431,12 @@ return {
           },
         },
 
-        -- 8. Salesforce, LSP clients, and language share the final right bubble.
+        -- 8. Salesforce, LSP clients, language icon, and encoding share the final bubble.
         lualine_z = {
           {
             final_context,
             color = { fg = bubble_colors.text, bg = bubble_colors.info, gui = "bold" },
             separator = { left = bubble.left },
-            cond = function()
-              return vim.bo.filetype ~= ""
-                or package.loaded.sf ~= nil
-                or #vim.lsp.get_clients({ bufnr = 0 }) > 0
-            end,
             padding = { left = 1, right = 1 },
           },
         },
