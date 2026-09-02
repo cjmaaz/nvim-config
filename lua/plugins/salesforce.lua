@@ -203,63 +203,62 @@ local plugin = {
       },
     },
     keys = {
-      -- Local org fetch/set refreshes the common project-local metadata inventory.
+      -- Fetch hydrates common inventory; target selection only changes CLI context.
       {
         "<leader>SF",
         function()
           sf_metadata().fetch_orgs_and_refresh_common()
         end,
-        desc = "SF: fetch orgs + metadata",
+        desc = "Fetch orgs + common metadata",
       },
       {
         "<leader>So",
         function()
-          sf_metadata().select_target_and_refresh_common()
+          sf_metadata().select_target()
         end,
-        desc = "SF: set target org + metadata",
+        desc = "Set local target org",
       },
-      -- Global target stays selection-only (no automatic inventory refresh).
       {
         "<leader>SO",
         function()
           sf_metadata().select_global_target()
         end,
-        desc = "SF: set global org",
+        desc = "Set global target org",
       },
-      { "<leader>Sb", sf_action("org_open"), desc = "SF: open org in browser" },
-      { "<leader>SB", sf_action("org_open_current_file"), desc = "SF: open current metadata in org" },
+      { "<leader>Sb", sf_action("org_open"), desc = "Open org in browser" },
+      { "<leader>SB", sf_action("org_open_current_file"), desc = "Open current metadata in org" },
 
       -- Retrieve / diff / logs / term
-      { "<leader>Sr", sf_action("retrieve"), desc = "SF: retrieve current file" },
-      { "<leader>Sd", sf_action("diff_in_target_org"), desc = "SF: diff with target org" },
-      { "<leader>Sl", sf_action("pull_log"), desc = "SF: pull debug log" },
-      { "<leader>Se", sf_action("toggle_term"), desc = "SF: toggle terminal" },
-      { "<leader>Sx", cancel_sf_actions, desc = "SF: cancel active actions" },
+      { "<leader>Sr", sf_action("retrieve"), desc = "Retrieve current file" },
+      { "<leader>Sd", sf_action("diff_in_target_org"), desc = "Diff with target org" },
+      { "<leader>Sl", sf_action("pull_log"), desc = "Pull debug log" },
+      { "<leader>Se", sf_action("toggle_term"), desc = "Toggle terminal" },
+      { "<leader>Sx", cancel_sf_actions, desc = "Cancel active actions" },
       {
         "<leader>SV",
         function()
           require("config.salesforce.vlocity").open()
         end,
-        desc = "SF: retrieve Vlocity DataPacks",
+        desc = "Retrieve Vlocity DataPacks",
       },
 
       -- Deploy (save + push current file)
-      { "<leader>Sp", sf_action("save_and_push"), desc = "SF: save and deploy current file" },
-      -- { "<leader>Sp", sf_action("push"), desc = "SF: push without save-first" }, -- if API exists / prefer
+      { "<leader>Sp", sf_action("save_and_push"), desc = "Save and deploy current file" },
+      -- { "<leader>Sp", sf_action("push"), desc = "Push without save-first" }, -- if API exists / prefer
 
       -- Tests
-      { "<leader>St", sf_action("run_current_test"), desc = "SF: test under cursor" },
-      { "<leader>ST", sf_action("run_current_test_with_coverage"), desc = "SF: test under cursor + coverage" },
-      { "<leader>Sa", sf_action("run_all_tests_in_this_file"), desc = "SF: all tests in file" },
+      { "<leader>St", sf_action("run_current_test"), desc = "Test under cursor" },
+      { "<leader>ST", sf_action("run_current_test_with_coverage"), desc = "Test under cursor + coverage" },
+      { "<leader>Sa", sf_action("run_all_tests_in_this_file"), desc = "All tests in file" },
       {
         "<leader>SA",
         sf_action("run_all_tests_in_this_file_with_coverage"),
-        desc = "SF: all tests in file + coverage",
+        desc = "All tests in file + coverage",
       },
-      { "<leader>SR", sf_action("repeat_last_tests"), desc = "SF: repeat last tests" },
-      { "<leader>Sv", sf_action("toggle_sign"), desc = "SF: toggle coverage signs" },
-      { "[v", sf_action("uncovered_jump_backward"), desc = "SF: previous uncovered line" },
-      { "]v", sf_action("uncovered_jump_forward"), desc = "SF: next uncovered line" },
+      { "<leader>SR", sf_action("repeat_last_tests"), desc = "Repeat last tests" },
+      { "<leader>Sv", sf_action("toggle_sign"), desc = "Toggle coverage signs" },
+      { "[v", sf_action("uncovered_jump_backward"), desc = "Previous uncovered line" },
+      { "]v", sf_action("uncovered_jump_forward"), desc = "Next uncovered line" },
 
       -- SOQL builder / whole-file / visual selection.
       {
@@ -267,7 +266,7 @@ local plugin = {
         function()
           require("config.salesforce.query").open()
         end,
-        desc = "SF: build SOQL query",
+        desc = "Build SOQL query",
       },
       {
         "<leader>Sq",
@@ -275,46 +274,37 @@ local plugin = {
           require("config.salesforce.query").run_current(false)
         end,
         mode = "n",
-        desc = "SF: run SOQL file",
+        desc = "Run SOQL file",
       },
       {
         "<leader>Sq",
         sf_action("run_highlighted_soql"),
         mode = "x",
-        desc = "SF: run selected SOQL",
+        desc = "Run selected SOQL",
       },
 
       -- Metadata (needs fzf-lua for list pickers)
-      {
-        "<leader>SM",
-        function()
-          sf_metadata().refresh_common()
-        end,
-        desc = "SF: pull metadata inventory",
-      },
-      { "<leader>Sm", sf_action("list_md_to_retrieve"), desc = "SF: list metadata to retrieve" },
-      { "<leader>SK", sf_action("pull_md_type_json"), desc = "SF: pull metadata types" },
-      { "<leader>Sk", sf_action("list_md_type_to_retrieve"), desc = "SF: list metadata types" },
+      { "<leader>Sm", sf_action("list_md_to_retrieve"), desc = "Pick cached metadata to retrieve" },
       {
         "<leader>SU",
         function()
           sf_metadata().prompt_refresh()
         end,
-        desc = "SF: update metadata browser",
+        desc = "Refresh metadata inventory",
       },
       {
         "<leader>Su",
         function()
           require("config.salesforce.browser").open()
         end,
-        desc = "SF: browse metadata",
+        desc = "Browse metadata inventory",
       },
       {
         "<leader>SP",
         function()
           require("config.salesforce.manifests").open()
         end,
-        desc = "SF: browse package manifests",
+        desc = "Browse package manifests",
       },
 
       -- sObjects for apex_ls completion
@@ -323,12 +313,12 @@ local plugin = {
         function()
           require("sf").refresh_sobjects({ category = "ALL" })
         end,
-        desc = "SF: refresh SObject definitions",
+        desc = "Refresh SObject definitions",
       },
-      -- { "<leader>Ss", function() require("sf").refresh_sobjects({ category = "CUSTOM" }) end, … },
+      -- { "<leader>Ss", function() require("sf").refresh_sobjects({ category = "CUSTOM" }) end, desc = "Refresh custom SObjects" },
 
       -- Ctags (optional host tool: universal-ctags)
-      { "<leader>Sc", sf_action("create_ctags"), desc = "SF: create Apex ctags" },
+      { "<leader>Sc", sf_action("create_ctags"), desc = "Create Apex ctags" },
     },
     config = function()
       install_sf_access_token_fix()
@@ -379,28 +369,28 @@ local plugin = {
       -- Esc cancels any foreground/background SF action; otherwise it clears search.
       vim.keymap.set("n", "<Esc>", cancel_sf_or_clear_search, {
         silent = true,
-        desc = "SF: cancel active actions / clear search",
+        desc = "Cancel active actions / clear search",
       })
 
       vim.api.nvim_create_autocmd("FileType", {
         pattern = "SFTerm",
         callback = function(event)
-          local opts = { buffer = event.buf, silent = true, desc = "SF: hide terminal" }
+          local opts = { buffer = event.buf, silent = true, desc = "Hide Salesforce terminal" }
           vim.keymap.set("n", "q", hide_visible_sf_terms, opts)
           vim.keymap.set("n", "<Esc>", cancel_sf_actions, {
             buffer = event.buf,
             silent = true,
-            desc = "SF: cancel active actions",
+            desc = "Cancel active actions",
           })
           vim.keymap.set("n", "<C-c>", cancel_sf_actions, {
             buffer = event.buf,
             silent = true,
-            desc = "SF: cancel active actions",
+            desc = "Cancel active actions",
           })
           vim.keymap.set("t", "<Esc>", cancel_sf_actions, {
             buffer = event.buf,
             silent = true,
-            desc = "SF: cancel active actions",
+            desc = "Cancel active actions",
           })
           -- Terminal-mode <C-c> remains the terminal's native interrupt.
         end,

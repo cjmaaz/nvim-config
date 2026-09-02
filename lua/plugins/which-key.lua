@@ -90,48 +90,44 @@ return {
         rules = {
           ------------------------------------------------------------ SF families
           -- Org / open (So SO Sb SB SF fetch) → blue
-          { pattern = "sf: fetch org", icon = "󰄨", color = "blue" },
-          { pattern = "sf: set target org", icon = "󰷏", color = "blue" },
-          { pattern = "sf: set global org", icon = "󰖟", color = "blue" },
-          { pattern = "sf: open org in browser", icon = "󰖟", color = "blue" },
-          { pattern = "sf: open current metadata", icon = "󰈙", color = "blue" },
+          { pattern = "fetch org", icon = "󰄨", color = "blue" },
+          { pattern = "set local target org", icon = "󰷏", color = "blue" },
+          { pattern = "set global target org", icon = "󰖟", color = "blue" },
+          { pattern = "open org in browser", icon = "󰖟", color = "blue" },
+          { pattern = "open current metadata", icon = "󰈙", color = "blue" },
 
-          -- Retrieve / metadata inventory (Sr Sm SM Sk SK Su SU) → azure
-          { pattern = "sf: retrieve", icon = "󰇚", color = "azure" },
-          { pattern = "sf: pull metadata inventory", icon = "󰉓", color = "azure" },
-          { pattern = "sf: list metadata to retrieve", icon = "󰉓", color = "azure" },
-          { pattern = "sf: pull metadata types", icon = "󰀫", color = "azure" },
-          { pattern = "sf: list metadata types", icon = "󰀫", color = "azure" },
-          { pattern = "sf: browse metadata", icon = "󰉓", color = "azure" },
-          { pattern = "sf: update metadata browser", icon = "󰓅", color = "azure" },
-          { pattern = "sf: browse package manifests", icon = "󰈙", color = "azure" },
-          { pattern = "sf: retrieve vlocity datapacks", icon = "󰇚", color = "azure" },
+          -- Retrieve / metadata inventory (Sr Sm Su SU) → azure
+          { pattern = "retrieve current file", icon = "󰇚", color = "azure" },
+          { pattern = "pick cached metadata to retrieve", icon = "󰉓", color = "azure" },
+          { pattern = "browse metadata inventory", icon = "󰉓", color = "azure" },
+          { pattern = "refresh metadata inventory", icon = "󰓅", color = "azure" },
+          { pattern = "browse package manifests", icon = "󰈙", color = "azure" },
+          { pattern = "retrieve vlocity datapacks", icon = "󰇚", color = "azure" },
 
           -- SOQL builder / runner → yellow
-          { pattern = "sf: build soql query", icon = "󰆼", color = "yellow" },
-          { pattern = "sf: run soql", icon = "󰆼", color = "yellow" },
+          { pattern = "build soql query", icon = "󰆼", color = "yellow" },
+          { pattern = "run soql", icon = "󰆼", color = "yellow" },
 
           -- Tests / coverage (St ST Sa SA SR Sv ]v [v) → green
-          { pattern = "sf: test under cursor %+ coverage", icon = "󰝖", color = "green" },
-          { pattern = "sf: test under cursor", icon = "󰙨", color = "green" },
-          { pattern = "sf: all tests in file %+ coverage", icon = "󰝖", color = "green" },
-          { pattern = "sf: all tests in file", icon = "󰙨", color = "green" },
-          { pattern = "sf: repeat last tests", icon = "󰑖", color = "green" },
-          { pattern = "sf: toggle coverage signs", icon = "󰍕", color = "green" },
-          { pattern = "sf: previous uncovered", icon = "󰁍", color = "green" },
-          { pattern = "sf: next uncovered", icon = "󰁔", color = "green" },
+          { pattern = "test under cursor %+ coverage", icon = "󰝖", color = "green" },
+          { pattern = "test under cursor", icon = "󰙨", color = "green" },
+          { pattern = "all tests in file %+ coverage", icon = "󰝖", color = "green" },
+          { pattern = "all tests in file", icon = "󰙨", color = "green" },
+          { pattern = "repeat last tests", icon = "󰑖", color = "green" },
+          { pattern = "toggle coverage signs", icon = "󰍕", color = "green" },
+          { pattern = "previous uncovered", icon = "󰁍", color = "green" },
+          { pattern = "next uncovered", icon = "󰁔", color = "green" },
 
           -- Deploy → purple · diff → orange · log → yellow · term → cyan · cancel → red
-          { pattern = "sf: save and deploy", icon = "󰅧", color = "purple" },
-          { pattern = "sf: diff", icon = "󰦓", color = "orange" },
-          { pattern = "sf: pull debug log", icon = "󰌱", color = "yellow" },
-          { pattern = "sf: toggle terminal", icon = "", color = "cyan" },
-          { pattern = "sf: hide terminal", icon = "󰖐", color = "cyan" },
-          { pattern = "sf: cancel", icon = "󰜺", color = "red" },
-          { pattern = "sf: run selected soql", icon = "󰆼", color = "yellow" },
-          { pattern = "sf: refresh sobject", icon = "󰓅", color = "grey" },
-          { pattern = "sf: create apex ctags", icon = "󰓻", color = "grey" },
-          { pattern = "^sf:", icon = "󰢎", color = "blue" }, -- leftover SF
+          { pattern = "save and deploy", icon = "󰅧", color = "purple" },
+          { pattern = "diff with target org", icon = "󰦓", color = "orange" },
+          { pattern = "pull debug log", icon = "󰌱", color = "yellow" },
+          { pattern = "toggle terminal", icon = "", color = "cyan" },
+          { pattern = "hide salesforce terminal", icon = "󰖐", color = "cyan" },
+          { pattern = "cancel active actions", icon = "󰜺", color = "red" },
+          { pattern = "run selected soql", icon = "󰆼", color = "yellow" },
+          { pattern = "refresh sobject", icon = "󰓅", color = "grey" },
+          { pattern = "create apex ctags", icon = "󰓻", color = "grey" },
           { pattern = "salesforce", icon = "󰢎", color = "blue" },
 
           -------------------------------------------------------- Search families

@@ -16,7 +16,7 @@ Nav: [index](./README.md) · [lsp](./lsp.md) · [which-key](./which-key.md) · [
 
 `<leader>` is **Space**. Press **`Space` then `S`** (capital **S**), wait ~300ms — which-key shows the **Salesforce** group.
 
-Search stays on lowercase `<leader>s…` (Telescope).
+Search stays on lowercase `<leader>s…` (Telescope). Child labels omit the redundant `SF:` prefix because the group already supplies that context.
 
 Also: `:SF` then Tab for command categories.
 
@@ -27,7 +27,7 @@ Also: `:SF` then Tab for command categories.
 | Key | Mode | Action |
 | --- | --- | --- |
 | `<leader>SF` | n | Fetch authenticated orgs, resolve the default target, then refresh common metadata |
-| `<leader>So` | n | Set the **local target** org, then refresh common metadata |
+| `<leader>So` | n | Set the **local target** org only |
 | `<leader>SO` | n | Set the **global target** org (no automatic metadata refresh) |
 | `<leader>Sb` | n | Open target org in browser |
 | `<leader>SB` | n | Open current metadata in org |
@@ -48,10 +48,7 @@ Also: `:SF` then Tab for command categories.
 | `<leader>SQ` | n | Open the schema-aware SOQL builder |
 | `<leader>Sq` | n | Save and run the current `.soql` file |
 | `<leader>Sq` | x | Run **visual** selection as SOQL |
-| `<leader>SM` | n | Pull metadata inventory JSON |
-| `<leader>Sm` | n | List metadata to retrieve (fzf-lua) |
-| `<leader>SK` | n | Pull metadata **types** JSON |
-| `<leader>Sk` | n | List metadata types (fzf-lua) |
+| `<leader>Sm` | n | Pick cached metadata to retrieve (fzf-lua) |
 | `<leader>Su` | n | Open the cached multi-select metadata browser |
 | `<leader>SU` | n | Update **Common** or **All** metadata inventory |
 | `<leader>SP` | n | Search package manifests under `manifest/` and its subdirectories |
@@ -104,7 +101,7 @@ Normal `<leader>Sq` saves the whole `.soql` buffer before execution. Visual `<le
 
 ## Metadata browser (`<leader>Su`)
 
-Inventory is project-local under `sf_cache/`. `SF` and `So` automatically refresh the same configured common types as `SM`; `SU` lets you choose **Common** or **All enabled types**. The All path can take several minutes and also traverses Report, Dashboard, Document, and EmailTemplate folders.
+Inventory is project-local under `sf_cache/`. `SF` refreshes configured common types after fetching orgs; `So` changes only the local target. Use `SU` for manual inventory updates: choose **Common** or **All enabled types**. The old `SM` mapping was removed because it performed the same Common refresh. The legacy `SK`/`Sk` type-catalog pair is also removed; **All** refreshes that catalog internally before scanning members. The All path can take several minutes and also traverses Report, Dashboard, Document, and EmailTemplate folders.
 
 The browser uses three panes: focused-item audit details across the upper-left, searchable results below, and live selected-item summaries on the right. Member details include creator/date, modifier/date, metadata ID, file, namespace, and manageable state; category details show descriptor/cache fields. A selected category appears once in the right pane as `Type — all N cached members` with a distinct color rather than listing every child.
 
@@ -149,7 +146,7 @@ Both actions run in SFTerm. Toggle the float with `<leader>Se`; cancel with `Esc
 ## Notes
 
 - **Project isolation:** sf.nvim, fzf-lua, query schema modules, and the global `vim.system` token workaround load only after a current buffer/cwd resolves to `sfdx-project.json` or `.forceignore`. Ordinary HTML/JS/TS/SOQL projects keep lightweight guarded mappings only. Once sf.nvim has been used in a Neovim process it remains loaded, but mappings, SOQL completion, and statusline output continue to re-check the active project root.
-- **Org flow:** `<leader>SF` refreshes orgs and common metadata for the CLI-default target. `<leader>So` selects a local target and then refreshes common metadata. `<leader>SO` changes only the global target.
+- **Org flow:** `<leader>SF` refreshes orgs and common metadata for the CLI-default target. `<leader>So` and `<leader>SO` change only the local/global target; run `<leader>SU` when you want to refresh inventory afterward.
 - **SFTerm** (float after deploy/retrieve/metadata): stays open so you can read output. `<leader>Se` toggles it; focused `q` also hides it. `Esc` is a cancel key, not a visibility toggle.
 - **Cancel:** `Esc` and `<leader>Sx` send Ctrl-C to running SFTerm channels and stop background inventory processes without requiring `<C-w>w`, whether the float is focused, unfocused, hidden, or absent. With nothing running, normal-mode `Esc` still clears search highlighting. Focused terminal-mode `<C-c>` remains native. Cancellation is best-effort after Salesforce has accepted a server-side deploy job.
 - **fzf-lua** is installed for metadata pickers only; everyday file search remains **Telescope** (`<leader>sf` / `sg`). Needs host **`fzf`** (`brew install fzf` · `sudo pacman -S fzf`) — see [TOOLS.md](../TOOLS.md).

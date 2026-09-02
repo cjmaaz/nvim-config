@@ -1,6 +1,6 @@
 --------------------------------------------------------------------------------
 -- Salesforce metadata inventory — callback-safe org flow + project sf_cache
--- Reuses sf.nvim's legacy <Type>_<org>.json files so SM/Sm and this browser agree.
+-- Reuses sf.nvim's legacy <Type>_<org>.json files so its lists and browser agree.
 -- Browser-only indexes/manifests live below sf_cache/metadata-browser/.
 --------------------------------------------------------------------------------
 
@@ -188,7 +188,7 @@ local function read_index(ctx)
     index.identity = ctx.identity
   end
 
-  -- Hydrate an index from sf.nvim's legacy cache so existing SM/SK data is usable.
+  -- Hydrate an index from sf.nvim's legacy cache so cached type/member data is usable.
   local seen = {}
   for _, descriptor in ipairs(index.types or {}) do
     if descriptor.xmlName then
@@ -641,11 +641,9 @@ local function set_org(choice, global, callback)
   end)
 end
 
-function M.select_target_and_refresh_common()
+function M.select_target()
   choose_org("Local target org:", function(choice)
-    set_org(choice, false, function()
-      M.refresh_common()
-    end)
+    set_org(choice, false)
   end)
 end
 
