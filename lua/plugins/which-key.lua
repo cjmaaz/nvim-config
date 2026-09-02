@@ -262,6 +262,8 @@ return {
           ------------------------------------------------ Explorer / sessions
           { pattern = "toggle file explorer", icon = "󰙅", color = "azure" },
           { pattern = "reveal current file in explorer", icon = "󰈙", color = "azure" },
+          { pattern = "yazi: current file", icon = "󰈙", color = "green" },
+          { pattern = "yazi: working directory", icon = "", color = "green" },
           { pattern = "session restore %(cwd%)", icon = "󰦛", color = "purple" },
           { pattern = "session restore %(last%)", icon = "󰋚", color = "purple" },
           { pattern = "session select", icon = "󰒓", color = "cyan" },

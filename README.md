@@ -74,6 +74,7 @@ nvim-config/
         ├── bufferline.lua # matching buffer bar (not tabpages)
         ├── cursor.lua     # calm smear animation across buffers/windows
         ├── explorer.lua  # filesystem-only neo-tree
+        ├── yazi.lua      # optional executable-gated terminal file manager
         ├── markdown.lua  # rendered Markdown + side preview
         ├── telescope.lua # fuzzy find / grep / buffers
         ├── treesitter.lua # parsers, highlight, folds, autotag

@@ -1,4 +1,4 @@
-# Explorer (neo-tree)
+# File managers (Neo-tree + optional Yazi)
 
 Defined in `lua/plugins/explorer.lua`. Neo-tree is now a filesystem-only sidebar (not netrw / oil) with auto-expanding width for long names. Buffer selection stays on `<leader><leader>` and Git browsing stays in LazyGit; filesystem Git badges remain enabled. Press `?` inside the tree for neo-tree’s own help. Shared neutral Catppuccin chrome matches bufferline, lualine, which-key, and Telescope.
 
@@ -16,6 +16,19 @@ Nav: [index](./README.md) · [core](./core.md) · [git](./git.md) · [telescope]
 `<leader>` is **Space**, so e.g. `Space` then `f` then `e`. which-key shows groups **File/Find** (`f`) and **Git** (`g`) — [which-key.md](./which-key.md).
 
 Fuzzy find without the tree: [telescope.md](./telescope.md) (`<leader>sf`).
+
+## Optional Yazi file manager
+
+`lua/plugins/yazi.lua` adds a transient floating file manager only when the host `yazi` executable exists at startup. Neo-tree remains the persistent sidebar, keeps directory-opening ownership, and is the fallback when Yazi is absent.
+
+| Key | Mode | Action |
+| --- | --- | --- |
+| `<leader>fy` | n, v | Open Yazi at the current file or visually selected path |
+| `<leader>fY` | n | Open Yazi at Neovim’s current working directory |
+
+Inside Yazi, `<F1>` shows integration help; `<C-v>` / `<C-x>` / `<C-t>` open in vertical split / horizontal split / tabpage, `<C-s>` greps through Telescope, `<Tab>` cycles open buffers, and `<C-q>` sends selections to quickfix. Replacement (`<C-g>`) is disabled because grug-far is not installed, Yazi’s `<C-\>` cwd action is disabled so Neovim’s terminal escape prefix remains available, and dependency-specific `<C-y>`/`<C-o>` actions stay off until grealpath/snacks.picker are added.
+
+The integration does not hijack directory buffers or change Neovim’s cwd on close. After installing Yazi, restart Neovim and run `:checkhealth yazi`.
 
 ---
 

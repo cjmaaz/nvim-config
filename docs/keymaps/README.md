@@ -17,7 +17,7 @@ Only maps we actually set are listed. Built-in Vim/Neovim keys (`hjkl`, `:w`, `g
 | Leaders | [below](#leaders) |
 | Buffers, windows, motion, diagnostics | [core.md](./core.md) |
 | Git (gitsigns) | [git.md](./git.md) |
-| Explorer (neo-tree) | [explorer.md](./explorer.md) |
+| File managers (Neo-tree / optional Yazi) | [explorer.md](./explorer.md) |
 | Project scaffolding and tasks | [project.md](./project.md) |
 | Markdown rendering | [markdown.md](./markdown.md) |
 | Telescope | [telescope.md](./telescope.md) |
@@ -48,7 +48,7 @@ Defined in `init.lua`.
 | --- | --- |
 | Statusline (lualine) | 40%-lightened palette, darker Visual mode, SF/LSP/language + non-UTF-8 encoding |
 | Bufferline | Filetype icon + filename only; dirty state moved to footer — [core.md](./core.md) |
-| neo-tree | Filesystem only: `<leader>fe` · `<leader>fE` — [explorer.md](./explorer.md) |
+| File managers | Neo-tree `<leader>fe`/`fE`; optional Yazi `<leader>fy`/`fY` when installed — [explorer.md](./explorer.md) |
 | Project workflows | `<leader>pn` scaffold · `<leader>pr` run/build/test — [project.md](./project.md) |
 | Markdown | `<leader>mr` inline render · `<leader>mp` side preview — [markdown.md](./markdown.md) |
 | Lazygit | `<leader>gg` · `<leader>gf` — [git.md](./git.md) |

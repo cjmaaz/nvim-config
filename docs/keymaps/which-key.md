@@ -21,7 +21,7 @@ Nav: [index](./README.md) · [core](./core.md) · [git](./git.md) · [explorer](
 | --- | --- | --- | --- |
 | `<leader>b` | Buffer | `lua/config/keymaps.lua` (`bd`, …) | [core.md](./core.md) |
 | `<leader>h` | Git hunk | `lua/plugins/git.lua` `on_attach` | [git.md](./git.md) |
-| `<leader>f` | File/Find | `lua/plugins/explorer.lua` (`fe`, `fE`) | [explorer.md](./explorer.md) |
+| `<leader>f` | File/Find | Neo-tree `fe`/`fE`; optional Yazi `fy`/`fY` | [explorer.md](./explorer.md) |
 | `<leader>g` | Git | `lazygit.lua` (`gg`, `gf`) | [git.md](./git.md) |
 | `<leader>m` | Markdown | `markdown.lua` (`mr`, `mp`) | [markdown.md](./markdown.md) |
 | `<leader>d` | Delete (black hole) | `keymaps.lua` (`d`, `D`); `x` also black-hole | [core.md](./core.md) |

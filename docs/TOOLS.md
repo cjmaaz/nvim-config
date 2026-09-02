@@ -127,11 +127,14 @@ Without `tree-sitter` + a C compiler, `:TSUpdate` / parser install will fail.
 | --- | --- | --- | --- |
 | **Commitizen** (`cz`) | Interactive conventional commits | [COMMITIZEN.md](./COMMITIZEN.md) | `npm i -g commitizen` (same on both; see that doc) |
 | **lazygit** | Full-screen Git TUI (`<leader>gg` / `gf`) | `lazygit --version` | `brew install lazygit` · `sudo pacman -S lazygit` · [upstream](https://github.com/jesseduffield/lazygit) |
+| **Yazi** 26.8.15+ | Optional floating file manager (`<leader>fy` / `fY`); Neo-tree remains fallback | `yazi --version` · `:checkhealth yazi` | `brew install yazi` · `sudo pacman -S yazi` · [official installation](https://yazi-rs.github.io/docs/installation) |
 | **Java (JDK)** | `apex_ls` / `jdtls` on the JVM | `java -version` | `brew install openjdk` · `sudo pacman -S jdk-openjdk` |
 | **Node.js** | Some Mason LSPs / prettierd / optional `sf` install path | `node --version` | `brew install node` · `sudo pacman -S nodejs npm` |
 | **Salesforce CLI (`sf`)** | `sf.nvim` org/deploy/test/metadata | `sf --version` | [CLI setup](https://developer.salesforce.com/tools/salesforcecli) (npm / installer; not a brew/pacman first-class package on all hosts) |
 | **Vlocity Build Tool** | Managed-package DataPack retrieval (`<leader>SV`) | `vlocity --version` | Node 18+ · `npm install --global vlocity` |
 | **universal-ctags** | Optional Apex jump enhancement (`<leader>Sc`) | `ctags --version` | `brew install universal-ctags` · `sudo pacman -S ctags` |
+
+Yazi works with only its binary. Its official guide recommends optional preview/search helpers such as `ffmpeg`, `7zip`/`sevenzip`, `jq`, `poppler`, `fd`, `rg`, `fzf`, `zoxide`, `resvg`, and ImageMagick.
 
 ---
 
@@ -171,6 +174,7 @@ For an isolated `cmake-init` install, install `pipx` first with `brew install pi
 | `lua/plugins/rainbow.lua` | treesitter parsers for the language |
 | `lua/plugins/colorizer.lua` | (none) |
 | `lua/plugins/explorer.lua` | Nerd Font icons (optional) |
+| `lua/plugins/yazi.lua` | host `yazi` 26.8.15+; optional preview helpers above; Telescope for directory grep |
 | `lua/plugins/markdown.lua` | no external runtime; existing Treesitter Markdown parsers |
 | `lua/plugins/telescope.lua` | `rg`, `fd`; optional `make` for fzf-native |
 | `lua/plugins/treesitter.lua` | Neovim 0.12+, `tree-sitter` CLI 0.26.1+, C compiler |
