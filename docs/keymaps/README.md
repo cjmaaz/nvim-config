@@ -15,13 +15,13 @@ Only maps we actually set are listed. Built-in Vim/Neovim keys (`hjkl`, `:w`, `g
 | Topic | File |
 | --- | --- |
 | Leaders | [below](#leaders) |
-| Buffers, windows, motion, diagnostics | [core.md](./core.md) |
+| Buffers, bulk cleanup, windows, motion, diagnostics | [core.md](./core.md) |
 | Git (gitsigns) | [git.md](./git.md) |
 | File managers (Neo-tree / optional Yazi) | [explorer.md](./explorer.md) |
 | Project scaffolding and tasks | [project.md](./project.md) |
 | Markdown rendering | [markdown.md](./markdown.md) |
-| Telescope | [telescope.md](./telescope.md) |
-| Treesitter / indent / autopairs | [treesitter.md](./treesitter.md) |
+| Telescope / project search and replace | [telescope.md](./telescope.md) |
+| Treesitter text objects / indent / autopairs | [treesitter.md](./treesitter.md) |
 | LSP / completion / formatting / lint | [lsp.md](./lsp.md) |
 | Salesforce (sf.nvim) | [salesforce.md](./salesforce.md) |
 | Comment / TODO / window context | [comment.md](./comment.md) |
@@ -48,14 +48,14 @@ Defined in `init.lua`.
 | --- | --- |
 | Statusline (lualine) | 40%-lightened palette, darker Visual mode, SF/language icon + non-UTF-8 encoding |
 | Bufferline | Filetype icon + filename only; dirty state moved to footer — [core.md](./core.md) |
-| File managers | Neo-tree `<leader>fe`/`fE`; optional Yazi `<leader>fy`/`fY` when installed — [explorer.md](./explorer.md) |
+| File managers | Neo-tree `<leader>fe`/`fE`; optional Yazi `<leader>fy`/`fY`/`fr` when installed — [explorer.md](./explorer.md) |
 | Project workflows | `<leader>pn` scaffold · `<leader>pr` run/build/test — [project.md](./project.md) |
 | Markdown | `<leader>mr` inline render · `<leader>mp` side preview — [markdown.md](./markdown.md) |
 | Lazygit | `<leader>gg` · `<leader>gf` — [git.md](./git.md) |
-| Telescope | Rounded prompt/results/preview grid with icons; `<leader>sf` · `<leader>sg` · `<leader><leader>` — [telescope.md](./telescope.md) |
+| Search | Telescope `<leader>sf`/`sg`; multi-grep `sm`; Grug Far replace `sR` — [telescope.md](./telescope.md) |
 | Floating windows | Retained rounded charcoal/pastel frame; plugin-specific windows may override it |
 | Diagnostics | `]d`/`[d` · `<leader>e` · `<leader>td` inline toggle · Trouble `<leader>xx` — [core.md](./core.md#diagnostics) · [qol.md](./qol.md) · [diagnostics/](../diagnostics/README.md) |
-| Treesitter / indent / pairs | Highlight, folds, guides, autopairs — [treesitter.md](./treesitter.md) |
+| Treesitter / indent / pairs | Highlight, folds, structural objects, detected indentation, guides, autopairs — [treesitter.md](./treesitter.md) |
 | LSP / format / blink | `gd`/`K`/`gr` · `<leader>cf` · `<C-y>` — [lsp.md](./lsp.md) |
 | Lint (nvim-lint) | `<leader>cl` · `<leader>tl` toggle auto · lazy Mason — [lsp.md](./lsp.md#linting-luapluginslintinglua) |
 | Salesforce | `<leader>S…` · Vlocity `SV` · SOQL `SQ`/`Sq` · metadata `Su` · cancel `Sx` — [salesforce.md](./salesforce.md) |

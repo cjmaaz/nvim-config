@@ -25,10 +25,11 @@ Fuzzy find without the tree: [telescope.md](./telescope.md) (`<leader>sf`).
 | --- | --- | --- |
 | `<leader>fy` | n, v | Open Yazi at the current file or visually selected path |
 | `<leader>fY` | n | Open Yazi at Neovim’s current working directory |
+| `<leader>fr` | n | Resume/toggle the last Yazi session |
 
-Inside Yazi, `<F1>` shows integration help; `<C-v>` / `<C-x>` / `<C-t>` open in vertical split / horizontal split / tabpage, `<C-s>` greps through Telescope, `<Tab>` cycles open buffers, and `<C-q>` sends selections to quickfix. Replacement (`<C-g>`) is disabled because grug-far is not installed, Yazi’s `<C-\>` cwd action is disabled so Neovim’s terminal escape prefix remains available, and dependency-specific `<C-y>`/`<C-o>` actions stay off until grealpath/snacks.picker are added.
+Inside Yazi, `<F1>` shows integration help; `<C-v>` / `<C-x>` / `<C-t>` open in vertical split / horizontal split / tabpage, `<C-s>` greps through Telescope, `<C-g>` sends the current directory or selected paths to Grug Far, `<Tab>` cycles open buffers, and `<C-q>` sends selections to quickfix. Yazi’s `<C-\>` cwd action is disabled so Neovim’s terminal escape prefix remains available, and dependency-specific `<C-y>`/`<C-o>` actions stay off until grealpath/snacks.picker are added.
 
-The integration does not hijack directory buffers or change Neovim’s cwd on close. After installing Yazi, restart Neovim and run `:checkhealth yazi`.
+The integration does not hijack directory buffers or change Neovim’s cwd on close. It refuses to open from the command-line window (`q:` / `q/`); close that window first. If terminal input ever feels stuck, press `<Esc><Esc>` to enter Normal mode in the Yazi buffer, then `q` to ask Yazi to quit cleanly. After installing Yazi, restart Neovim and run `:checkhealth yazi`.
 
 ---
 

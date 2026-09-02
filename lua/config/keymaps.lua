@@ -36,6 +36,52 @@ map("n", "<leader>bd", "<cmd>bdelete<CR>", { desc = "Delete buffer" })
 -- map("n", "<leader>bd", "<cmd>bdelete!<CR>", { desc = "Delete buffer (force)" }) -- discards unsaved
 -- map("n", "<leader>c", "<cmd>bdelete<CR>", { desc = "Delete buffer" }) -- LazyVim-ish letter
 
+local function delete_file_buffers(scope)
+  local current = vim.api.nvim_get_current_buf()
+  local visible = {}
+  for _, tabpage in ipairs(vim.api.nvim_list_tabpages()) do
+    for _, win in ipairs(vim.api.nvim_tabpage_list_wins(tabpage)) do
+      visible[vim.api.nvim_win_get_buf(win)] = true
+    end
+  end
+
+  local deleted, modified, failed = 0, 0, 0
+  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+    local is_file = vim.api.nvim_buf_is_valid(buf)
+      and vim.bo[buf].buflisted
+      and vim.bo[buf].buftype == ""
+      and vim.api.nvim_buf_get_name(buf) ~= ""
+    local selected = scope == "others" or not visible[buf]
+
+    if buf ~= current and is_file and selected then
+      if vim.bo[buf].modified then
+        modified = modified + 1
+      elseif pcall(vim.api.nvim_buf_delete, buf, {}) then
+        deleted = deleted + 1
+      else
+        failed = failed + 1
+      end
+    end
+  end
+
+  local message = string.format("Deleted %d %s buffer(s)", deleted, scope)
+  if modified > 0 then
+    message = message .. string.format("; kept %d modified", modified)
+  end
+  if failed > 0 then
+    message = message .. string.format("; %d could not close", failed)
+  end
+  vim.notify(message, failed > 0 and vim.log.levels.WARN or vim.log.levels.INFO, { title = "Buffers" })
+end
+
+-- Close saved file buffers while preserving edits, terminals, and special UI.
+map("n", "<leader>bo", function()
+  delete_file_buffers("others")
+end, { desc = "Delete other buffers" })
+map("n", "<leader>bi", function()
+  delete_file_buffers("hidden")
+end, { desc = "Delete hidden buffers" })
+
 -- Optional: wipe vs delete (wipe drops marks/options harder — usually skip for now)
 -- map("n", "<leader>bw", "<cmd>bwipeout<CR>", { desc = "Wipe buffer" })
 

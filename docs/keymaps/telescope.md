@@ -37,6 +37,7 @@ Nav: [index](./README.md) · [core](./core.md) · [git](./git.md) · [explorer](
 | `<leader>sd` | n | Search **diagnostics** (useful once LSP is on; empty before that) |
 | `<leader>st` | n | Search **TODO / FIXME** comments (todo-comments) |
 | `<leader>sr` | n | **Resume** the last Telescope picker |
+| `<leader>sR` | n, x | Project-wide **search and replace** (Grug Far); visual selection pre-fills search |
 | `<leader>sn` | n | Find files under your **Neovim config** dir (`stdpath("config")`) |
 | `<leader>sp` | n | Find files under **lazy.nvim plugin packages** (`stdpath("data")/lazy`) |
 
@@ -62,6 +63,14 @@ You start in **insert** mode in the prompt (type to filter).
 | `?` | n | Show Telescope help for mappings (when in normal mode in the picker) |
 
 Tip: `<leader>sr` reopens whatever you just closed — handy after a mis-click.
+
+---
+
+## Search and replace (`<leader>sR`)
+
+Telescope and multi-grep locate matches; `grug-far.nvim` owns reviewable replacements. Open it in Normal mode for an empty project-wide workspace, or select text first to pre-fill the search. Enter a replacement to preview diffs, then use the actions shown in Grug Far’s header to replace selected/all matches. The workspace is transient, so closing its window does not leave another buffer in bufferline.
+
+From optional Yazi, `<C-g>` opens the same workflow scoped to the current directory or selected paths. Direct commands: `:GrugFar` and `:GrugFarWithin`. Requires ripgrep 14+; run `:checkhealth grug-far` if needed.
 
 ---
 

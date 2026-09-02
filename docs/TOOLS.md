@@ -101,11 +101,11 @@ iTerm2 and Konsole cannot assign a different family only for italic ASCII text, 
 
 ---
 
-## Strongly recommended (Telescope / Treesitter / Salesforce pickers)
+## Strongly recommended (search / Treesitter / Salesforce pickers)
 
 | Tool | Why | Check | Install |
 | --- | --- | --- | --- |
-| **ripgrep** (`rg`) | Telescope live grep (`<leader>sg`, `<leader>sw`) | `rg --version` | `brew install ripgrep` · `sudo pacman -S ripgrep` |
+| **ripgrep** (`rg`) 14+ | Telescope live grep and Grug Far search/replace (`<leader>sR`); 15+ recommended | `rg --version` | `brew install ripgrep` · `sudo pacman -S ripgrep` |
 | **fd** | Telescope find files (`<leader>sf`) when available | `fd --version` | `brew install fd` · `sudo pacman -S fd` |
 | **fzf** | **fzf-lua** binary (sf.nvim metadata lists `<leader>Sm` / `Sk`) | `fzf --version` | `brew install fzf` · `sudo pacman -S fzf` |
 | **make** | Builds `telescope-fzf-native` (faster sorter); optional | `make --version` | Xcode CLT / `brew install make` · `sudo pacman -S make` (or `base-devel`) |
@@ -127,7 +127,8 @@ Without `tree-sitter` + a C compiler, `:TSUpdate` / parser install will fail.
 | --- | --- | --- | --- |
 | **Commitizen** (`cz`) | Interactive conventional commits | [COMMITIZEN.md](./COMMITIZEN.md) | `npm i -g commitizen` (same on both; see that doc) |
 | **lazygit** | Full-screen Git TUI (`<leader>gg` / `gf`) | `lazygit --version` | `brew install lazygit` · `sudo pacman -S lazygit` · [upstream](https://github.com/jesseduffield/lazygit) |
-| **Yazi** 26.8.15+ | Optional floating file manager (`<leader>fy` / `fY`); Neo-tree remains fallback | `yazi --version` · `:checkhealth yazi` | `brew install yazi` · `sudo pacman -S yazi` · [official installation](https://yazi-rs.github.io/docs/installation) |
+| **Yazi** 26.8.15+ | Optional floating file manager (`<leader>fy` / `fY` / `fr`); Neo-tree remains fallback | `yazi --version` · `:checkhealth yazi` | `brew install yazi` · `sudo pacman -S yazi` · [official installation](https://yazi-rs.github.io/docs/installation) |
+| **ast-grep** 0.36+ | Optional structural engine inside Grug Far; ripgrep remains the default | `ast-grep --version` | `brew install ast-grep` · `sudo pacman -S ast-grep` · [official installation](https://ast-grep.github.io/guide/quick-start.html) |
 | **Java (JDK)** | `apex_ls` / `jdtls` on the JVM | `java -version` | `brew install openjdk` · `sudo pacman -S jdk-openjdk` |
 | **Node.js** | Some Mason LSPs / prettierd / optional `sf` install path | `node --version` | `brew install node` · `sudo pacman -S nodejs npm` |
 | **Salesforce CLI (`sf`)** | `sf.nvim` org/deploy/test/metadata | `sf --version` | [CLI setup](https://developer.salesforce.com/tools/salesforcecli) (npm / installer; not a brew/pacman first-class package on all hosts) |
@@ -174,10 +175,12 @@ For an isolated `cmake-init` install, install `pipx` first with `brew install pi
 | `lua/plugins/rainbow.lua` | treesitter parsers for the language |
 | `lua/plugins/colorizer.lua` | (none) |
 | `lua/plugins/explorer.lua` | Nerd Font icons (optional) |
-| `lua/plugins/yazi.lua` | host `yazi` 26.8.15+; optional preview helpers above; Telescope for directory grep |
+| `lua/plugins/yazi.lua` | host `yazi` 26.8.15+; optional preview helpers above; Telescope for directory grep; Grug Far for `<C-g>` replace |
 | `lua/plugins/markdown.lua` | no external runtime; existing Treesitter Markdown parsers |
 | `lua/plugins/telescope.lua` | `rg`, `fd`; optional `make` for fzf-native |
-| `lua/plugins/treesitter.lua` | Neovim 0.12+, `tree-sitter` CLI 0.26.1+, C compiler |
+| `lua/plugins/grug-far.lua` | `rg` 14+ (15+ recommended); optional `ast-grep` 0.36+ |
+| `lua/plugins/guess-indent.lua` | (none; built-in EditorConfig remains authoritative) |
+| `lua/plugins/treesitter.lua` | Neovim 0.12+, `tree-sitter` CLI 0.26.1+, C compiler; parsers supply structural queries |
 | `lua/plugins/indent.lua` | (none beyond Neovim) |
 | `lua/plugins/autopairs.lua` | Treesitter optional (`check_ts`) |
 | `lua/plugins/lsp.lua` | network (Mason), JDK for Apex; `:Mason` for on-demand servers |

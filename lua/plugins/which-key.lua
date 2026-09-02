@@ -150,6 +150,7 @@ return {
           { pattern = "search commands", icon = "󰘳", color = "cyan" },
           { pattern = "search select telescope", icon = "", color = "cyan" },
           { pattern = "search resume", icon = "󰐊", color = "cyan" },
+          { pattern = "search and replace", icon = "󰛔", color = "orange" },
           { pattern = "find buffers", icon = "󰓩", color = "cyan" },
           { pattern = "search diagnostics", icon = "󱖫", color = "red" },
           { pattern = "search todo", icon = "󱅊", color = "yellow" },
@@ -264,6 +265,7 @@ return {
           { pattern = "reveal current file in explorer", icon = "󰈙", color = "azure" },
           { pattern = "yazi: current file", icon = "󰈙", color = "green" },
           { pattern = "yazi: working directory", icon = "", color = "green" },
+          { pattern = "yazi: resume session", icon = "󰐊", color = "green" },
           { pattern = "session restore %(cwd%)", icon = "󰦛", color = "purple" },
           { pattern = "session restore %(last%)", icon = "󰋚", color = "purple" },
           { pattern = "session select", icon = "󰒓", color = "cyan" },
@@ -308,6 +310,8 @@ return {
           ------------------------------------------------ Delete / black hole
           { pattern = "delete to eol", icon = "󰆴", color = "red" },
           { pattern = "delete char", icon = "󰛌", color = "red" },
+          { pattern = "delete other buffers", icon = "󰅖", color = "red" },
+          { pattern = "delete hidden buffers", icon = "󰅖", color = "red" },
           { pattern = "delete buffer", icon = "󰅖", color = "red" },
           { pattern = "black hole", icon = "󰩹", color = "red" },
           { pattern = "delete", icon = "󰩹", color = "red" },
@@ -335,6 +339,8 @@ return {
 
           -------------------------------------------------------------- Misc
           { pattern = "undotree", icon = "󰕌", color = "purple" },
+          { pattern = "around treesitter", icon = "󰅩", color = "purple" },
+          { pattern = "inside treesitter", icon = "󰅪", color = "purple" },
           { pattern = "toggle word wrap", icon = "󰖶", color = "azure" },
           { pattern = "toggle", icon = "", color = "yellow" },
           { pattern = "format", icon = "", color = "cyan" },

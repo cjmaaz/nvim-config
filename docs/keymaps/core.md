@@ -19,8 +19,12 @@ Nav: [index](./README.md) · [git](./git.md) · [explorer](./explorer.md) · [te
 | `]a` / `[a` | n | Next / previous argument (`:next` / `:previous`) |
 | `]A` / `[A` | n | Last / first argument |
 | `<leader>bd` | n | Delete current buffer (`:bdelete`) |
+| `<leader>bo` | n | Delete other saved file buffers |
+| `<leader>bi` | n | Delete hidden saved file buffers |
 
 `[B` / `]B` follows LazyVim’s bufferline-reorder convention and is discoverable through `<leader>sk` by searching “Move buffer.” The previous first/last-buffer behavior and `<A-h>` / `<A-l>` reorder alternatives remain commented in config.
+
+Bulk cleanup preserves the current buffer, every modified buffer, terminals, plugin/special buffers, and unlisted scratch buffers. “Hidden” means not displayed in any window on any tabpage; “other” can replace files shown in other windows while preserving the window layout.
 
 Other commented alternates: force delete (`bdelete!`), `<leader>c` as buffer-delete, wipeout.
 

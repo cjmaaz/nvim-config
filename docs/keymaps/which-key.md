@@ -19,13 +19,13 @@ Nav: [index](./README.md) · [core](./core.md) · [git](./git.md) · [explorer](
 
 | Group prefix | Label in popup | Maps live in | Doc |
 | --- | --- | --- | --- |
-| `<leader>b` | Buffer | `lua/config/keymaps.lua` (`bd`, …) | [core.md](./core.md) |
+| `<leader>b` | Buffer | `lua/config/keymaps.lua` (`bd`, `bo`, `bi`) | [core.md](./core.md) |
 | `<leader>h` | Git hunk | `lua/plugins/git.lua` `on_attach` | [git.md](./git.md) |
-| `<leader>f` | File/Find | Neo-tree `fe`/`fE`; optional Yazi `fy`/`fY` | [explorer.md](./explorer.md) |
+| `<leader>f` | File/Find | Neo-tree `fe`/`fE`; optional Yazi `fy`/`fY`/`fr` | [explorer.md](./explorer.md) |
 | `<leader>g` | Git | `lazygit.lua` (`gg`, `gf`) | [git.md](./git.md) |
 | `<leader>m` | Markdown | `markdown.lua` (`mr`, `mp`) | [markdown.md](./markdown.md) |
 | `<leader>d` | Delete (black hole) | `keymaps.lua` (`d`, `D`); `x` also black-hole | [core.md](./core.md) |
-| `<leader>s` | Search | `telescope.lua` (`sf`, `sg`, `sm` multi-grep, `sp` packages, …); `todo-comments` (`st`) | [telescope.md](./telescope.md) · [comment.md](./comment.md) |
+| `<leader>s` | Search | `telescope.lua` (`sf`, `sg`, `sm`, lowercase `sr` resume); Grug Far uppercase `sR`; TODO `st` | [telescope.md](./telescope.md) · [comment.md](./comment.md) |
 | `<leader>S` | Salesforce | `lua/plugins/salesforce.lua` (`Sp`, `Sx`, …) | [salesforce.md](./salesforce.md) |
 | `<leader>c` | Code | `formatting.lua` (`cf`); `linting.lua` (`cl`); LSP `ca` | [lsp.md](./lsp.md) |
 | `<leader>p` | Project | `project_scaffold.lua` (`pn`); `project_runner.lua` (`pr`) | [project.md](./project.md) |

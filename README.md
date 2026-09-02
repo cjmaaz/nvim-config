@@ -77,7 +77,9 @@ nvim-config/
         ├── yazi.lua      # optional executable-gated terminal file manager
         ├── markdown.lua  # rendered Markdown + side preview
         ├── telescope.lua # fuzzy find / grep / buffers
-        ├── treesitter.lua # parsers, highlight, folds, autotag
+        ├── grug-far.lua  # reviewable project-wide search and replace
+        ├── guess-indent.lua # EditorConfig-aware indent detection
+        ├── treesitter.lua # parsers, highlight, folds, text objects, autotag
         ├── indent.lua    # indent-blankline (ibl) guides
         ├── autopairs.lua # auto (), {}, quotes
         ├── lsp.lua       # Mason + language servers (lua always; others on demand)
@@ -97,4 +99,4 @@ nvim-config/
 1. Install host tools from [docs/TOOLS.md](docs/TOOLS.md) (Neovim **0.12+**, Git, a Nerd Font, **`rg` + `fd`**, **tree-sitter CLI** + C compiler; **JDK** if you edit Apex; **`sf` CLI** for Salesforce projects).
 2. Point Neovim at this config (symlink, `NVIM_APPNAME`, or clone as your `~/.config/nvim`).
 3. Open Neovim once — lazy.nvim bootstraps and installs plugins from `lazy-lock.json` (Treesitter/Mason may download on first use).
-4. Skim [docs/keymaps/](docs/keymaps/README.md) — `<leader>sf` / project `<leader>pn`/`pr` / `<leader>cf` / `gd` / neo-tree `<leader>fe` / Salesforce `<leader>S`.
+4. Skim [docs/keymaps/](docs/keymaps/README.md) — find `<leader>sf` / replace `<leader>sR` / project `<leader>pn`/`pr` / `<leader>cf` / `gd` / neo-tree `<leader>fe` / Salesforce `<leader>S`.

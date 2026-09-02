@@ -111,6 +111,48 @@ return {
     end,
   },
   {
+    "nvim-treesitter/nvim-treesitter-textobjects",
+    branch = "main", -- direct API compatible with nvim-treesitter main
+    event = "VeryLazy", -- queries and maps are needed only after the editor settles
+    -- lazy = false, -- make structural text objects available during startup
+    dependencies = { "nvim-treesitter/nvim-treesitter" },
+    opts = {
+      select = {
+        -- Let an operator find the next matching object after the cursor.
+        lookahead = true,
+        -- lookahead = false, -- select only an object already under the cursor
+
+        -- Whole function/class operations should behave like line objects.
+        selection_modes = {
+          ["@function.outer"] = "V",
+          ["@class.outer"] = "V",
+          ["@parameter.outer"] = "v",
+        },
+
+        -- Keep surrounding blank space out of selections.
+        include_surrounding_whitespace = false,
+        -- include_surrounding_whitespace = true, -- consume adjacent whitespace like `ap`
+      },
+    },
+    config = function(_, opts)
+      require("nvim-treesitter-textobjects").setup(opts)
+      local select = require("nvim-treesitter-textobjects.select")
+
+      local function textobject(lhs, query, desc)
+        vim.keymap.set({ "x", "o" }, lhs, function()
+          select.select_textobject(query, "textobjects")
+        end, { desc = desc })
+      end
+
+      textobject("af", "@function.outer", "Around Treesitter function")
+      textobject("if", "@function.inner", "Inside Treesitter function")
+      textobject("ac", "@class.outer", "Around Treesitter class")
+      textobject("ic", "@class.inner", "Inside Treesitter class")
+      textobject("aa", "@parameter.outer", "Around Treesitter argument")
+      textobject("ia", "@parameter.inner", "Inside Treesitter argument")
+    end,
+  },
+  {
     "windwp/nvim-ts-autotag", -- auto close/rename HTML / JSX / TSX tags
     event = { "BufReadPost", "BufNewFile" }, -- load when editing a buffer
     opts = {
