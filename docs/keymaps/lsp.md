@@ -42,6 +42,8 @@ which-key: **Code** (`<leader>c`) / **Toggle** (`<leader>t`) — [which-key.md](
 
 blink.cmp + LuaSnip. **Accept with `<C-y>`** (Kickstart / `:help ins-completion`). Tab/S-Tab/Enter accept is commented in the plugin file if you prefer CodeOSS-style.
 
+Blink and LuaSnip load on the first `InsertEnter`. LSP clients receive the same locked Blink completion capabilities from `lsp.lua` beforehand, so deferring the UI/snippet modules does not remove server snippets or completion edits.
+
 | Key (insert, menu open) | Action |
 | --- | --- |
 | `<C-n>` / `<C-p>` | Next / previous item |

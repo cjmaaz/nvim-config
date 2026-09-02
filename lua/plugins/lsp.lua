@@ -6,6 +6,48 @@
 -- Alts: ensure_installed everything (CodeOSS) · Kickstart grn/gra-only maps.
 --------------------------------------------------------------------------------
 
+-- Advertise Blink's completion features without loading its UI/snippet stack.
+-- Keep this aligned with blink.cmp's locked get_lsp_capabilities() result.
+local function completion_capabilities()
+  return vim.tbl_deep_extend("force", vim.lsp.protocol.make_client_capabilities(), {
+    textDocument = {
+      completion = {
+        completionItem = {
+          snippetSupport = true,
+          commitCharactersSupport = false,
+          documentationFormat = { "markdown", "plaintext" },
+          deprecatedSupport = true,
+          preselectSupport = false,
+          tagSupport = { valueSet = { 1 } },
+          insertReplaceSupport = true,
+          resolveSupport = {
+            properties = {
+              "documentation",
+              "detail",
+              "additionalTextEdits",
+              "command",
+              "data",
+            },
+          },
+          insertTextModeSupport = { valueSet = { 1 } },
+          labelDetailsSupport = true,
+        },
+        completionList = {
+          itemDefaults = {
+            "commitCharacters",
+            "editRange",
+            "insertTextFormat",
+            "insertTextMode",
+            "data",
+          },
+        },
+        contextSupport = true,
+        insertTextMode = 1,
+      },
+    },
+  })
+end
+
 return {
   {
     "folke/lazydev.nvim", -- Lua LSP extras for Neovim APIs (vim.*, plugins)
@@ -26,13 +68,13 @@ return {
       { "mason-org/mason.nvim", opts = {} }, -- UI + install binaries (:Mason)
       "mason-org/mason-lspconfig.nvim", -- maps Mason pkgs ↔ lspconfig names
       "WhoIsSethDaniel/mason-tool-installer.nvim", -- ensure_installed at startup
-      "saghen/blink.cmp", -- completion capabilities for LSP
+      -- "saghen/blink.cmp", -- simpler, but forces Blink + LuaSnip before InsertEnter
       "b0o/SchemaStore.nvim", -- JSON/YAML schemas for jsonls / yamlls
       { "j-hui/fidget.nvim", opts = {} }, -- LSP progress in the corner
       -- { "folke/neodev.nvim", … }, -- older; prefer lazydev above
     },
     config = function()
-      local capabilities = require("blink.cmp").get_lsp_capabilities() -- tell servers about blink
+      local capabilities = completion_capabilities() -- tell servers about Blink without loading it
       -- local capabilities = vim.lsp.protocol.make_client_capabilities() -- stock, no blink
       local schemastore = require("schemastore")
 

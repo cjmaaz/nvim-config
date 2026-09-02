@@ -10,6 +10,8 @@ Config also shims `telescope.utils.if_nil` when missing (Nvim 0.12 + Telescope m
 
 Panel chrome uses Catppuccin Mocha accents over the neutral charcoal palette in `lua/config/ui_chrome.lua`: subtle borders, a raised active row, and pastel accents matching the bars, which-key, and neo-tree. Normal pickers use a responsive 90% × 85% horizontal grid with separately rounded prompt/results/preview boxes, the prompt at the bottom, and the selected file or symbol in the preview title. File rows and picker markers use Nerd Font icons when available, with plain-text fallbacks.
 
+Telescope initializes on `VeryLazy`: the first screen renders before its picker stack, while mappings, `vim.ui.select`, fzf-native, and ui-select remain ready before normal interaction.
+
 **Ignore globs** (extra noise beyond `.gitignore`): `node_modules/`, `.git/`, `.sfdx/`, `.sf/`, `target/`, `dist/`, `build/`, `*.class`/`*.jar`, lockfiles, `*.min.js`/`*.min.css` — see `file_ignore_patterns` in `telescope.lua`.
 
 Nav: [index](./README.md) · [core](./core.md) · [git](./git.md) · [explorer](./explorer.md) · [treesitter](./treesitter.md) · [lsp](./lsp.md) · [qol](./qol.md) · [which-key](./which-key.md)

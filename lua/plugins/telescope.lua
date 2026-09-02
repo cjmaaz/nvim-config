@@ -10,8 +10,8 @@
 return {
   {
     "nvim-telescope/telescope.nvim",
-    event = "VimEnter", -- Kickstart/CodeOSS: available soon after UI
-    -- event = "VeryLazy",
+    event = "VeryLazy", -- preserve eager availability, but render the first screen first
+    -- event = "VimEnter", -- preload pickers before the first screen (slower startup)
     -- branch = "0.1.x", -- frozen; breaks preview highlight with treesitter `main` (ft_to_lang nil)
     branch = "master", -- works with nvim-treesitter main + Nvim 0.12
     -- version = "*", -- alternate: release tags when they catch up
