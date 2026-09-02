@@ -1,6 +1,6 @@
 # File managers (Neo-tree + optional Yazi)
 
-Defined in `lua/plugins/explorer.lua`. Neo-tree is now a filesystem-only sidebar (not netrw / oil) with auto-expanding width for long names. Buffer selection stays on `<leader><leader>` and Git browsing stays in LazyGit; filesystem Git badges remain enabled. Press `?` inside the tree for neo-tree’s own help. Shared neutral Catppuccin chrome matches bufferline, lualine, which-key, and Telescope.
+Defined in `lua/plugins/explorer.lua`. Neo-tree is now a filesystem-only sidebar (not netrw / oil) with auto-expanding width for long names. Buffer selection stays on `<leader><leader>` and Git browsing stays in LazyGit; filesystem Git badges remain enabled. Neo-tree, bufferline, and the statusline language corner share `nvim-web-devicons`, whose exact file mapping library is broader than mini.icons. Press `?` inside the tree for neo-tree’s own help. Shared neutral Catppuccin chrome matches bufferline, lualine, which-key, and Telescope.
 
 Nav: [index](./README.md) · [core](./core.md) · [git](./git.md) · [telescope](./telescope.md) · [treesitter](./treesitter.md) · [lsp](./lsp.md) · [which-key](./which-key.md)
 

@@ -46,7 +46,7 @@ Defined in `init.lua`.
 
 | Area | How you use it today |
 | --- | --- |
-| Statusline (lualine) | 40%-lightened palette, darker Visual mode, SF/LSP/language + non-UTF-8 encoding |
+| Statusline (lualine) | 40%-lightened palette, darker Visual mode, SF/language icon + non-UTF-8 encoding |
 | Bufferline | Filetype icon + filename only; dirty state moved to footer — [core.md](./core.md) |
 | File managers | Neo-tree `<leader>fe`/`fE`; optional Yazi `<leader>fy`/`fY` when installed — [explorer.md](./explorer.md) |
 | Project workflows | `<leader>pn` scaffold · `<leader>pr` run/build/test — [project.md](./project.md) |

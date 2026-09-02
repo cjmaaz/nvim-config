@@ -53,7 +53,7 @@ local bubble_colors = {
   git = lighten("#008E00", footer_lighten),
   -- Center relative path uses the requested dark Peacock shade.
   path = lighten("#004066", footer_lighten),
-  -- SF/LSP/language reuses the Normal-mode Peacock Blue.
+  -- Salesforce/language info reuses the Normal-mode Peacock Blue.
   info = lighten("#00638B", footer_lighten),
   -- Active mode and final info bubble text stays solid black.
   text = "#000000",
@@ -91,7 +91,6 @@ local status_icons = vim.g.have_nerd_font
       dirty = "●",
       diagnostics = { error = " ", warn = " " },
       salesforce = "󰢎",
-      lsp = "󰒋",
     }
   or {
     mode = "",
@@ -105,7 +104,6 @@ local status_icons = vim.g.have_nerd_font
     dirty = "[+]",
     diagnostics = { error = "E:", warn = "W:" },
     salesforce = "SF:",
-    lsp = "LSP:",
   }
 
 local function with_icon(icon, text)
@@ -180,20 +178,6 @@ local function relative_file_context()
   return statusline_escape(left_truncate(text, math.max(24, math.floor(vim.o.columns * 0.36))))
 end
 
-local function lsp_names()
-  local names, seen = {}, {}
-  for _, client in ipairs(vim.lsp.get_clients({ bufnr = 0 })) do
-    if not seen[client.name] then
-      names[#names + 1] = client.name
-      seen[client.name] = true
-    end
-    if #names == 2 then
-      break
-    end
-  end
-  return table.concat(names, ",")
-end
-
 local function language_info()
   local filetype = vim.bo.filetype
   if filetype == "" then
@@ -201,6 +185,7 @@ local function language_info()
   end
   local icon = ""
   if vim.g.have_nerd_font then
+    -- Same broad icon provider used by Neo-tree and bufferline.
     icon = require("nvim-web-devicons").get_icon_by_filetype(filetype, { default = true }) or ""
   end
   return icon ~= "" and icon or filetype
@@ -261,11 +246,6 @@ local function final_context()
     if sf ~= "" then
       parts[#parts + 1] = sf
     end
-  end
-
-  local clients = lsp_names()
-  if clients ~= "" then
-    parts[#parts + 1] = with_icon(status_icons.lsp, clients)
   end
 
   local language = language_info()
@@ -439,7 +419,7 @@ return {
           },
         },
 
-        -- 8. Salesforce, LSP clients, language icon, and encoding share the final bubble.
+        -- 8. Salesforce, language icon, and non-UTF-8 encoding share the final bubble.
         lualine_z = {
           {
             final_context,
@@ -448,13 +428,12 @@ return {
             cond = function()
               return vim.bo.filetype ~= ""
                 or package.loaded.sf ~= nil
-                or #vim.lsp.get_clients({ bufnr = 0 }) > 0
                 or encoding_info() ~= ""
             end,
             padding = { left = 1, right = 1 },
           },
         },
-        -- lualine_z = { "filetype" }, -- language only, without SF/LSP data
+        -- lualine_z = { "filetype" }, -- language text only, without SF/encoding data
       },
 
       -- Shown in windows that are not current (only matters if globalstatus = false).

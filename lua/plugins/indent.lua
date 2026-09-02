@@ -207,9 +207,10 @@ return {
           -- highlight = { "IblScope" },
 
           -- ibl's ECMA map omits class_body, so the outer class scope disappears.
-          -- Apex is also missing upstream; register both gaps explicitly.
+          -- Its Java map still uses obsolete `body`; Apex is absent entirely.
           include = {
             node_type = {
+              java = { "class_body", "class_declaration" },
               javascript = { "class_body" },
               typescript = { "class_body" },
               tsx = { "class_body" },
