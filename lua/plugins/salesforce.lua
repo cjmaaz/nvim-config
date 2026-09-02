@@ -203,14 +203,8 @@ local plugin = {
       },
     },
     keys = {
-      -- Fetch hydrates common inventory; target selection only changes CLI context.
-      {
-        "<leader>SF",
-        function()
-          sf_metadata().fetch_orgs_and_refresh_common()
-        end,
-        desc = "Fetch orgs + common metadata",
-      },
+      -- Keep upstream fetch semantics: refresh orgs/default target, not metadata.
+      { "<leader>SF", sf_action("fetch_org_list"), desc = "Fetch orgs" },
       {
         "<leader>So",
         function()

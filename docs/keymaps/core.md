@@ -36,7 +36,7 @@ Optional later: enable `diagnostics = "nvim_lsp"` after LSP; Craftzdog-style `mo
 
 ### Statusline (UI)
 
-`lua/plugins/statusline.lua` keeps this exact left-to-right order: mode bubble (Vim or terminal icon), workspace bubble, Git-branch bubble, dirty flag, left-truncated relative file path plus nvim-navic method/property context, plain error/warning counts, a shared `line:column` + progress bubble, then one right bubble containing available Salesforce org/coverage, the language icon, and non-UTF-8 file encoding. LSP client names are intentionally omitted.
+`lua/plugins/statusline.lua` keeps this exact left-to-right order: mode bubble (Vim or terminal icon), workspace bubble, Git-branch bubble, dirty flag, left-truncated relative file path plus nvim-navic method/property context, plain error/warning counts, a shared `line:column` + progress bubble, then one right bubble containing available Salesforce org/coverage, the language icon, and non-UTF-8 file encoding. LSP client names are intentionally omitted; Apex uses only the Salesforce cloud language icon.
 
 Left-side bubbles use a right curve (``); right-side bubbles use a left curve (``). Footer accents are lifted 40% toward white: Normal/info `#66A1B9`, project/position `#99A9E4`, Git/Insert `#66BB66`, and center path `#668CA3`. Visual is intentionally darker purple `#8D80EF`; Replace, Command, and Terminal use `#E3B0C2`, `#F19D8F`, and `#CBE8A3`. Active mode text and final Salesforce/language text/icons are black.
 

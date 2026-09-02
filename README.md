@@ -70,6 +70,7 @@ nvim-config/
     └── plugins/          # one plugin (or small family) per file
         ├── init.lua      # empty list; keeps `import = "plugins"` valid
         ├── colorscheme.lua # Noctis Bordo + retained background/alternates
+        ├── icons.lua     # shared devicons; Salesforce cloud for Apex
         ├── statusline.lua  # ordered dark bubble footer
         ├── bufferline.lua # matching buffer bar (not tabpages)
         ├── cursor.lua     # calm smear animation across buffers/windows

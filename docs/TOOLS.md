@@ -162,6 +162,7 @@ For an isolated `cmake-init` install, install `pipx` first with `brew install pi
 | Config area | Relies on |
 | --- | --- |
 | `lua/config/lazy.lua` | `git`, network (first clone of lazy.nvim) |
+| `lua/plugins/icons.lua` | Nerd Font; shared Apex/Salesforce cloud mapping for devicons consumers |
 | `lua/plugins/statusline.lua` | Nerd Font icons; Maple Mono NF or optional Cascadia/Victor pairing above; SF org once sf.nvim loaded |
 | `lua/plugins/git.lua` | `git` repo + Nerd Font signs (or ASCII fallback) |
 | `lua/plugins/lazygit.lua` | host **`lazygit`** (`brew` / `pacman`) |

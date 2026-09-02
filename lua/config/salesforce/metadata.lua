@@ -556,37 +556,6 @@ local function sync_target(choice)
   }
 end
 
-function M.fetch_orgs_and_refresh_common()
-  fetch_orgs(function(err, items)
-    if err then
-      return
-    end
-
-    local choice
-    for _, item in ipairs(items) do
-      if item.is_default then
-        choice = item
-        break
-      end
-    end
-    if not choice and sf_util().target_org ~= "" then
-      for _, item in ipairs(items) do
-        if item.value == sf_util().target_org or item.username == sf_util().target_org then
-          choice = item
-          break
-        end
-      end
-    end
-
-    if not choice then
-      notify("Org list refreshed, but no default target org is configured.", vim.log.levels.WARN)
-      return
-    end
-    sync_target(choice)
-    M.refresh_common()
-  end)
-end
-
 local function choose_org(prompt, callback)
   local root = project_root()
   if not root then
