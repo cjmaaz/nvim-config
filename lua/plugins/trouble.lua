@@ -35,11 +35,25 @@ return {
       -- indent_guides = true,
       -- indent_guides = false,
 
-      -- Per-mode layout overrides (position, size, win). See :h trouble.nvim-options.
-      -- modes = {
-      --   diagnostics = { mode = "diagnostics", preview = { type = "split", relative = "win", position = "right", size = 0.3 } },
-      --   symbols = { win = { position = "right", size = 0.3 } },
-      -- },
+      -- TODO tree: selecting a row stays a list operation until explicitly opened.
+      modes = {
+        todo = {
+          auto_preview = true, -- show the selected TODO in the main editor window
+          -- auto_preview = false, -- keep the editor unchanged while browsing the tree
+          preview = {
+            type = "main",
+            scratch = false, -- preview the real file buffer, never a [No Name] copy
+            -- scratch = true, -- faster unloaded-file preview, but it is not an editable file buffer
+          },
+          keys = {
+            ["<cr>"] = "jump_close", -- open the real file, focus it, and close the tree
+            ["<2-leftmouse>"] = "jump_close", -- same behavior for double-click
+            i = false, -- disable Trouble's internal item-table inspector in TODO mode
+          },
+        },
+        -- diagnostics = { mode = "diagnostics", preview = { type = "split", relative = "win", position = "right", size = 0.3 } },
+        -- symbols = { win = { position = "right", size = 0.3 } },
+      },
 
       -- icons = { … }, -- customize severity / fold glyphs (needs Nerd Font for fancy defaults)
       -- warn_no_results = true, -- notify when a mode has nothing to show
