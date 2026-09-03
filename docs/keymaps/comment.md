@@ -49,7 +49,7 @@ Colored, searchable comment annotations:
 | `<leader>st` | n | Search TODOs via **TodoTelescope** (Search group) |
 | `<leader>xt` | n | Toggle the **TODO tree** in Trouble, grouped by tag then file |
 
-Inside the TODO tree, moving to or single-clicking a row automatically previews its real file in the main window, while keyboard focus remains in the tree. Press `<CR>` or double-click to focus that file at the annotation and close the tree; `i` then enters Insert mode normally. `p` toggles the preview, and Trouble’s internal `i` item-table inspector is disabled in TODO mode.
+`<leader>xt` opens with keyboard focus in the TODO tree—no `<C-w>w` needed. Moving to or single-clicking a row automatically previews its real file in the main window, while focus remains in the tree. Press `<CR>` or double-click to focus that file at the annotation and close the tree; `i` then enters Insert mode normally. `p` toggles the preview, and Trouble’s internal `i` item-table inspector is disabled in TODO mode.
 
 Also: `:TodoQuickFix` · `:TodoLocList` · `:TodoTelescope` · `:Trouble todo`.
 

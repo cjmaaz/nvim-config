@@ -78,7 +78,7 @@ return {
         desc = "Previous TODO comment",
       },
       { "<leader>st", "<cmd>TodoTelescope<CR>", desc = "Search TODO comments" },
-      { "<leader>xt", "<cmd>Trouble todo toggle focus=false<CR>", desc = "TODO tree (Trouble)" },
+      { "<leader>xt", "<cmd>Trouble todo toggle focus=true<CR>", desc = "TODO tree (Trouble)" },
       -- { "<leader>st", "<cmd>TodoQuickFix<CR>", desc = "TODO quickfix" }, -- no Telescope
     },
   },
