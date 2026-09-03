@@ -42,8 +42,8 @@ return {
           -- auto_preview = false, -- keep the editor unchanged while browsing the tree
           preview = {
             type = "main",
-            scratch = false, -- preview the real file buffer, never a [No Name] copy
-            -- scratch = true, -- faster unloaded-file preview, but it is not an editable file buffer
+            scratch = true, -- unlisted preview; browsing TODOs does not populate bufferline
+            -- scratch = false, -- load every preview as a real listed file buffer
           },
           keys = {
             ["<cr>"] = "jump_close", -- open the real file, focus it, and close the tree
