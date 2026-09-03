@@ -301,6 +301,7 @@ return {
           { pattern = "symbols %(trouble%)", icon = "", color = "purple" },
           { pattern = "location list %(trouble%)", icon = "󰍉", color = "azure" },
           { pattern = "quickfix %(trouble%)", icon = "󰁨", color = "yellow" },
+          { pattern = "todo tree %(trouble%)", icon = "󱅊", color = "yellow" },
           { pattern = "trouble", icon = "󰔫", color = "red" },
 
           ------------------------------------------------ Delete / black hole

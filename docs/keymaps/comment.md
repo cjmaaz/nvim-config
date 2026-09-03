@@ -30,15 +30,26 @@ Uses Treesitter **context-commentstring** so JSX/TSX/HTML injections get the rig
 
 ## todo-comments
 
-Highlights `TODO`, `FIXME`, `HACK`, `NOTE`, … in the buffer and gutter.
+Colored, searchable comment annotations:
+
+| Write in a source comment | Style |
+| --- | --- |
+| `TODO:` | Cyan task |
+| `NOTE:` / `INFO:` | Teal information |
+| `WARN:` / `WARNING:` | Yellow warning |
+| `IMPORTANT:` / `ALERT:` | Red `!` |
+| `QUESTION:` / `ASK:` | Lavender `?` |
+
+`FIX`/`FIXME`/`BUG`, `HACK`, `PERF`, and `TEST` remain available from the plugin defaults. Only Treesitter-recognized comments are colored; normal strings containing these words are ignored.
 
 | Key | Mode | Action |
 | --- | --- | --- |
 | `]t` | n | Next TODO-style comment |
 | `[t` | n | Previous TODO-style comment |
 | `<leader>st` | n | Search TODOs via **TodoTelescope** (Search group) |
+| `<leader>xt` | n | Toggle the **TODO tree** in Trouble, grouped by tag then file |
 
-Also: `:TodoQuickFix` · `:TodoLocList` · `:TodoTelescope`.
+Also: `:TodoQuickFix` · `:TodoLocList` · `:TodoTelescope` · `:Trouble todo`.
 
 ---
 

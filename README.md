@@ -89,7 +89,7 @@ nvim-config/
         ├── linting.lua   # nvim-lint; <leader>cl / tl; lazy Mason
         ├── salesforce.lua # sf.nvim + fzf-lua; <leader>S… (Sp push, Sx cancel)
         ├── comment.lua   # Comment.nvim + context-commentstring
-        ├── todo-comments.lua # TODO/FIXME highlight + ]t / <leader>st
+        ├── todo-comments.lua # colored annotations + Telescope/Trouble TODO views
         ├── breadcrumbs.lua # disabled Dropbar alternate
         ├── git.lua       # gitsigns signs + hunk keymaps
         └── which-key.lua # leader popup / group labels

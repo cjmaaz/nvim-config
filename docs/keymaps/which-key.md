@@ -31,7 +31,7 @@ Nav: [index](./README.md) · [core](./core.md) · [git](./git.md) · [explorer](
 | `<leader>p` | Project | `project_scaffold.lua` (`pn`); `project_runner.lua` (`pr`) | [project.md](./project.md) |
 | `<leader>t` | Toggle | `tw` wrap · `td` inline diagnostics · `tf` FoS · `tl` lint · `th` inlays · `tb` blame · `tg`/`tG` Gremlins | [core.md](./core.md) · [lsp.md](./lsp.md) · [git.md](./git.md) · [qol.md](./qol.md) |
 | `<leader>q` | Session | `persistence.lua` (`qs`, `qS`, `ql`, `qd`) | [qol.md](./qol.md) |
-| `<leader>x` | Trouble | `trouble.lua` (`xx`, `xX`, …) | [qol.md](./qol.md) |
+| `<leader>x` | Trouble | diagnostics `xx`/`xX`; TODO tree `xt` | [qol.md](./qol.md) · [comment.md](./comment.md) |
 | `<leader>u` | Undotree | `undotree.lua` | [qol.md](./qol.md) |
 | `gc` / `gb` | Comment line / block | `lua/plugins/comment.lua` | [comment.md](./comment.md) |
 | `gs` / `gS` | Flash jump / treesitter | `lua/plugins/flash.lua` | [qol.md](./qol.md) |

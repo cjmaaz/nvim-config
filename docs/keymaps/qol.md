@@ -52,6 +52,7 @@ Sticky panel for diagnostics and lists (richer than `:lopen`).
 | `<leader>xs` | n | Document **symbols** |
 | `<leader>xl` | n | **Location list** |
 | `<leader>xq` | n | **Quickfix** |
+| `<leader>xt` | n | Project **TODO tree**, grouped by annotation tag and file |
 
 Float at cursor remains [`<leader>e`](./core.md#diagnostics); Telescope [`<leader>sd`](./telescope.md) still searches diagnostics.
 
