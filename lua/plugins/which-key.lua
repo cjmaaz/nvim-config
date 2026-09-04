@@ -51,8 +51,8 @@ return {
       -- preset = "helix",
 
       win = {
-        no_overlap = false,
-        -- no_overlap = true,
+        no_overlap = true, -- keep the popup away from the blinking editor cursor
+        -- no_overlap = false, -- allow the full-width strip to cover the cursor row
         border = "rounded",
         -- border = "single",
         -- border = "none",
