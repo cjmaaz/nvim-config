@@ -168,6 +168,7 @@ return {
           { pattern = "toggle auto%-lint", icon = "󱉶", color = "yellow" },
           { pattern = "lsp: code action", icon = "󰌵", color = "purple" },
           { pattern = "code action", icon = "󰌵", color = "purple" },
+          { pattern = "generate documentation", icon = "󰏫", color = "cyan" },
 
           ----------------------------------------------------------------- LSP nav
           { pattern = "lsp: hover", icon = "󰋽", color = "azure" },

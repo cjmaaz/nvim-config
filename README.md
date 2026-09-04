@@ -89,6 +89,7 @@ nvim-config/
         ├── linting.lua   # nvim-lint; <leader>cl / tl; lazy Mason
         ├── salesforce.lua # sf.nvim + fzf-lua; <leader>S… (Sp push, Sx cancel)
         ├── comment.lua   # Comment.nvim + context-commentstring
+        ├── neogen.lua    # lazy docstring/Javadoc/Doxygen generation
         ├── todo-comments.lua # colored annotations + Telescope/Trouble TODO views
         ├── breadcrumbs.lua # disabled Dropbar alternate
         ├── git.lua       # gitsigns signs + hunk keymaps

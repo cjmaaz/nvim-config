@@ -178,6 +178,7 @@ For an isolated `cmake-init` install, install `pipx` first with `brew install pi
 | `lua/plugins/explorer.lua` | Nerd Font icons (optional) |
 | `lua/plugins/yazi.lua` | host `yazi` 26.8.15+; optional preview helpers above; Telescope for directory grep; Grug Far for `<C-g>` replace |
 | `lua/plugins/markdown.lua` | no external runtime; existing Treesitter Markdown parsers |
+| `lua/plugins/neogen.lua` | existing Treesitter parsers + LuaSnip; no additional host executable |
 | `lua/plugins/telescope.lua` | `rg`, `fd`; optional `make` for fzf-native |
 | `lua/plugins/grug-far.lua` | `rg` 14+ (15+ recommended); optional `ast-grep` 0.36+ |
 | `lua/plugins/guess-indent.lua` | (none; built-in EditorConfig remains authoritative) |

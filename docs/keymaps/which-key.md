@@ -27,7 +27,7 @@ Nav: [index](./README.md) · [core](./core.md) · [git](./git.md) · [explorer](
 | `<leader>d` | Delete (black hole) | `keymaps.lua` (`d`, `D`); `x` also black-hole | [core.md](./core.md) |
 | `<leader>s` | Search | `telescope.lua` (`sf`, `sg`, `sm`, lowercase `sr` resume); Grug Far uppercase `sR`; TODO `st` | [telescope.md](./telescope.md) · [comment.md](./comment.md) |
 | `<leader>S` | Salesforce | `lua/plugins/salesforce.lua` (`Sp`, `Sx`, …) | [salesforce.md](./salesforce.md) |
-| `<leader>c` | Code | `formatting.lua` (`cf`); `linting.lua` (`cl`); LSP `ca` | [lsp.md](./lsp.md) |
+| `<leader>c` | Code | Neogen docs `cn`; format `cf`; lint `cl`; LSP action `ca` | [comment.md](./comment.md) · [lsp.md](./lsp.md) |
 | `<leader>p` | Project | `project_scaffold.lua` (`pn`); `project_runner.lua` (`pr`) | [project.md](./project.md) |
 | `<leader>t` | Toggle | `tw` wrap · `td` inline diagnostics · `tf` FoS · `tl` lint · `th` inlays · `tb` blame · `tg`/`tG` Gremlins | [core.md](./core.md) · [lsp.md](./lsp.md) · [git.md](./git.md) · [qol.md](./qol.md) |
 | `<leader>q` | Session | `persistence.lua` (`qs`, `qS`, `ql`, `qd`) | [qol.md](./qol.md) |

@@ -5,6 +5,7 @@ Polish: toggle comments, highlight TODO-style notes, and navigate a clickable wi
 | Plugin | File |
 | --- | --- |
 | Comment.nvim (+ context-commentstring) | `lua/plugins/comment.lua` |
+| Neogen | `lua/plugins/neogen.lua` |
 | todo-comments.nvim | `lua/plugins/todo-comments.lua` |
 | dropbar.nvim (breadcrumbs) | `lua/plugins/breadcrumbs.lua` |
 
@@ -25,6 +26,18 @@ Defaults (no custom leader maps):
 | `gc` / `gb` | v | Comment visual selection (line / block) |
 
 Uses Treesitter **context-commentstring** so JSX/TSX/HTML injections get the right `//` vs `{/* */}`.
+
+---
+
+## Neogen
+
+| Key | Mode | Action |
+| --- | --- | --- |
+| `<leader>cn` | n | Generate documentation for the nearest function/class/type |
+
+Neogen is command/key lazy-loaded and uses LuaSnip placeholders. Java generates Javadoc; C and C++ generate Doxygen; JavaScript/TypeScript, Lua, Python, Rust, Go, and the other upstream languages use their native conventions. The local Apex adapter reuses Javadoc for classes, interfaces, enums, triggers, methods, constructors, parameters, returns, and throws.
+
+Direct commands: `:Neogen`, `:Neogen func`, `:Neogen class`, `:Neogen type`, or `:Neogen file`.
 
 ---
 
