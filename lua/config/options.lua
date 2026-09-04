@@ -21,6 +21,16 @@ opt.winborder = "rounded" -- consistent soft boxes for diagnostics, menus, and p
 -- opt.winborder = "single" -- square corners with the same one-cell outline
 -- opt.winborder = "none" -- let floats blend into the editor background
 
+-- Blink with a shape that identifies the current editing mode.
+-- Terminals control the real blink cadence; Neovim requests the shape/timing.
+opt.guicursor = table.concat({
+  "n-v-c-sm:block-blinkwait700-blinkoff400-blinkon250",
+  "i-ci-ve:ver25-blinkwait700-blinkoff400-blinkon250",
+  "r-cr-o:hor20-blinkwait700-blinkoff400-blinkon250",
+  "t:block-blinkwait700-blinkoff400-blinkon250-TermCursor",
+}, ",")
+-- opt.guicursor = "" -- let the terminal keep one cursor style in every mode
+
 -- Always reserve the gutter for signs (gitsigns, diagnostics) so text does not jump.
 opt.signcolumn = "yes"
 -- opt.signcolumn = "auto" -- only show the column when a sign is present

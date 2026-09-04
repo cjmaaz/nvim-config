@@ -40,6 +40,12 @@ Optional later: enable `diagnostics = "nvim_lsp"` after LSP; Craftzdog-style `mo
 
 Left-side bubbles use a right curve (``); right-side bubbles use a left curve (``). Footer accents are lifted 40% toward white: Normal/info `#66A1B9`, project/position `#99A9E4`, Git/Insert `#66BB66`, and center path `#668CA3`. Visual is intentionally darker purple `#8D80EF`; Replace, Command, and Terminal use `#E3B0C2`, `#F19D8F`, and `#CBE8A3`. Active mode text and final Salesforce/language text/icons are black.
 
+### Cursor shape and blink
+
+`lua/config/options.lua` requests a blinking block in Normal/Visual/Command modes, a 25%-width vertical caret in Insert mode, and a 20%-height horizontal dash in Replace/operator-pending mode. This is terminal-native and has no timer/plugin overhead.
+
+VS Code’s exact `cursorBlinking = "expand"` animation scales the caret continuously on the y-axis. Terminal protocols cannot request that animation; the terminal also decides the effective blink cadence even though `guicursor` includes timing hints.
+
 ---
 
 ## Windows (splits)
