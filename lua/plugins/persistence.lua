@@ -6,13 +6,17 @@
 -- Cheatsheet: docs/keymaps/qol.md
 --------------------------------------------------------------------------------
 
+local function started_bare()
+  return vim.fn.argc() == 0 and #vim.v.argv == 1 and not vim.g.started_with_stdin
+end
+
 return {
   {
     "folke/persistence.nvim",
 
-    -- When to start tracking open buffers for a session.
-    event = "BufReadPre", -- as soon as a real file opens (usual)
-    -- event = "BufReadPost", -- slightly later
+    -- Load at UI startup so bare `nvim` can restore before normal interaction.
+    event = "VimEnter",
+    -- event = "BufReadPre", -- manual restore only; slightly less blank-start work
     -- lazy = false, -- always load at startup (rarely needed)
 
     opts = {
@@ -25,9 +29,26 @@ return {
       -- need = 2, -- skip “just opened one file” sessions
 
       -- Split sessions by git branch (same cwd, different branch → different file).
-      -- branch = false, -- default: one session per directory
-      -- branch = true, -- nicer if you hop branches a lot in one project
+      branch = true, -- preserve separate work when hopping non-main branches
+      -- branch = false, -- keep one session per directory across every branch
     },
+
+    config = function(_, opts)
+      local persistence = require("persistence")
+      persistence.setup(opts)
+
+      if started_bare() then
+        vim.schedule(function()
+          local current = persistence.current()
+          local unbranched = persistence.current({ branch = false })
+          if vim.fn.filereadable(current) == 1 or vim.fn.filereadable(unbranched) == 1 then
+            persistence.load() -- prefer the launch directory (and current branch)
+          else
+            persistence.load({ last = true }) -- otherwise resume the latest workspace
+          end
+        end)
+      end
+    end,
 
     keys = {
       -- Restore the session recorded for the **current working directory**.

@@ -30,6 +30,8 @@ Alternatives considered: `vscode-unicode-highlight.nvim` (exact UI idea but imma
 
 Restores open buffers for a cwd after restart (`folke/persistence.nvim`). Auto-saves on exit unless you stop it.
 
+Starting with exactly `nvim` automatically restores the current directory/current Git branch session when available, otherwise the most recently saved session from any project. Argument-driven launches—including `nvim file.lua`, stdin, headless use, and `+cmd`/`-c`—do not auto-restore or replace what you explicitly requested.
+
 | Key | Mode | Action |
 | --- | --- | --- |
 | `<leader>qs` | n | Restore session for **current cwd** |
