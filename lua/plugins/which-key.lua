@@ -9,6 +9,7 @@
 local function apply_which_key_hl()
   local chrome = require("config.ui_chrome")
   local bg, fg = chrome.panel_bg, chrome.panel_fg
+  vim.api.nvim_set_hl(0, "WhichKeyHiddenCursor", { blend = 100, nocombine = true })
   vim.api.nvim_set_hl(0, "WhichKeyNormal", { fg = fg, bg = bg })
   -- vim.api.nvim_set_hl(0, "WhichKeyNormal", { link = "NormalFloat" }) -- blend with floats
   vim.api.nvim_set_hl(0, "WhichKeyBorder", { fg = chrome.divider_fg, bg = bg })
@@ -20,6 +21,40 @@ local function apply_which_key_hl()
   vim.api.nvim_set_hl(0, "WhichKeyDesc", { fg = fg, bg = bg })
   vim.api.nvim_set_hl(0, "WhichKeySeparator", { fg = chrome.muted_fg, bg = bg })
   vim.api.nvim_set_hl(0, "WhichKeyValue", { fg = chrome.muted_fg, bg = bg })
+end
+
+--- Hide the real editor cursor while WhichKey covers its screen cell.
+local function install_cursor_hider()
+  local view = require("which-key.view")
+  if view._cursor_hider_installed then
+    return
+  end
+  ---@diagnostic disable-next-line: inject-field
+  view._cursor_hider_installed = true
+
+  local show = view.show
+  local hide = view.hide
+  local saved_guicursor
+
+  view.show = function(...)
+    saved_guicursor = saved_guicursor or vim.o.guicursor
+    vim.o.guicursor = "a:WhichKeyHiddenCursor"
+    local ok, result = pcall(show, ...)
+    if not ok then
+      view.hide()
+      error(result)
+    end
+    return result
+  end
+
+  view.hide = function(...)
+    local result = hide(...)
+    if saved_guicursor then
+      vim.o.guicursor = saved_guicursor
+      saved_guicursor = nil
+    end
+    return result
+  end
 end
 
 return {
@@ -51,8 +86,8 @@ return {
       -- preset = "helix",
 
       win = {
-        no_overlap = true, -- keep the popup away from the blinking editor cursor
-        -- no_overlap = false, -- allow the full-width strip to cover the cursor row
+        no_overlap = false, -- cover the cursor row; the cursor is hidden while visible
+        -- no_overlap = true, -- move/shrink the popup around the editor cursor
         border = "rounded",
         -- border = "single",
         -- border = "none",
@@ -379,6 +414,7 @@ return {
     config = function(_, opts)
       require("which-key").setup(opts)
       apply_which_key_hl()
+      install_cursor_hider()
       vim.api.nvim_create_autocmd("ColorScheme", {
         group = vim.api.nvim_create_augroup("which_key_hl", { clear = true }),
         callback = apply_which_key_hl,
