@@ -14,6 +14,7 @@ Import [`neovim-keymaps.tsv`](./neovim-keymaps.tsv) into Anki to study this repo
 1. In Anki, choose **File → Import** and select `neovim-keymaps.tsv`.
 2. The file headers request:
    - separator: **Tab**
+   - formatting: **HTML** (for readable emphasis and line breaks)
    - note type: **Basic**
    - deck: **Neovim::Keymaps**
    - columns: **Front**, **Back**, **Tags**
@@ -30,4 +31,4 @@ If your Anki version does not apply a header automatically, select tab separatio
 - `config::override` — stock keys whose behavior is replaced or qualified here
 - `mode::normal`, `mode::insert`, `mode::visual`, etc. — filter by mode
 
-The deck is intentionally key-to-action. Fronts include scope and mode so repeated keys such as `<CR>`, `q`, or `<C-d>` remain distinct.
+Every front is a plain-language question such as “What does **Shift+H** do in **Normal mode**?” The back gives the action and exact Neovim notation. Context remains visible in smaller text so repeated keys such as `<CR>`, `q`, or `<C-d>` stay unambiguous.
