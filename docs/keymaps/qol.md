@@ -87,6 +87,8 @@ Label-jump (`folke/flash.nvim`). Mapped on **`gs`/`gS`** so stock `s` (substitut
 | `R` | o, x | Treesitter **search** |
 | `<C-s>` | c | Toggle Flash in **command-line** search |
 
+Visual `gS` is also nvim-surround’s default linewise-surround chord, so that mode has a plugin load-order collision. Use visual `S{char}` for surround; treat `gS` as the Flash Treesitter chord in normal/operator-pending mode.
+
 ---
 
 ## Cursor animation (`lua/plugins/cursor.lua`)
@@ -115,6 +117,7 @@ Remembers past yanks; `p`/`P` put from the ring (`gbprod/yanky.nvim`).
 
 | Key | Mode | Action |
 | --- | --- | --- |
+| `y` | n, x | Yank through Yanky and add the text to its history ring |
 | `p` / `P` | n, x | Put after / before (Yanky) |
 | `gp` / `gP` | n, x | Put and leave cursor after |
 | `<C-p>` / `<C-n>` | n | Cycle **previous** / **next** ring entry after a put |

@@ -6,7 +6,7 @@ Only maps we actually set are listed. Built-in Vim/Neovim keys (`hjkl`, `:w`, `g
 
 `vim.keymap.set(mode, lhs, rhs, opts?)` — **mode** = when (`n` normal, `i` insert, `v` visual, `t` terminal, …); **lhs** = keys you press; **rhs** = action; **opts** = usually `{ desc = "…" }`.
 
-**Also:** [TOOLS.md](../TOOLS.md) · [diagnostics/](../diagnostics/README.md) · [COMMITIZEN.md](../COMMITIZEN.md) · [repo README](../../README.md)
+**Also:** [Anki keymap deck](../anki/README.md) · [TOOLS.md](../TOOLS.md) · [diagnostics/](../diagnostics/README.md) · [COMMITIZEN.md](../COMMITIZEN.md) · [repo README](../../README.md)
 
 ---
 

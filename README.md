@@ -7,6 +7,7 @@ From-scratch Neovim config (lazy.nvim). Built one slice at a time.
 | Doc | Contents |
 | --- | --- |
 | [docs/keymaps/](docs/keymaps/README.md) | Custom shortcuts (split by topic; start at README) |
+| [docs/anki/](docs/anki/README.md) | Importable Anki deck for config and native Neovim keys |
 | [docs/diagnostics/](docs/diagnostics/README.md) | Diagnostic UI, settings, Java non-project FAQ |
 | [docs/TOOLS.md](docs/TOOLS.md) | Host tools: Neovim, fonts, `rg` / `fd`, … |
 | [docs/COMMITIZEN.md](docs/COMMITIZEN.md) | Optional conventional-commit CLI |
@@ -29,6 +30,9 @@ nvim-config/
 │   │   ├── salesforce.md # sf.nvim <leader>S…
 │   │   ├── comment.md    # Comment / TODO / breadcrumbs
 │   │   └── which-key.md
+│   ├── anki/
+│   │   ├── README.md     # import instructions and tag guide
+│   │   └── neovim-keymaps.tsv # 729-card Anki import
 │   ├── diagnostics/      # where diagnostics show + settings + Java FAQ
 │   │   ├── README.md
 │   │   ├── display.md

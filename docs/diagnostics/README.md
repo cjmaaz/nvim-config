@@ -26,8 +26,8 @@ Config: `lua/config/keymaps.lua` (`vim.diagnostic.config` + jump maps).
 | --- | --- |
 | `]d` / `[d` | Next / previous (opens a float on jump) |
 | `<leader>e` | Float at cursor |
-| `<leader>q` | Location list → prefer Trouble `<leader>xx` / `xl` ([qol](../keymaps/qol.md)) |
 | `<leader>xx` | Trouble diagnostics panel |
+| `<leader>xl` | Location list in Trouble (`<leader>q…` is session management) |
 | `<leader>sd` | Telescope diagnostics |
 
 Defaults today: **signs** + **underline** (WARN+) + **virtual text** (end of line) + float on jump. Colors follow your **colorscheme** (not a fixed “brown”).

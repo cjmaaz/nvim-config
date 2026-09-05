@@ -19,6 +19,8 @@ Nav: [index](./README.md) · [core](./core.md) · [git](./git.md) · [explorer](
 
 Host tools: Neovim **0.12+**, `tree-sitter` CLI, C compiler — [TOOLS.md](../TOOLS.md). After install: `:Lazy sync`, then `:checkhealth nvim-treesitter`.
 
+Autopairs handles context-aware bracket/quote insertion, paired `<BS>`, pair-aware `<CR>`, and insert-mode `<M-e>` fast-wrap.
+
 Folds: `za` toggle, `zo`/`zc` open/close — see `:help fold`.
 
 ## Structural text objects

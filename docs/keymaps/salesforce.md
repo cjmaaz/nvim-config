@@ -88,6 +88,8 @@ Blink completion in `.soql` buffers uses the disk/memory cache only:
 
 Schema cache entries refresh after 24 hours. Network requests happen while opening the builder or explicitly changing an object—not while typing.
 
+Inside the SOQL field picker, `<Tab>` toggles a field and `<CR>` confirms the selection.
+
 | Query-buffer key | Action |
 | --- | --- |
 | `<localleader>f` (`\f`) | Pick fields and replace the draft’s SELECT list |
@@ -148,7 +150,7 @@ Both actions run in SFTerm. Toggle the float with `<leader>Se`; cancel with `Esc
 - **Project isolation:** sf.nvim, fzf-lua, query schema modules, and the global `vim.system` token workaround load only after a current buffer/cwd resolves to `sfdx-project.json` or `.forceignore`. Ordinary HTML/JS/TS/SOQL projects keep lightweight guarded mappings only. Once sf.nvim has been used in a Neovim process it remains loaded, but mappings, SOQL completion, and statusline output continue to re-check the active project root.
 - **Org flow:** `<leader>SF` runs the upstream org-list fetch; `<leader>So` and `<leader>SO` change only the local/global target. None fetch metadata—run `<leader>SU` when you want to refresh inventory.
 - **SFTerm** (float after deploy/retrieve/metadata): stays open so you can read output. `<leader>Se` toggles it; focused `q` also hides it. `Esc` is a cancel key, not a visibility toggle.
-- **Cancel:** `Esc` and `<leader>Sx` send Ctrl-C to running SFTerm channels and stop background inventory processes without requiring `<C-w>w`, whether the float is focused, unfocused, hidden, or absent. With nothing running, normal-mode `Esc` still clears search highlighting. Focused terminal-mode `<C-c>` remains native. Cancellation is best-effort after Salesforce has accepted a server-side deploy job.
+- **Cancel:** `Esc` and `<leader>Sx` send Ctrl-C to running SFTerm channels and stop background inventory processes without requiring `<C-w>w`, whether the float is focused, unfocused, hidden, or absent. Normal-mode `<C-c>` inside SFTerm also cancels; terminal-mode `<C-c>` remains the terminal’s native interrupt. With nothing running, normal-mode `Esc` still clears search highlighting. Cancellation is best-effort after Salesforce has accepted a server-side deploy job.
 - **fzf-lua** is installed for metadata pickers only; everyday file search remains **Telescope** (`<leader>sf` / `sg`). Needs host **`fzf`** (`brew install fzf` · `sudo pacman -S fzf`) — see [TOOLS.md](../TOOLS.md).
 - Coverage signs appear after a **coverage** test run (`ST` / `SA`) when `auto_display_code_sign` is on.
 - Optional statusline: target org + coverage appear in lualine once `sf.nvim` is loaded (`statusline.lua` / CodeOSS-style).

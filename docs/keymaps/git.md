@@ -58,7 +58,7 @@ Needs host **`lazygit`** — [TOOLS.md](../TOOLS.md).
 
 | Key | Mode | Action |
 | --- | --- | --- |
-| `ih` | o, x | Select the hunk under the cursor (e.g. `vah`, `cih`) |
+| `ih` | o, x | Select the hunk under the cursor (e.g. `vih`, `cih`) |
 
 ---
 

@@ -42,8 +42,9 @@ Focus must be **in** the tree (click it or move with `<C-h>` if it’s on the le
 | Key | Action |
 | --- | --- |
 | `j` / `k` | Move down / up |
-| `h` or `C` | Collapse folder / close node |
-| `l` or `<CR>` | Expand folder **or** open file in the last used editor window |
+| `C` | Collapse the current node (or its parent when already closed) |
+| `<CR>` | Expand/collapse a directory or open a file in the last editor window |
+| `l` | Focus the active preview; it is not the normal open-file key |
 | `<BS>` | Move the tree root **up one directory** |
 | `.` | Set the selected directory as the new tree **root** |
 | `za`-style: expander glyphs | Click / toggle via open |

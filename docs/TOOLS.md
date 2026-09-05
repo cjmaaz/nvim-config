@@ -107,7 +107,7 @@ iTerm2 and Konsole cannot assign a different family only for italic ASCII text, 
 | --- | --- | --- | --- |
 | **ripgrep** (`rg`) 14+ | Telescope live grep and Grug Far search/replace (`<leader>sR`); 15+ recommended | `rg --version` | `brew install ripgrep` · `sudo pacman -S ripgrep` |
 | **fd** | Telescope find files (`<leader>sf`) when available | `fd --version` | `brew install fd` · `sudo pacman -S fd` |
-| **fzf** | **fzf-lua** binary (sf.nvim metadata lists `<leader>Sm` / `Sk`) | `fzf --version` | `brew install fzf` · `sudo pacman -S fzf` |
+| **fzf** | **fzf-lua** binary (Salesforce metadata/manifests: `Sm`, `Su`, `SP`) | `fzf --version` | `brew install fzf` · `sudo pacman -S fzf` |
 | **make** | Builds `telescope-fzf-native` (faster sorter); optional | `make --version` | Xcode CLT / `brew install make` · `sudo pacman -S make` (or `base-devel`) |
 | **tree-sitter CLI** | Compiles parsers for `nvim-treesitter` (`main`) | `tree-sitter --version` | `brew install tree-sitter` · `sudo pacman -S tree-sitter` (need **0.26.1+**) |
 | **C compiler** | Builds tree-sitter parser `.so` files | `clang --version` / `gcc --version` | Xcode CLT · `sudo pacman -S base-devel` (or `clang`) |

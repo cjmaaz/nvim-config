@@ -77,7 +77,7 @@ Deletes that **don’t** overwrite the default yank register (`"_`).
 | --- | --- | --- |
 | `x` | n | Delete char → black hole |
 | `<leader>d` | n, v | Delete → black hole |
-| `<leader>D` | n | Delete to EOL → black hole |
+| `<leader>D` | n | Delete to EOL → black hole (LSP buffers shadow this with type definition) |
 
 Stock `d`/`c` still use registers. Yank history: [qol.md](./qol.md#yank-history-luapluginsyankylua).
 

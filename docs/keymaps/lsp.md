@@ -24,6 +24,8 @@ Buffer-local maps appear only after a language server attaches (`LspAttach`).
 | `<leader>ws` | n | Workspace symbols (Telescope) |
 | `<leader>th` | n | Toggle inlay hints (if server supports) |
 
+In an attached LSP buffer, the buffer-local `<leader>D` mapping takes precedence over the global black-hole “delete to end of line” mapping.
+
 **Inlay hints** are non-editing virtual text supplied by the attached LSP: inferred types, parameter names, return types, and similar context. `<leader>th` toggles them only for the current buffer and never changes the file. If nothing appears, that server/file has no enabled hints. This is separate from `ts_ls` semantic-token highlighting.
 
 **Always on:** `lua_ls` (+ `stylua` via Mason).
@@ -47,9 +49,13 @@ Blink and LuaSnip load on the first `InsertEnter`. LSP clients receive the same 
 | Key (insert, menu open) | Action |
 | --- | --- |
 | `<C-n>` / `<C-p>` | Next / previous item |
+| `<Down>` / `<Up>` | Next / previous item; fall back when the menu is closed |
 | `<C-y>` | Accept |
 | `<C-e>` | Cancel |
 | `<C-space>` | Open menu / docs |
+| `<C-b>` / `<C-f>` | Scroll completion documentation |
+| `<Tab>` / `<S-Tab>` | Jump forward / backward through snippet placeholders |
+| `<C-k>` | Show or hide signature help |
 
 For `.soql` buffers, Blink adds a custom **SOQL** source backed by the selected org’s project-local schema cache. It completes SObjects, fields, relationships, keywords, functions, and date literals without contacting the org while typing. Refresh/populate the cache through the [SOQL builder](./salesforce.md#soql-builder-completion-and-runner).
 

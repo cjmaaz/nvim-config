@@ -1,0 +1,735 @@
+#separator:Tab
+#html:false
+#notetype:Basic
+#deck:Neovim::Keymaps
+#tags column:3
+#columns:Front	Back	Tags
+[Config · leaders · global] <Space>	Global leader prefix for custom mappings.	nvim config config::leaders context::global
+[Config · leaders · buffer-local] \	Local leader prefix; Salesforce SOQL drafts use it.	nvim config config::leaders context::buffer-local
+[Config · buffers · n] <S-h>	Switch to the previous buffer; tabpages remain on gT.	nvim config config::buffers mode::normal
+[Config · buffers · n] <S-l>	Switch to the next buffer; tabpages remain on gt.	nvim config config::buffers mode::normal
+[Config · buffers · n] [b	Switch to the previous buffer.	nvim config config::buffers mode::normal
+[Config · buffers · n] ]b	Switch to the next buffer.	nvim config config::buffers mode::normal
+[Config · bufferline · n] [B	Move the current bufferline entry left.	nvim config config::bufferline mode::normal
+[Config · bufferline · n] ]B	Move the current bufferline entry right.	nvim config config::bufferline mode::normal
+[Config · arguments · n] [a	Go to the previous argument-list file.	nvim config config::arguments mode::normal
+[Config · arguments · n] ]a	Go to the next argument-list file.	nvim config config::arguments mode::normal
+[Config · arguments · n] [A	Go to the first argument-list file.	nvim config config::arguments mode::normal
+[Config · arguments · n] ]A	Go to the last argument-list file.	nvim config config::arguments mode::normal
+[Config · buffers · n] <leader>bd	Delete the current buffer without forcing unsaved changes.	nvim config config::buffers mode::normal
+[Config · buffers · n] <leader>bo	Delete other saved file buffers; preserve modified and special buffers.	nvim config config::buffers mode::normal
+[Config · buffers · n] <leader>bi	Delete hidden saved file buffers; preserve modified and special buffers.	nvim config config::buffers mode::normal
+[Config · project · n] <leader>pn	Choose an ecosystem and scaffold a new project.	nvim config config::project mode::normal
+[Config · project · n] <leader>pr	Detect the project and choose a run, build, or test task.	nvim config config::project mode::normal
+[Config · project task terminal · n] q	Hide the task terminal window without stopping its job.	nvim config config::project context::task-terminal mode::normal
+[Config · Gremlins · n] <leader>tg	Toggle dangerous-Unicode diagnostics for the current buffer.	nvim config config::gremlins mode::normal
+[Config · Gremlins · n] <leader>tG	Export current-buffer Gremlins to quickfix and open it.	nvim config config::gremlins mode::normal
+[Config · core search · n] <Esc>	Cancel active Salesforce actions after sf.nvim loads; otherwise clear search highlighting.	nvim config config::core mode::normal
+[Config · word wrap · n] <leader>tw	Toggle window-local soft wrap with linebreak and breakindent.	nvim config config::core mode::normal
+[Config · windows · n] <C-h>	Focus the window to the left.	nvim config config::windows mode::normal
+[Config · windows · n] <C-l>	Focus the window to the right.	nvim config config::windows mode::normal
+[Config · windows · n] <C-j>	Focus the window below.	nvim config config::windows mode::normal
+[Config · windows · n] <C-k>	Focus the window above.	nvim config config::windows mode::normal
+[Config · windows · n] ss	Create a horizontal split; the s prefix delays standalone s by up to 300 ms.	nvim config config::windows mode::normal
+[Config · windows · n] sv	Create a vertical split; the s prefix delays standalone s by up to 300 ms.	nvim config config::windows mode::normal
+[Config · windows · n] sh	Focus the left window; the s prefix delays standalone s by up to 300 ms.	nvim config config::windows mode::normal
+[Config · windows · n] sl	Focus the right window; the s prefix delays standalone s by up to 300 ms.	nvim config config::windows mode::normal
+[Config · windows · n] sj	Focus the lower window; the s prefix delays standalone s by up to 300 ms.	nvim config config::windows mode::normal
+[Config · windows · n] sk	Focus the upper window; the s prefix delays standalone s by up to 300 ms.	nvim config config::windows mode::normal
+[Config · core editing · n] s	Substitute one character; unchanged behavior, but s-prefixed window mappings add up to 300 ms delay.	nvim config config::core mode::normal collision
+[Config · black-hole delete · n] x	Delete one character without replacing the yank register.	nvim config config::delete mode::normal
+[Config · black-hole delete · n,x] <leader>d	Delete without replacing the yank register.	nvim config config::delete mode::normal mode::visual
+[Config · black-hole delete · n] <leader>D	Delete to end of line without replacing the yank register; LSP buffers override this key.	nvim config config::delete mode::normal collision
+[Config · search motion · n] n	Go to the next search match, open folds, and recenter.	nvim config config::motion mode::normal
+[Config · search motion · n] N	Go to the previous search match, open folds, and recenter.	nvim config config::motion mode::normal
+[Config · scroll motion · n] <C-d>	Scroll half a page down and recenter; picker contexts override it.	nvim config config::motion mode::normal
+[Config · scroll motion · n] <C-u>	Scroll half a page up and recenter; picker contexts override it.	nvim config config::motion mode::normal
+[Config · visual lines · x] J	Move the selected lines down and keep them selected.	nvim config config::editing mode::visual
+[Config · visual lines · x] K	Move the selected lines up and keep them selected.	nvim config config::editing mode::visual
+[Config · terminal · t] <Esc><Esc>	Leave terminal-job mode for Normal mode; useful before local q mappings.	nvim config config::terminal mode::terminal
+[Config · hjkl training · n] <Left>	Show a reminder to use h instead of moving.	nvim config config::training mode::normal
+[Config · hjkl training · n] <Right>	Show a reminder to use l instead of moving.	nvim config config::training mode::normal
+[Config · hjkl training · n] <Up>	Show a reminder to use k instead of moving.	nvim config config::training mode::normal
+[Config · hjkl training · n] <Down>	Show a reminder to use j instead of moving.	nvim config config::training mode::normal
+[Config · diagnostics · n] ]d	Jump to the next diagnostic and open its float.	nvim config config::diagnostics mode::normal
+[Config · diagnostics · n] [d	Jump to the previous diagnostic and open its float.	nvim config config::diagnostics mode::normal
+[Config · diagnostics · n] <leader>e	Show the diagnostic float at the cursor.	nvim config config::diagnostics mode::normal
+[Config · diagnostics · n] <leader>td	Toggle end-of-line diagnostic text; keep signs, underlines, and floats.	nvim config config::diagnostics mode::normal
+[Config · Telescope launch · n] <leader>sf	Find project files.	nvim config config::telescope mode::normal
+[Config · Telescope launch · n] <leader>sg	Live-grep project text with ripgrep.	nvim config config::telescope mode::normal
+[Config · Telescope launch · n] <leader>sm	Open multi-grep; separate pattern and glob with two spaces.	nvim config config::telescope mode::normal
+[Config · Telescope launch · n,x] <leader>sw	Grep the cursor word or visual selection.	nvim config config::telescope mode::normal mode::visual
+[Config · Telescope launch · n] <leader>s.	Search recently opened files.	nvim config config::telescope mode::normal
+[Config · Telescope launch · n] <leader><leader>	Find and switch among open buffers.	nvim config config::telescope mode::normal
+[Config · Telescope launch · n] <leader>/	Fuzzy-search only the current buffer in a dropdown.	nvim config config::telescope mode::normal
+[Config · Telescope launch · n] <leader>s/	Live-grep only files already open in buffers.	nvim config config::telescope mode::normal
+[Config · Telescope launch · n] <leader>sh	Search help tags.	nvim config config::telescope mode::normal
+[Config · Telescope launch · n] <leader>sk	Search active keymaps and their descriptions.	nvim config config::telescope mode::normal
+[Config · Telescope launch · n] <leader>sc	Search Ex commands.	nvim config config::telescope mode::normal
+[Config · Telescope launch · n] <leader>ss	Open the Telescope builtins meta-picker.	nvim config config::telescope mode::normal
+[Config · Telescope launch · n] <leader>sd	Search current diagnostics.	nvim config config::telescope mode::normal
+[Config · TODO search · n] <leader>st	Search TODO-style comments through Telescope.	nvim config config::todo mode::normal
+[Config · Telescope launch · n] <leader>sr	Resume the previous Telescope picker.	nvim config config::telescope mode::normal
+[Config · Grug Far · n,x] <leader>sR	Open project search-and-replace; visual text pre-fills the search.	nvim config config::grug-far mode::normal mode::visual
+[Config · Telescope launch · n] <leader>sn	Find files under the Neovim config directory.	nvim config config::telescope mode::normal
+[Config · Telescope launch · n] <leader>sp	Find files inside installed lazy.nvim plugin packages.	nvim config config::telescope mode::normal
+[Config · Telescope picker · i] <C-j>	Move to the next result; custom override of Telescope's default no-op.	nvim config config::telescope context::picker mode::insert
+[Config · Telescope picker · i] <C-k>	Move to the previous result; overrides preview-right scrolling in Insert mode.	nvim config config::telescope context::picker mode::insert
+[Config · Telescope picker · i,n] <CR>	Open the selected result.	nvim config config::telescope context::picker mode::insert mode::normal
+[Config · Telescope picker · i,n] <C-x>	Open the selected result in a horizontal split.	nvim config config::telescope context::picker mode::insert mode::normal
+[Config · Telescope picker · i,n] <C-v>	Open the selected result in a vertical split.	nvim config config::telescope context::picker mode::insert mode::normal
+[Config · Telescope picker · i,n] <C-t>	Open the selected result in a new tabpage.	nvim config config::telescope context::picker mode::insert mode::normal
+[Config · Telescope picker · i,n] <C-q>	Send results to quickfix and open the quickfix list.	nvim config config::telescope context::picker mode::insert mode::normal
+[Config · Telescope picker · i,n] <C-u>	Scroll the preview upward.	nvim config config::telescope context::picker mode::insert mode::normal
+[Config · Telescope picker · i,n] <C-d>	Scroll the preview downward.	nvim config config::telescope context::picker mode::insert mode::normal
+[Config · Telescope picker · i,n] <Esc>	Leave Insert mode first; from picker Normal mode, close the picker.	nvim config config::telescope context::picker mode::insert mode::normal
+[Config · Telescope picker · i] <C-c>	Close the picker.	nvim config config::telescope context::picker mode::insert
+[Config · Telescope picker · n] ?	Show Telescope's picker-local mapping help.	nvim config config::telescope context::picker mode::normal
+[Config · Neo-tree launch · n] <leader>fe	Toggle the filesystem tree on the left.	nvim config config::neo-tree mode::normal
+[Config · Neo-tree launch · n] <leader>fE	Reveal the current file in the filesystem tree.	nvim config config::neo-tree mode::normal
+[Config · Neo-tree · n] C	Close the current node, or its parent when already closed; h is not mapped.	nvim config config::neo-tree context::explorer mode::normal
+[Config · Neo-tree · n] <CR>	Expand or collapse a directory, or open a file in the editor.	nvim config config::neo-tree context::explorer mode::normal
+[Config · Neo-tree · n] l	Focus the active preview window; unlike stale docs, it does not open nodes.	nvim config config::neo-tree context::explorer mode::normal
+[Config · Neo-tree · n] <BS>	Move the tree root up one directory.	nvim config config::neo-tree context::explorer mode::normal
+[Config · Neo-tree · n] .	Set the selected directory as the tree root.	nvim config config::neo-tree context::explorer mode::normal
+[Config · Neo-tree · n] z	Close all expanded nodes.	nvim config config::neo-tree context::explorer mode::normal
+[Config · Neo-tree · n] S	Open the selected file in a horizontal split.	nvim config config::neo-tree context::explorer mode::normal
+[Config · Neo-tree · n] s	Open the selected file in a vertical split; this buffer-local map overrides substitute.	nvim config config::neo-tree context::explorer mode::normal collision
+[Config · Neo-tree · n] t	Open the selected file in a new tabpage.	nvim config config::neo-tree context::explorer mode::normal
+[Config · Neo-tree · n] P	Toggle the preview float for the selected file.	nvim config config::neo-tree context::explorer mode::normal
+[Config · Neo-tree · n] q	Close the Neo-tree window.	nvim config config::neo-tree context::explorer mode::normal
+[Config · Neo-tree · n] <Esc>	Cancel or revert an active preview or floating prompt.	nvim config config::neo-tree context::explorer mode::normal
+[Config · Neo-tree · n] a	Add a file; brace expansion is supported.	nvim config config::neo-tree context::explorer mode::normal
+[Config · Neo-tree · n] A	Add a directory.	nvim config config::neo-tree context::explorer mode::normal
+[Config · Neo-tree · n] d	Delete the selected node after confirmation.	nvim config config::neo-tree context::explorer mode::normal
+[Config · Neo-tree · n] r	Rename the selected node's full name.	nvim config config::neo-tree context::explorer mode::normal
+[Config · Neo-tree · n] b	Rename only the selected node's basename.	nvim config config::neo-tree context::explorer mode::normal
+[Config · Neo-tree · n] y	Copy the selected node to Neo-tree's clipboard.	nvim config config::neo-tree context::explorer mode::normal
+[Config · Neo-tree · n] x	Cut the selected node to Neo-tree's clipboard.	nvim config config::neo-tree context::explorer mode::normal
+[Config · Neo-tree · n] p	Paste from Neo-tree's clipboard.	nvim config config::neo-tree context::explorer mode::normal
+[Config · Neo-tree · n] c	Copy the selected node to a prompted destination path.	nvim config config::neo-tree context::explorer mode::normal
+[Config · Neo-tree · n] m	Move the selected node to a prompted destination path.	nvim config config::neo-tree context::explorer mode::normal
+[Config · Neo-tree · n] <C-r>	Clear Neo-tree's clipboard.	nvim config config::neo-tree context::explorer mode::normal
+[Config · Neo-tree · n] H	Toggle filtered dotfiles and gitignored files.	nvim config config::neo-tree context::explorer mode::normal
+[Config · Neo-tree · n] /	Fuzzy-find files within the tree.	nvim config config::neo-tree context::explorer mode::normal
+[Config · Neo-tree · n] D	Fuzzy-find directories within the tree.	nvim config config::neo-tree context::explorer mode::normal
+[Config · Neo-tree · n] [g	Jump to the previous Git-modified file.	nvim config config::neo-tree context::explorer mode::normal
+[Config · Neo-tree · n] ]g	Jump to the next Git-modified file.	nvim config config::neo-tree context::explorer mode::normal
+[Config · Neo-tree · n] o	Open the order-by prefix menu.	nvim config config::neo-tree context::explorer mode::normal
+[Config · Neo-tree order · n] oc	Order entries by creation time.	nvim config config::neo-tree context::explorer mode::normal
+[Config · Neo-tree order · n] od	Order entries by diagnostics.	nvim config config::neo-tree context::explorer mode::normal
+[Config · Neo-tree order · n] og	Order entries by Git status.	nvim config config::neo-tree context::explorer mode::normal
+[Config · Neo-tree order · n] om	Order entries by modification time.	nvim config config::neo-tree context::explorer mode::normal
+[Config · Neo-tree order · n] on	Order entries by name.	nvim config config::neo-tree context::explorer mode::normal
+[Config · Neo-tree order · n] os	Order entries by size.	nvim config config::neo-tree context::explorer mode::normal
+[Config · Neo-tree order · n] ot	Order entries by type.	nvim config config::neo-tree context::explorer mode::normal
+[Config · Neo-tree · n] e	Toggle automatic tree-width expansion.	nvim config config::neo-tree context::explorer mode::normal
+[Config · Neo-tree · n] R	Refresh the filesystem tree.	nvim config config::neo-tree context::explorer mode::normal
+[Config · Neo-tree · n] i	Show details for the selected file.	nvim config config::neo-tree context::explorer mode::normal
+[Config · Neo-tree · n] ?	Show Neo-tree's local mapping help.	nvim config config::neo-tree context::explorer mode::normal
+[Config · Yazi launch · n,x] <leader>fy	Open optional Yazi at the current file or selected path; requires yazi at startup.	nvim config config::yazi mode::normal mode::visual
+[Config · Yazi launch · n] <leader>fY	Open optional Yazi at Neovim's cwd; requires yazi at startup.	nvim config config::yazi mode::normal
+[Config · Yazi launch · n] <leader>fr	Resume or toggle the last Yazi session; requires yazi at startup.	nvim config config::yazi mode::normal
+[Config · Yazi · t] <F1>	Show the yazi.nvim integration help.	nvim config config::yazi context::yazi mode::terminal
+[Config · Yazi · t] <C-v>	Open the selected path in a vertical split.	nvim config config::yazi context::yazi mode::terminal
+[Config · Yazi · t] <C-x>	Open the selected path in a horizontal split.	nvim config config::yazi context::yazi mode::terminal
+[Config · Yazi · t] <C-t>	Open the selected path in a new tabpage.	nvim config config::yazi context::yazi mode::terminal
+[Config · Yazi · t] <C-s>	Grep the current directory or selected paths through Telescope.	nvim config config::yazi context::yazi mode::terminal
+[Config · Yazi · t] <C-g>	Open Grug Far for the current directory or selected paths.	nvim config config::yazi context::yazi mode::terminal
+[Config · Yazi · t] <Tab>	Cycle through Neovim's open buffers.	nvim config config::yazi context::yazi mode::terminal
+[Config · Yazi · t] <C-q>	Send selected paths to quickfix.	nvim config config::yazi context::yazi mode::terminal
+[Config · Yazi · n] q	Quit Yazi cleanly after leaving terminal mode.	nvim config config::yazi context::yazi mode::normal
+[Config · Gitsigns · n] ]c	Jump to the next hunk; retains Vim's native ]c behavior in diff windows.	nvim config config::gitsigns mode::normal
+[Config · Gitsigns · n] [c	Jump to the previous hunk; retains Vim's native [c behavior in diff windows.	nvim config config::gitsigns mode::normal
+[Config · Gitsigns · n] <leader>hs	Stage the hunk under the cursor.	nvim config config::gitsigns mode::normal
+[Config · Gitsigns · n] <leader>hr	Reset the hunk under the cursor, discarding those working-tree changes.	nvim config config::gitsigns mode::normal
+[Config · Gitsigns · x] <leader>hs	Stage the selected lines.	nvim config config::gitsigns mode::visual
+[Config · Gitsigns · x] <leader>hr	Reset the selected lines, discarding those working-tree changes.	nvim config config::gitsigns mode::visual
+[Config · Gitsigns · n] <leader>hS	Stage the entire current buffer.	nvim config config::gitsigns mode::normal
+[Config · Gitsigns · n] <leader>hR	Reset the entire current buffer.	nvim config config::gitsigns mode::normal
+[Config · Gitsigns · n] <leader>hp	Preview the current hunk in a float.	nvim config config::gitsigns mode::normal
+[Config · Gitsigns · n] <leader>hb	Show full blame information for the current line.	nvim config config::gitsigns mode::normal
+[Config · Gitsigns · n] <leader>hd	Diff the current file against the Git index.	nvim config config::gitsigns mode::normal
+[Config · Gitsigns · n] <leader>tb	Toggle inline blame for the current line.	nvim config config::gitsigns mode::normal
+[Config · Gitsigns · o,x] ih	Select the current Git hunk; use cih or vih, not stale vah.	nvim config config::gitsigns mode::operator mode::visual
+[Config · LazyGit · n] <leader>gg	Open LazyGit for the repository; requires the lazygit executable.	nvim config config::lazygit mode::normal
+[Config · LazyGit · n] <leader>gf	Open LazyGit filtered to the current file; requires lazygit.	nvim config config::lazygit mode::normal
+[Config · Markdown · n] <leader>mr	Toggle rendered versus raw Markdown in the current Markdown buffer.	nvim config config::markdown mode::normal
+[Config · Markdown · n] <leader>mp	Toggle the live rendered side preview for the current Markdown buffer.	nvim config config::markdown mode::normal
+[Config · LSP buffer · n] K	Show hover documentation; only exists after an LSP attaches.	nvim config config::lsp mode::normal
+[Config · LSP buffer · n] gD	Go to the symbol's declaration; only exists after LSP attach.	nvim config config::lsp mode::normal
+[Config · LSP buffer · n] gd	Go to the symbol's definition; only exists after LSP attach.	nvim config config::lsp mode::normal
+[Config · LSP buffer · n] gI	Go to the symbol's implementation; only exists after LSP attach.	nvim config config::lsp mode::normal
+[Config · LSP buffer · n] gr	Find references through Telescope; only exists after LSP attach.	nvim config config::lsp mode::normal
+[Config · LSP buffer · n] <leader>D	Go to the type definition; buffer-local mapping overrides global black-hole delete-to-EOL.	nvim config config::lsp mode::normal collision
+[Config · LSP buffer · n] <leader>rn	Rename the symbol; only exists after LSP attach.	nvim config config::lsp mode::normal
+[Config · LSP buffer · n,x] <leader>ca	Show code actions; only exists after LSP attach.	nvim config config::lsp mode::normal mode::visual
+[Config · LSP buffer · n] <leader>ds	Find document symbols through Telescope.	nvim config config::lsp mode::normal
+[Config · LSP buffer · n] <leader>ws	Find workspace symbols through Telescope.	nvim config config::lsp mode::normal
+[Config · LSP buffer · n] <leader>th	Toggle current-buffer inlay hints; only mapped when the server supports them.	nvim config config::lsp mode::normal
+[Config · completion · i] <C-n>	Select the next completion item; falls back when completion is inactive.	nvim config config::completion mode::insert
+[Config · completion · i] <C-p>	Select the previous completion item; falls back when completion is inactive.	nvim config config::completion mode::insert
+[Config · completion · i] <C-y>	Select and accept the current completion item.	nvim config config::completion mode::insert
+[Config · completion · i] <C-e>	Cancel completion; otherwise fall back to normal Insert-mode behavior.	nvim config config::completion mode::insert
+[Config · completion · i] <C-Space>	Show completion or toggle its documentation.	nvim config config::completion mode::insert
+[Config · completion · i] <Up>	Select the previous completion item; otherwise move normally.	nvim config config::completion mode::insert
+[Config · completion · i] <Down>	Select the next completion item; otherwise move normally.	nvim config config::completion mode::insert
+[Config · completion · i] <C-b>	Scroll completion documentation up; otherwise fall back.	nvim config config::completion mode::insert
+[Config · completion · i] <C-f>	Scroll completion documentation down; otherwise fall back.	nvim config config::completion mode::insert
+[Config · completion · i] <Tab>	Jump forward through snippet placeholders; it does not accept completion.	nvim config config::completion mode::insert
+[Config · completion · i] <S-Tab>	Jump backward through snippet placeholders; it does not accept completion.	nvim config config::completion mode::insert
+[Config · completion · i] <C-k>	Show or hide signature help; otherwise fall back.	nvim config config::completion mode::insert
+[Config · formatting · n,x] <leader>cf	Format the buffer or selected range with Conform and LSP fallback.	nvim config config::formatting mode::normal mode::visual
+[Config · formatting · n] <leader>tf	Toggle the global format-on-save disable flag.	nvim config config::formatting mode::normal
+[Config · linting · n] <leader>cl	Lint the current buffer now.	nvim config config::linting mode::normal
+[Config · linting · n] <leader>tl	Toggle automatic linting for this Neovim process.	nvim config config::linting mode::normal
+[Config · Comment.nvim · n] gcc	Toggle a line comment on the current line.	nvim config config::comment mode::normal
+[Config · Comment.nvim · n] gc{motion}	Toggle line comments over a motion.	nvim config config::comment mode::normal
+[Config · Comment.nvim · n] gbc	Toggle a block comment on the current line or block.	nvim config config::comment mode::normal
+[Config · Comment.nvim · n] gb{motion}	Toggle block comments over a motion.	nvim config config::comment mode::normal
+[Config · Comment.nvim · x] gc	Toggle line comments over the visual selection.	nvim config config::comment mode::visual
+[Config · Comment.nvim · x] gb	Toggle block comments over the visual selection.	nvim config config::comment mode::visual
+[Config · Neogen · n] <leader>cn	Generate documentation for the nearest declaration.	nvim config config::neogen mode::normal
+[Config · TODO comments · n] ]t	Jump to the next TODO-style comment.	nvim config config::todo mode::normal
+[Config · TODO comments · n] [t	Jump to the previous TODO-style comment.	nvim config config::todo mode::normal
+[Config · Treesitter objects · o,x] af	Select around a function, method, or constructor.	nvim config config::treesitter mode::operator mode::visual
+[Config · Treesitter objects · o,x] if	Select inside a function, method, or constructor.	nvim config config::treesitter mode::operator mode::visual
+[Config · Treesitter objects · o,x] ac	Select around a class.	nvim config config::treesitter mode::operator mode::visual
+[Config · Treesitter objects · o,x] ic	Select inside a class.	nvim config config::treesitter mode::operator mode::visual
+[Config · Treesitter objects · o,x] aa	Select around a parameter or call argument.	nvim config config::treesitter mode::operator mode::visual
+[Config · Treesitter objects · o,x] ia	Select inside a parameter or call argument.	nvim config config::treesitter mode::operator mode::visual
+[Config · nvim-surround · n] ys{motion}{char}	Add a surrounding pair around a motion.	nvim config config::surround mode::normal
+[Config · nvim-surround · n] ds{char}	Delete the specified surrounding pair.	nvim config config::surround mode::normal
+[Config · nvim-surround · n] cs{target}{replacement}	Change one surrounding pair into another.	nvim config config::surround mode::normal
+[Config · nvim-surround · x] S{char}	Surround the visual selection; visual gS conflicts with Flash.	nvim config config::surround mode::visual collision
+[Config · Flash · n,x,o] gs	Jump to a labeled target while preserving standalone substitute s.	nvim config config::flash mode::normal mode::visual mode::operator
+[Config · Flash · n,x,o] gS	Jump to a Treesitter node; visual mode collides with nvim-surround and load order decides the winner.	nvim config config::flash mode::normal mode::visual mode::operator collision
+[Config · Flash · o] r	Use a remote Flash target during an operator.	nvim config config::flash mode::operator
+[Config · Flash · o,x] R	Search and select Treesitter nodes.	nvim config config::flash mode::operator mode::visual
+[Config · Flash search · c] <C-s>	Toggle Flash labels while entering a command-line search.	nvim config config::flash mode::command
+[Config · Undotree · n] <leader>u	Toggle the visual undo-history tree.	nvim config config::undotree mode::normal
+[Config · Yanky · n,x] y	Yank through Yanky's persistent history ring.	nvim config config::yanky mode::normal mode::visual
+[Config · Yanky · n,x] p	Put after from Yanky's current ring entry.	nvim config config::yanky mode::normal mode::visual
+[Config · Yanky · n,x] P	Put before from Yanky's current ring entry.	nvim config config::yanky mode::normal mode::visual
+[Config · Yanky · n,x] gp	Put after and leave the cursor after the inserted text.	nvim config config::yanky mode::normal mode::visual
+[Config · Yanky · n,x] gP	Put before and leave the cursor after the inserted text.	nvim config config::yanky mode::normal mode::visual
+[Config · Yanky · n] <C-p>	After a put, switch to the previous Yanky ring entry.	nvim config config::yanky mode::normal
+[Config · Yanky · n] <C-n>	After a put, switch to the next Yanky ring entry.	nvim config config::yanky mode::normal
+[Config · Dial · n,x] <C-a>	Increment numbers, dates, booleans, or configured word pairs.	nvim config config::dial mode::normal mode::visual
+[Config · Dial · n,x] <C-x>	Decrement numbers, dates, booleans, or configured word pairs.	nvim config config::dial mode::normal mode::visual
+[Config · Dial · x] g<C-a>	Increment additively across a visual block.	nvim config config::dial mode::visual
+[Config · Dial · x] g<C-x>	Decrement additively across a visual block.	nvim config config::dial mode::visual
+[Config · autopairs · i] (	Insert or navigate a context-aware parenthesis pair.	nvim config config::autopairs mode::insert
+[Config · autopairs · i] )	Move over an existing paired closing parenthesis when appropriate.	nvim config config::autopairs mode::insert
+[Config · autopairs · i] [	Insert or navigate a context-aware square-bracket pair.	nvim config config::autopairs mode::insert
+[Config · autopairs · i] ]	Move over an existing paired closing square bracket when appropriate.	nvim config config::autopairs mode::insert
+[Config · autopairs · i] {	Insert or navigate a context-aware brace pair.	nvim config config::autopairs mode::insert
+[Config · autopairs · i] }	Move over an existing paired closing brace when appropriate.	nvim config config::autopairs mode::insert
+[Config · autopairs · i] '	Insert or navigate a context-aware single-quote pair.	nvim config config::autopairs mode::insert
+[Config · autopairs · i] "	Insert or navigate a context-aware double-quote pair.	nvim config config::autopairs mode::insert
+[Config · autopairs · i] `	Insert or navigate a context-aware backtick pair.	nvim config config::autopairs mode::insert
+[Config · autopairs · i] <BS>	Delete an empty paired delimiter together when appropriate.	nvim config config::autopairs mode::insert
+[Config · autopairs · i] <CR>	Insert a pair-aware newline; Blink's default preset does not claim Enter.	nvim config config::autopairs mode::insert
+[Config · autopairs · i] <M-e>	Open autopairs fast-wrap for the surrounding expression.	nvim config config::autopairs mode::insert
+[Config · sessions · n] <leader>qs	Restore the saved session for the current cwd.	nvim config config::sessions mode::normal
+[Config · sessions · n] <leader>qS	Select from saved sessions.	nvim config config::sessions mode::normal
+[Config · sessions · n] <leader>ql	Restore the most recently saved session from any cwd.	nvim config config::sessions mode::normal
+[Config · sessions · n] <leader>qd	Stop persistence from saving on this exit.	nvim config config::sessions mode::normal
+[Config · Trouble · n] <leader>xx	Toggle workspace diagnostics in Trouble.	nvim config config::trouble mode::normal
+[Config · Trouble · n] <leader>xX	Toggle diagnostics for the current buffer.	nvim config config::trouble mode::normal
+[Config · Trouble · n] <leader>xs	Toggle document symbols without stealing editor focus.	nvim config config::trouble mode::normal
+[Config · Trouble · n] <leader>xl	Toggle the location list in Trouble.	nvim config config::trouble mode::normal
+[Config · Trouble · n] <leader>xq	Toggle quickfix in Trouble.	nvim config config::trouble mode::normal
+[Config · Trouble TODO · n] <leader>xt	Toggle the focused TODO tree with scratch previews.	nvim config config::trouble config::todo mode::normal
+[Config · Trouble TODO · n] <CR>	Open the real file at the TODO and close the tree.	nvim config config::trouble context::todo mode::normal
+[Config · Trouble TODO · mouse] <2-LeftMouse>	Open the real file at the TODO and close the tree.	nvim config config::trouble context::todo context::mouse
+[Config · Trouble TODO · n] p	Toggle the selected TODO's scratch preview.	nvim config config::trouble context::todo mode::normal
+[Config · Salesforce org · n] <leader>SF	Fetch orgs and adopt the Salesforce CLI default target; requires an SF project.	nvim config config::salesforce mode::normal
+[Config · Salesforce org · n] <leader>So	Set the local target org only; requires an SF project.	nvim config config::salesforce mode::normal
+[Config · Salesforce org · n] <leader>SO	Set the global target org without refreshing metadata.	nvim config config::salesforce mode::normal
+[Config · Salesforce org · n] <leader>Sb	Open the target org in a browser.	nvim config config::salesforce mode::normal
+[Config · Salesforce org · n] <leader>SB	Open the current metadata component in the org.	nvim config config::salesforce mode::normal
+[Config · Salesforce retrieve · n] <leader>Sr	Retrieve the current file from the target org.	nvim config config::salesforce mode::normal
+[Config · Salesforce deploy · n] <leader>Sp	Save and deploy the current file.	nvim config config::salesforce mode::normal
+[Config · Salesforce cancel · n] <leader>Sx	Cancel active SF terminal and background actions; requires current SF project context.	nvim config config::salesforce mode::normal
+[Config · Salesforce diff · n] <leader>Sd	Diff the current file against the target org.	nvim config config::salesforce mode::normal
+[Config · Salesforce logs · n] <leader>Sl	Pull a Salesforce debug log.	nvim config config::salesforce mode::normal
+[Config · Salesforce terminal · n] <leader>Se	Toggle the integrated Salesforce terminal float.	nvim config config::salesforce mode::normal
+[Config · Salesforce Vlocity · n] <leader>SV	Open scoped or full Vlocity DataPack retrieval.	nvim config config::salesforce mode::normal
+[Config · Salesforce tests · n] <leader>St	Run the Apex test under the cursor.	nvim config config::salesforce mode::normal
+[Config · Salesforce tests · n] <leader>ST	Run the Apex test under the cursor with coverage.	nvim config config::salesforce mode::normal
+[Config · Salesforce tests · n] <leader>Sa	Run all Apex tests in the current file.	nvim config config::salesforce mode::normal
+[Config · Salesforce tests · n] <leader>SA	Run all Apex tests in the file with coverage.	nvim config config::salesforce mode::normal
+[Config · Salesforce tests · n] <leader>SR	Repeat the last Apex test run.	nvim config config::salesforce mode::normal
+[Config · Salesforce coverage · n] <leader>Sv	Toggle Apex coverage signs.	nvim config config::salesforce mode::normal
+[Config · Salesforce coverage · n] [v	Jump to the previous uncovered line.	nvim config config::salesforce mode::normal
+[Config · Salesforce coverage · n] ]v	Jump to the next uncovered line.	nvim config config::salesforce mode::normal
+[Config · Salesforce SOQL · n] <leader>SQ	Open the schema-aware SOQL builder.	nvim config config::salesforce config::soql mode::normal
+[Config · Salesforce SOQL · n] <leader>Sq	Save and run the current .soql file.	nvim config config::salesforce config::soql mode::normal
+[Config · Salesforce SOQL · x] <leader>Sq	Run the visual selection as SOQL.	nvim config config::salesforce config::soql mode::visual
+[Config · Salesforce metadata · n] <leader>Sm	Pick cached metadata to retrieve.	nvim config config::salesforce::metadata mode::normal
+[Config · Salesforce metadata · n] <leader>Su	Open the cached multi-select metadata browser.	nvim config config::salesforce::metadata mode::normal
+[Config · Salesforce metadata · n] <leader>SU	Refresh Common or All metadata inventory.	nvim config config::salesforce::metadata mode::normal
+[Config · Salesforce manifest · n] <leader>SP	Search XML package manifests below manifest/.	nvim config config::salesforce::manifest mode::normal
+[Config · Salesforce schema · n] <leader>Ss	Refresh SObject definitions for Apex language support.	nvim config config::salesforce mode::normal
+[Config · Salesforce ctags · n] <leader>Sc	Create Apex ctags; requires universal-ctags.	nvim config config::salesforce mode::normal
+[Config · Salesforce terminal · n] q	Hide visible SFTerm floats without stopping their jobs.	nvim config config::salesforce context::terminal mode::normal
+[Config · Salesforce terminal · n] <Esc>	Cancel active Salesforce actions from an SFTerm buffer.	nvim config config::salesforce context::terminal mode::normal
+[Config · Salesforce terminal · n] <C-c>	Cancel active Salesforce actions; terminal-mode Ctrl-C remains native.	nvim config config::salesforce context::terminal mode::normal
+[Config · Salesforce terminal · t] <Esc>	Send cancellation to active Salesforce actions without leaving terminal mode.	nvim config config::salesforce context::terminal mode::terminal
+[Config · SOQL draft · n] \f	Pick fields and replace the draft's SELECT list.	nvim config config::soql context::draft mode::normal
+[Config · SOQL draft · n] \o	Change the SObject or open its existing draft.	nvim config config::soql context::draft mode::normal
+[Config · SOQL draft · n] \r	Save and run the query through the standard data API.	nvim config config::soql context::draft mode::normal
+[Config · SOQL draft · n] \t	Save and run the query through the Tooling API.	nvim config config::soql context::draft mode::normal
+[Config · SOQL field picker · picker] <Tab>	Toggle the current field selection.	nvim config config::soql context::picker
+[Config · SOQL field picker · picker] <CR>	Confirm selected fields and update the draft.	nvim config config::soql context::picker
+[Config · Salesforce metadata browser · picker] <Tab>	Toggle the current member or whole category.	nvim config config::salesforce::metadata context::picker
+[Config · Salesforce metadata browser · picker] <C-a>	Toggle all entries matching the current filter.	nvim config config::salesforce::metadata context::picker
+[Config · Salesforce metadata browser · picker] <C-e>	Expand or collapse the category; fetch it first if uncached.	nvim config config::salesforce::metadata context::picker
+[Config · Salesforce metadata browser · picker] <CR>	Retrieve selected members or all cached members of selected categories.	nvim config config::salesforce::metadata context::picker
+[Config · Salesforce metadata browser · picker] <C-g>	Generate a timestamped package.xml from the selection.	nvim config config::salesforce::metadata context::picker
+[Config · Salesforce metadata browser · picker] <C-d>	Deploy matching local metadata; explicit member selections are required.	nvim config config::salesforce::metadata context::picker
+[Config · Salesforce metadata browser · picker] <C-x>	Delete remote metadata after dry-run and confirmations; local files remain.	nvim config config::salesforce::metadata context::picker
+[Config · Salesforce metadata browser · picker] <C-u>	Refresh the current metadata type.	nvim config config::salesforce::metadata context::picker
+[Config · Salesforce manifest picker · picker] <CR>	Retrieve the selected package manifest.	nvim config config::salesforce::manifest context::picker
+[Config · Salesforce manifest picker · picker] <C-d>	Confirm and deploy the selected package manifest.	nvim config config::salesforce::manifest context::picker
+[Config · which-key popup · popup] <C-d>	Scroll the which-key popup downward; outside it, core half-page scrolling applies.	nvim config config::which-key context::popup
+[Config · which-key popup · popup] <C-u>	Scroll the which-key popup upward; outside it, core half-page scrolling applies.	nvim config config::which-key context::popup
+[Config · which-key popup · popup] <Esc>	Close the which-key popup.	nvim config config::which-key context::popup
+[Native · Practical recipes · Normal] ciw	Change the inner word under the cursor, then enter Insert mode.	nvim native native::recipes native::text_objects mode::normal
+[Native · Practical recipes · Normal] diw	Delete the inner word under the cursor.	nvim native native::recipes native::text_objects mode::normal
+[Native · Practical recipes · Normal] daw	Delete a word together with adjacent whitespace.	nvim native native::recipes native::text_objects mode::normal
+[Native · Practical recipes · Normal] yiw	Yank the inner word under the cursor.	nvim native native::recipes native::text_objects mode::normal
+[Native · Practical recipes · Normal] ci"	Change the text inside double quotes, keeping the quotes.	nvim native native::recipes native::text_objects mode::normal
+[Native · Practical recipes · Normal] da"	Delete double-quoted text together with its quotes.	nvim native native::recipes native::text_objects mode::normal
+[Native · Practical recipes · Normal] ci(	Change text inside parentheses, keeping the parentheses.	nvim native native::recipes native::text_objects mode::normal
+[Native · Practical recipes · Normal] da(	Delete a parenthesized expression including its parentheses.	nvim native native::recipes native::text_objects mode::normal
+[Native · Practical recipes · Normal] ci{	Change text inside braces, keeping the braces.	nvim native native::recipes native::text_objects mode::normal
+[Native · Practical recipes · Normal] da{	Delete a braced block including its braces.	nvim native native::recipes native::text_objects mode::normal
+[Native · Practical recipes · Normal] cit	Change the contents inside the surrounding HTML/XML tag.	nvim native native::recipes native::text_objects mode::normal
+[Native · Practical recipes · Normal] dat	Delete the surrounding HTML/XML tag and its contents.	nvim native native::recipes native::text_objects mode::normal
+[Native · Practical recipes · Normal] ggVG	Select the entire buffer linewise.	nvim native native::recipes native::visual mode::normal
+[Native · Practical recipes · Normal] gg=G	Reindent the entire buffer.	nvim native native::recipes native::operators mode::normal
+[Native · Practical recipes · Normal] yyp	Duplicate the current line below it; this config performs yank and put through Yanky.	nvim native native::recipes native::yanks_registers mode::normal config::override
+[Native · Practical recipes · Normal] yyP	Duplicate the current line above it; this config performs yank and put through Yanky.	nvim native native::recipes native::yanks_registers mode::normal config::override
+[Native · Practical recipes · Normal] 3yyp	Yank three lines and paste them after the current line; this can interleave with the original block.	nvim native native::recipes native::counts native::yanks_registers mode::normal config::override
+[Native · Practical recipes · Normal] 3yy2jp	Yank three lines, move to the original block end, and paste an adjacent duplicate below it.	nvim native native::recipes native::counts native::yanks_registers mode::normal config::override
+[Native · Practical recipes · Normal] yy3p	Yank one line and paste three copies below.	nvim native native::recipes native::counts native::yanks_registers mode::normal config::override
+[Native · Practical recipes · Normal] 3yy	Yank the current line plus the next two lines.	nvim native native::recipes native::counts native::yanks_registers mode::normal config::override
+[Native · Practical recipes · Normal] 3dd	Delete the current line plus the next two lines.	nvim native native::recipes native::counts native::operators mode::normal
+[Native · Practical recipes · Normal] 5<C-a>	Increment the supported value under the cursor by five; Dial owns this key in the config.	nvim native native::recipes native::counts mode::normal config::override
+[Native · Practical recipes · Normal] 5<C-x>	Decrement the supported value under the cursor by five; Dial owns this key in the config.	nvim native native::recipes native::counts mode::normal config::override
+[Native · Practical recipes · Normal] <C-v>2jItext<Esc>	Insert text at the block start across three lines; use uppercase I.	nvim native native::recipes native::visual mode::normal context::blockwise
+[Native · Practical recipes · Normal] <C-v>2jAtext<Esc>	Append text at the block edge across three lines; use uppercase A.	nvim native native::recipes native::visual mode::normal context::blockwise
+[Native · Practical recipes · Normal] <C-v>2jr{char}	Replace the selected column with one character across three lines.	nvim native native::recipes native::visual mode::normal context::blockwise
+[Native · Practical recipes · Normal] <C-v>2jd	Delete the selected block column across three lines.	nvim native native::recipes native::visual mode::normal context::blockwise
+[Native · Practical recipes · Normal] V2j>	Select three lines and indent them once.	nvim native native::recipes native::visual native::operators mode::normal
+[Native · Practical recipes · Normal] V2j<	Select three lines and unindent them once.	nvim native native::recipes native::visual native::operators mode::normal
+[Native · Practical recipes · Normal] ddp	Move the current line down by one line.	nvim native native::recipes native::operators mode::normal config::override
+[Native · Practical recipes · Normal] ddkP	Move the current line up by one line.	nvim native native::recipes native::operators mode::normal config::override
+[Native · Modes/help · Insert/Visual/Replace/Command-line] <Esc>	Cancel or return to Normal mode.	nvim native native::modes_help mode::insert mode::visual mode::replace mode::command-line
+[Native · Modes/help · Insert/Visual/Replace] <C-[>	Return to Normal mode; equivalent to Escape.	nvim native native::modes_help mode::insert mode::visual mode::replace
+[Native · Modes/help · Normal] i	Enter Insert mode before the cursor.	nvim native native::modes_help mode::normal
+[Native · Modes/help · Normal] v	Enter characterwise Visual mode.	nvim native native::modes_help mode::normal
+[Native · Modes/help · Normal] V	Enter linewise Visual mode.	nvim native native::modes_help mode::normal
+[Native · Modes/help · Normal] <C-v>	Enter blockwise Visual mode.	nvim native native::modes_help mode::normal
+[Native · Modes/help · Normal] R	Enter Replace mode.	nvim native native::modes_help mode::normal
+[Native · Modes/help · Normal] :	Open the Ex command line.	nvim native native::modes_help mode::normal context::ex
+[Native · Modes/help · Ex] :help {topic}	Open help for a command, option, key, or topic.	nvim native native::modes_help context::ex context::help
+[Native · Modes/help · Ex] :help index	Open the complete native command index.	nvim native native::modes_help context::ex context::help
+[Native · Modes/help · Ex] :help quickref	Open Vim's compact quick-reference sheet.	nvim native native::modes_help context::ex context::help
+[Native · Modes/help · Ex] :help user-manual	Open the structured Vim user manual.	nvim native native::modes_help context::ex context::help
+[Native · Modes/help · Ex] :helpgrep {pattern}	Search help files and populate quickfix.	nvim native native::modes_help context::ex context::help
+[Native · Modes/help · Help buffer] <C-]>	Follow the help tag under the cursor.	nvim native native::modes_help context::help
+[Native · Modes/help · Help/tag navigation] <C-t>	Return through the tag stack.	nvim native native::modes_help context::help context::tags
+[Native · Modes/help · Ex] :version	Show version, build features, and runtime information.	nvim native native::modes_help context::ex
+[Native · Modes/help · Ex] :Tutor	Start the interactive Vim/Neovim tutor.	nvim native native::modes_help context::ex
+[Native · Modes/help · Neovim Ex] :checkhealth	Run built-in and plugin health checks.	nvim native native::modes_help context::ex context::neovim
+[Native · Modes/help · Normal] gs	CONFIG OVERRIDE: stock waits for count seconds; Flash owns gs.	nvim native native::modes_help mode::normal config::override
+[Native · Motions · Normal/Operator-pending] h / l	Move one character left / right.	nvim native native::motions mode::normal mode::operator-pending
+[Native · Motions · Normal/Operator-pending] j / k	Move one screen line down / up.	nvim native native::motions mode::normal mode::operator-pending
+[Native · Motions · Normal] <Left> / <Right> / <Up> / <Down>	CONFIG OVERRIDE: disabled reminders; use h/l/k/j.	nvim native native::motions mode::normal config::override
+[Native · Motions · Normal/Operator-pending] 0	Move to column one of the line.	nvim native native::motions mode::normal mode::operator-pending
+[Native · Motions · Normal/Operator-pending] ^	Move to the first nonblank character.	nvim native native::motions mode::normal mode::operator-pending
+[Native · Motions · Normal/Operator-pending] $	Move to the end of the line.	nvim native native::motions mode::normal mode::operator-pending
+[Native · Motions · Normal/Operator-pending] g_	Move to the last nonblank character.	nvim native native::motions mode::normal mode::operator-pending
+[Native · Motions · Normal/Operator-pending] w / b	Move to the next / previous word start.	nvim native native::motions mode::normal mode::operator-pending
+[Native · Motions · Normal/Operator-pending] e / ge	Move to the next / previous word end.	nvim native native::motions mode::normal mode::operator-pending
+[Native · Motions · Normal/Operator-pending] W / B	Move by whitespace-delimited WORD starts.	nvim native native::motions mode::normal mode::operator-pending
+[Native · Motions · Normal/Operator-pending] E / gE	Move by whitespace-delimited WORD ends.	nvim native native::motions mode::normal mode::operator-pending
+[Native · Motions · Normal/Operator-pending] f{char} / F{char}	Jump to the next / previous character on this line.	nvim native native::motions mode::normal mode::operator-pending
+[Native · Motions · Normal/Operator-pending] t{char} / T{char}	Jump just before / after that character.	nvim native native::motions mode::normal mode::operator-pending
+[Native · Motions · Normal/Operator-pending] ; / ,	Repeat the latest f/t motion forward / backward.	nvim native native::motions mode::normal mode::operator-pending
+[Native · Motions · Normal/Operator-pending] %	Jump to the matching bracket or language item.	nvim native native::motions mode::normal mode::operator-pending
+[Native · Motions · Normal] {N}%	Jump to N percent through the file.	nvim native native::motions mode::normal
+[Native · Motions · Normal/Operator-pending] gg / G	Jump to the first / last line.	nvim native native::motions mode::normal mode::operator-pending
+[Native · Motions · Normal/Operator-pending] {N}G	Jump to line N.	nvim native native::motions mode::normal mode::operator-pending
+[Native · Motions · Normal/Operator-pending] {N}|	Jump to screen column N.	nvim native native::motions mode::normal mode::operator-pending
+[Native · Motions · Normal/Operator-pending] H / M / L	Jump to the top / middle / bottom visible line.	nvim native native::motions mode::normal mode::operator-pending
+[Native · Motions · Normal] <C-f> / <C-b>	Scroll one full page forward / backward.	nvim native native::motions mode::normal
+[Native · Motions · Normal] <C-d> / <C-u>	CONFIG OVERRIDE: half-page scroll plus recenter.	nvim native native::motions mode::normal config::override
+[Native · Motions · Normal] <C-e> / <C-y>	Scroll the window down / up without intentionally moving the cursor.	nvim native native::motions mode::normal
+[Native · Motions · Normal] zz / zt / zb	Place the cursor line at center / top / bottom.	nvim native native::motions mode::normal
+[Native · Motions · Normal/Operator-pending] gj / gk	Move down / up by displayed wrapped lines.	nvim native native::motions mode::normal mode::operator-pending
+[Native · Motions · Normal/Operator-pending] g0 / g^ / g$	Move to start / first nonblank / end of the displayed line.	nvim native native::motions mode::normal mode::operator-pending
+[Native · Motions · Normal/Operator-pending] ) / (	Move to the next / previous sentence.	nvim native native::motions mode::normal mode::operator-pending
+[Native · Motions · Normal/Operator-pending] } / {	Move to the next / previous paragraph.	nvim native native::motions mode::normal mode::operator-pending
+[Native · Motions · Normal/Operator-pending] [{ / ]}	Move to the previous unmatched { / next unmatched }.	nvim native native::motions mode::normal mode::operator-pending
+[Native · Motions · Normal/Operator-pending] [( / ])	Move to the previous unmatched ( / next unmatched ).	nvim native native::motions mode::normal mode::operator-pending
+[Native · Motions · Normal/Operator-pending] + / <CR>	Move to the first nonblank of the next line.	nvim native native::motions mode::normal mode::operator-pending
+[Native · Motions · Normal/Operator-pending] -	Move to the first nonblank of the previous line.	nvim native native::motions mode::normal mode::operator-pending
+[Native · Counts · Normal/Operator-pending] {N}{motion}	Repeat a motion N times; for example 3w or 5j.	nvim native native::counts mode::normal mode::operator-pending
+[Native · Counts · Normal] {N}{operator}{motion}	Apply an operator N times; for example 2dw.	nvim native native::counts mode::normal
+[Native · Counts · Normal] {operator}{N}{motion}	Count the motion; for example d3w.	nvim native native::counts mode::normal
+[Native · Counts · Normal] {N1}{operator}{N2}{motion}	Counts multiply; 2d3w affects six words.	nvim native native::counts mode::normal
+[Native · Counts · Normal] {N}dd	Delete N lines.	nvim native native::counts mode::normal
+[Native · Counts · Normal/Insert] {N}i{text}<Esc>	Insert the text N times.	nvim native native::counts mode::normal mode::insert
+[Native · Counts · Normal] {N}r{char}	Replace N characters with char.	nvim native native::counts mode::normal
+[Native · Counts · Normal] {N}.	Repeat the latest change N times.	nvim native native::counts mode::normal
+[Native · Operators · Normal] {operator}{motion}	Apply an edit to the text covered by a motion.	nvim native native::operators mode::normal
+[Native · Operators · Normal] d{motion}	Delete motion text and save it in a register.	nvim native native::operators mode::normal
+[Native · Operators · Normal] c{motion}	Delete motion text and enter Insert mode.	nvim native native::operators mode::normal
+[Native · Operators · Normal] y{motion}	Yank motion text without changing it.	nvim native native::operators mode::normal
+[Native · Operators · Normal] dd / D	Delete the whole line / cursor through line end.	nvim native native::operators mode::normal
+[Native · Operators · Normal] cc / C	Change the whole line / cursor through line end.	nvim native native::operators mode::normal
+[Native · Operators · Normal] yy	Yank the current line linewise.	nvim native native::operators mode::normal
+[Native · Operators · Normal] Y	Yank to line end in Neovim defaults; historical Vim uses yy.	nvim native native::operators mode::normal context::neovim
+[Native · Operators · Normal] x	CONFIG OVERRIDE: stock deletes into registers; config uses the black-hole register.	nvim native native::operators mode::normal config::override
+[Native · Operators · Normal] X	Delete the character before the cursor.	nvim native native::operators mode::normal
+[Native · Operators · Normal] s	CONFIG PREFIX CONFLICT: stock substitutes characters; s-prefixed split maps may delay or intercept sequences.	nvim native native::operators mode::normal config::override
+[Native · Operators · Normal] S	Change the current line; equivalent to cc.	nvim native native::operators mode::normal
+[Native · Operators · Normal] r{char}	Replace character(s) without entering Insert mode.	nvim native native::operators mode::normal
+[Native · Operators · Normal] gR	Enter Virtual Replace mode using screen columns.	nvim native native::operators mode::normal
+[Native · Operators · Normal] gr{char}	CONFIG OVERRIDE: stock virtual-replaces characters; bare gr is LSP references.	nvim native native::operators mode::normal config::override
+[Native · Operators · Normal] ~	Switch the character's case and advance.	nvim native native::operators mode::normal
+[Native · Operators · Normal] g~{motion}	Switch case over motion text.	nvim native native::operators mode::normal
+[Native · Operators · Normal] gu{motion} / gU{motion}	Lowercase / uppercase motion text.	nvim native native::operators mode::normal
+[Native · Operators · Normal] guu / gUU / g~~	Lowercase / uppercase / swap case on the line.	nvim native native::operators mode::normal
+[Native · Operators · Normal] >{motion} / <{motion}	Indent / unindent motion lines.	nvim native native::operators mode::normal
+[Native · Operators · Normal] >> / <<	Indent / unindent the current line.	nvim native native::operators mode::normal
+[Native · Operators · Normal] ={motion} / ==	Reindent motion text / the current line.	nvim native native::operators mode::normal
+[Native · Operators · Normal] gq{motion} / gqq	Format motion text / the current line.	nvim native native::operators mode::normal
+[Native · Operators · Normal] !{motion} / !!	Filter motion text / the current line through a shell command.	nvim native native::operators mode::normal
+[Native · Operators · Normal] J	Join the next line while normalizing surrounding whitespace.	nvim native native::operators mode::normal
+[Native · Operators · Normal] gJ	Join the next line without inserting or removing spaces.	nvim native native::operators mode::normal
+[Native · Operators · Normal, Neovim] gc{motion}	CONFIG OVERRIDE: Neovim's native comment operator is provided instead by Comment.nvim.	nvim native native::operators mode::normal context::neovim config::override
+[Native · Operators · Normal, Neovim] gcc	CONFIG OVERRIDE: Neovim's native line-comment toggle is provided by Comment.nvim.	nvim native native::operators mode::normal context::neovim config::override
+[Native · Operators · Normal, Neovim] gcgc	CONFIG OVERRIDE: operate on the surrounding comment block; Comment.nvim owns gc here.	nvim native native::operators mode::normal context::neovim config::override
+[Native · Text objects · Operator-pending/Visual] i{object} / a{object}	Select inner content / a wider object including boundaries.	nvim native native::text_objects mode::operator-pending mode::visual
+[Native · Text objects · Operator-pending/Visual] iw / aw	Select the inner word / a word with surrounding space.	nvim native native::text_objects mode::operator-pending mode::visual
+[Native · Text objects · Operator-pending/Visual] iW / aW	Select the inner WORD / a whitespace-delimited WORD.	nvim native native::text_objects mode::operator-pending mode::visual
+[Native · Text objects · Operator-pending/Visual] is / as	Select the inner sentence / a sentence.	nvim native native::text_objects mode::operator-pending mode::visual
+[Native · Text objects · Operator-pending/Visual] ip / ap	Select the inner paragraph / a paragraph.	nvim native native::text_objects mode::operator-pending mode::visual
+[Native · Text objects · Operator-pending/Visual] i" / a"	Select inside double quotes / including the quotes.	nvim native native::text_objects mode::operator-pending mode::visual
+[Native · Text objects · Operator-pending/Visual] i' / a'	Select inside single quotes / including the quotes.	nvim native native::text_objects mode::operator-pending mode::visual
+[Native · Text objects · Operator-pending/Visual] i` / a`	Select inside backticks / including the backticks.	nvim native native::text_objects mode::operator-pending mode::visual
+[Native · Text objects · Operator-pending/Visual] i( / a(	Select inside parentheses / including the parentheses.	nvim native native::text_objects mode::operator-pending mode::visual
+[Native · Text objects · Operator-pending/Visual] ib / ab	Aliases for i( / a(.	nvim native native::text_objects mode::operator-pending mode::visual
+[Native · Text objects · Operator-pending/Visual] i[ / a[	Select inside brackets / including the brackets.	nvim native native::text_objects mode::operator-pending mode::visual
+[Native · Text objects · Operator-pending/Visual] i{ / a{	Select inside braces / including the braces.	nvim native native::text_objects mode::operator-pending mode::visual
+[Native · Text objects · Operator-pending/Visual] iB / aB	Aliases for i{ / a{.	nvim native native::text_objects mode::operator-pending mode::visual
+[Native · Text objects · Operator-pending/Visual] i< / a<	Select inside angle brackets / including the brackets.	nvim native native::text_objects mode::operator-pending mode::visual
+[Native · Text objects · Operator-pending/Visual] it / at	Select inside an XML/HTML tag / including the tags.	nvim native native::text_objects mode::operator-pending mode::visual
+[Native · Text objects · Operator-pending/Visual] {N}i(	Select a progressively outer nested pair.	nvim native native::text_objects mode::operator-pending mode::visual
+[Native · Insert changes · Normal] a / A	Insert after the cursor / at line end.	nvim native native::insert_changes mode::normal
+[Native · Insert changes · Normal] I	Insert at the first nonblank character.	nvim native native::insert_changes mode::normal
+[Native · Insert changes · Normal] o / O	Open a new line below / above and insert.	nvim native native::insert_changes mode::normal
+[Native · Insert changes · Normal] gi	Resume Insert mode at the last insertion position.	nvim native native::insert_changes mode::normal
+[Native · Insert changes · Insert] <C-o>{normal-command}	Execute one Normal command and resume inserting.	nvim native native::insert_changes mode::insert mode::normal
+[Native · Insert changes · Insert] <BS> / <C-h>	Delete the character before the cursor.	nvim native native::insert_changes mode::insert
+[Native · Insert changes · Insert] <Del>	Delete the character under the cursor.	nvim native native::insert_changes mode::insert
+[Native · Insert changes · Insert] <C-w>	Delete the preceding word.	nvim native native::insert_changes mode::insert
+[Native · Insert changes · Insert] <C-u>	Delete inserted text back to the line start.	nvim native native::insert_changes mode::insert
+[Native · Insert changes · Insert] <C-t> / <C-d>	Increase / decrease the current line's indent.	nvim native native::insert_changes mode::insert
+[Native · Insert changes · Insert] <C-v>{char-or-code}	Insert the next key literally or enter a numeric character code.	nvim native native::insert_changes mode::insert
+[Native · Insert changes · Insert] <C-k>{two chars}	Insert a digraph.	nvim native native::insert_changes mode::insert
+[Native · Insert changes · Insert] <C-r>{reg}	Insert a register's contents.	nvim native native::insert_changes mode::insert
+[Native · Insert changes · Insert] <C-r>=	Evaluate an expression and insert its result.	nvim native native::insert_changes mode::insert
+[Native · Insert changes · Insert] <C-a>	Insert the previously inserted text; Dial's Normal/Visual override does not apply here.	nvim native native::insert_changes mode::insert
+[Native · Insert changes · Insert] <C-@>	Insert previously inserted text and leave Insert mode.	nvim native native::insert_changes mode::insert
+[Native · Insert changes · Insert] <C-n> / <C-p>	Select the next / previous native keyword-completion candidate.	nvim native native::insert_changes mode::insert
+[Native · Insert changes · Insert] <C-x><C-f>	Complete a file name.	nvim native native::insert_changes mode::insert
+[Native · Insert changes · Insert] <C-x><C-l>	Complete a whole line.	nvim native native::insert_changes mode::insert
+[Native · Insert changes · Insert] <C-x><C-o>	Run omnifunction completion.	nvim native native::insert_changes mode::insert
+[Native · Insert changes · Insert] <C-y> / <C-e>	Copy the character above / below when completion is inactive.	nvim native native::insert_changes mode::insert
+[Native · Yanks/registers · Normal/Visual] "{reg}{operator}	Direct the next yank, delete, change, or put to a register.	nvim native native::yanks_registers mode::normal mode::visual
+[Native · Yanks/registers · Normal/Visual] ""	Explicitly select the unnamed register.	nvim native native::yanks_registers mode::normal mode::visual
+[Native · Yanks/registers · Normal/Visual] "0	Select the most recent yank register.	nvim native native::yanks_registers mode::normal mode::visual
+[Native · Yanks/registers · Normal/Visual] "1 through "9	Select recent delete/change history, newest first.	nvim native native::yanks_registers mode::normal mode::visual
+[Native · Yanks/registers · Normal/Visual] "-	Select the small-delete register.	nvim native native::yanks_registers mode::normal mode::visual
+[Native · Yanks/registers · Normal/Visual] "_	Select the black-hole register and discard text.	nvim native native::yanks_registers mode::normal mode::visual
+[Native · Yanks/registers · Normal/Visual] "a through "z	Select a named register.	nvim native native::yanks_registers mode::normal mode::visual
+[Native · Yanks/registers · Normal/Visual] "A through "Z	Append to the corresponding named register.	nvim native native::yanks_registers mode::normal mode::visual
+[Native · Yanks/registers · Normal/Visual] "+	Select the system clipboard register.	nvim native native::yanks_registers mode::normal mode::visual context::clipboard
+[Native · Yanks/registers · Normal/Visual] "*	Select the primary-selection clipboard where supported.	nvim native native::yanks_registers mode::normal mode::visual context::clipboard
+[Native · Yanks/registers · Insert/Command-line] "%	Insert the current file name.	nvim native native::yanks_registers mode::insert mode::command-line
+[Native · Yanks/registers · Insert/Command-line] "#	Insert the alternate file name.	nvim native native::yanks_registers mode::insert mode::command-line
+[Native · Yanks/registers · Insert/Command-line] ":	Insert the most recently executed Ex command.	nvim native native::yanks_registers mode::insert mode::command-line
+[Native · Yanks/registers · Insert/Command-line] "/	Insert the latest search pattern.	nvim native native::yanks_registers mode::insert mode::command-line
+[Native · Yanks/registers · Insert/Command-line] ".	Insert the most recently inserted text.	nvim native native::yanks_registers mode::insert mode::command-line
+[Native · Yanks/registers · Normal/Insert/Command-line] "=	Use the expression register.	nvim native native::yanks_registers mode::normal mode::insert mode::command-line
+[Native · Yanks/registers · Ex] :registers [names]	Show register contents, optionally limited to selected registers.	nvim native native::yanks_registers context::ex
+[Native · Yanks/registers · Normal] p / P	CONFIG OVERRIDE: Yanky puts after / before using its yank ring.	nvim native native::yanks_registers mode::normal config::override
+[Native · Yanks/registers · Normal] gp / gP	CONFIG OVERRIDE: Yanky puts after / before and leaves the cursor after the text.	nvim native native::yanks_registers mode::normal config::override
+[Native · Yanks/registers · Visual] p / P	CONFIG OVERRIDE: replace the selection using Yanky; stock also updates registers.	nvim native native::yanks_registers mode::visual config::override
+[Native · Yanks/registers · Normal] [p / ]p	Put before / after while adjusting linewise indentation.	nvim native native::yanks_registers mode::normal
+[Native · Yanks/registers · Normal] "0p	Put the latest yank even after later deletes.	nvim native native::yanks_registers mode::normal
+[Native · Yanks/registers · Normal] "+y{motion}	Yank motion text to the system clipboard.	nvim native native::yanks_registers mode::normal context::clipboard
+[Native · Yanks/registers · Ex] :put {reg} / :put! {reg}	Put a register below / above the addressed line.	nvim native native::yanks_registers context::ex
+[Native · Yanks/registers · Ex] :put =expression	Evaluate an expression and insert its result as a line.	nvim native native::yanks_registers context::ex
+[Native · Undo/repeat · Normal] u	Undo the latest change block.	nvim native native::undo_repeat mode::normal
+[Native · Undo/repeat · Normal] <C-r>	Redo the latest undone change.	nvim native native::undo_repeat mode::normal
+[Native · Undo/repeat · Normal] U	Undo the latest changes made on one line.	nvim native native::undo_repeat mode::normal
+[Native · Undo/repeat · Normal] .	Repeat the latest repeatable change.	nvim native native::undo_repeat mode::normal
+[Native · Undo/repeat · Insert] <C-g>u	Start a new undo block without leaving Insert mode.	nvim native native::undo_repeat mode::insert
+[Native · Undo/repeat · Ex] :undo / :redo	Undo / redo one change.	nvim native native::undo_repeat context::ex
+[Native · Undo/repeat · Ex] :earlier 5m	Move to the text state from about five minutes earlier.	nvim native native::undo_repeat context::ex
+[Native · Undo/repeat · Ex] :later 5m	Move to the text state from about five minutes later.	nvim native native::undo_repeat context::ex
+[Native · Undo/repeat · Normal] g- / g+	Traverse older / newer states chronologically across undo branches.	nvim native native::undo_repeat mode::normal
+[Native · Undo/repeat · Ex] :undolist	Show undo-tree leaves.	nvim native native::undo_repeat context::ex
+[Native · Search/substitute · Normal] /pattern	Search forward for a pattern.	nvim native native::search_substitute mode::normal context::search
+[Native · Search/substitute · Normal] ?pattern	Search backward for a pattern.	nvim native native::search_substitute mode::normal context::search
+[Native · Search/substitute · Normal] n / N	CONFIG OVERRIDE: repeat search in the same / opposite direction and recenter.	nvim native native::search_substitute mode::normal config::override
+[Native · Search/substitute · Normal] * / #	Search forward / backward for the exact word under the cursor.	nvim native native::search_substitute mode::normal
+[Native · Search/substitute · Normal] g* / g#	Search forward / backward for cursor text without word boundaries.	nvim native native::search_substitute mode::normal
+[Native · Search/substitute · Command-line search] /<C-r><C-w>	Insert the word under the cursor into the search.	nvim native native::search_substitute mode::command-line context::search
+[Native · Search/substitute · Search pattern] \c / \C	Force case-insensitive / case-sensitive matching.	nvim native native::search_substitute context::search-pattern
+[Native · Search/substitute · Search pattern] \V	Treat the remainder mostly literally with very nomagic.	nvim native native::search_substitute context::search-pattern
+[Native · Search/substitute · Search pattern] \< / \>	Match a word start / word end.	nvim native native::search_substitute context::search-pattern
+[Native · Search/substitute · Ex] :nohlsearch	Hide search highlighting without clearing the pattern.	nvim native native::search_substitute context::ex
+[Native · Search/substitute · Ex] :s/old/new/	Replace the first match on the current line.	nvim native native::search_substitute context::ex
+[Native · Search/substitute · Ex] :s/old/new/g	Replace every match on the current line.	nvim native native::search_substitute context::ex
+[Native · Search/substitute · Ex] :%s/old/new/g	Replace every match in the buffer.	nvim native native::search_substitute context::ex
+[Native · Search/substitute · Ex] :%s/old/new/gc	Replace buffer-wide with confirmation.	nvim native native::search_substitute context::ex
+[Native · Search/substitute · Ex] :'<,'>s/old/new/g	Replace throughout the last Visual line range.	nvim native native::search_substitute context::ex mode::visual
+[Native · Search/substitute · Ex] :%s//new/g	Replace the most recent search pattern.	nvim native native::search_substitute context::ex
+[Native · Search/substitute · Ex] :%s/old//g	Delete every matching occurrence.	nvim native native::search_substitute context::ex
+[Native · Search/substitute · Ex] :s#old/path#new/path#g	Use another delimiter for slash-heavy patterns.	nvim native native::search_substitute context::ex
+[Native · Search/substitute · Replacement] & / \0	Insert the entire matched text.	nvim native native::search_substitute context::replacement
+[Native · Search/substitute · Replacement] \1 through \9	Insert a captured subexpression.	nvim native native::search_substitute context::replacement
+[Native · Search/substitute · Normal] &	Repeat the latest substitution on the current line.	nvim native native::search_substitute mode::normal
+[Native · Search/substitute · Normal] g&	Repeat the latest substitution with flags across the buffer.	nvim native native::search_substitute mode::normal
+[Native · Search/substitute · Normal/Visual/Operator-pending] gn / gN	Select or operate through the next / previous search match.	nvim native native::search_substitute mode::normal mode::visual mode::operator-pending
+[Native · Marks/jumps/changes · Normal] m{a-z}	Set a buffer-local mark.	nvim native native::marks_jumps_changes mode::normal
+[Native · Marks/jumps/changes · Normal] m{A-Z}	Set a global mark that can jump between files.	nvim native native::marks_jumps_changes mode::normal
+[Native · Marks/jumps/changes · Normal/Operator-pending] '{mark}	Jump to the mark's line and first nonblank.	nvim native native::marks_jumps_changes mode::normal mode::operator-pending
+[Native · Marks/jumps/changes · Normal/Operator-pending] `{mark}	Jump to the mark's exact position.	nvim native native::marks_jumps_changes mode::normal mode::operator-pending
+[Native · Marks/jumps/changes · Normal] ''	Jump to the line before the latest jump.	nvim native native::marks_jumps_changes mode::normal
+[Native · Marks/jumps/changes · Normal] ``	Jump to the exact position before the latest jump.	nvim native native::marks_jumps_changes mode::normal
+[Native · Marks/jumps/changes · Normal] '. / `.	Jump to the line / exact position of the latest change.	nvim native native::marks_jumps_changes mode::normal
+[Native · Marks/jumps/changes · Normal] '^ / `^	Jump to the line / exact position where Insert mode last ended.	nvim native native::marks_jumps_changes mode::normal
+[Native · Marks/jumps/changes · Normal] `[ / `]	Jump to the exact start / end of the last changed or yanked text.	nvim native native::marks_jumps_changes mode::normal
+[Native · Marks/jumps/changes · Normal] `< / `>	Jump to the exact start / end of the previous Visual selection.	nvim native native::marks_jumps_changes mode::normal
+[Native · Marks/jumps/changes · Normal] '0	Jump to the position where this file was last exited.	nvim native native::marks_jumps_changes mode::normal
+[Native · Marks/jumps/changes · Normal] <C-o> / <C-i>	Move to older / newer positions in the jump list.	nvim native native::marks_jumps_changes mode::normal
+[Native · Marks/jumps/changes · Ex] :jumps	Show the current window's jump list.	nvim native native::marks_jumps_changes context::ex
+[Native · Marks/jumps/changes · Normal] g; / g,	Move to older / newer entries in the change list.	nvim native native::marks_jumps_changes mode::normal
+[Native · Marks/jumps/changes · Ex] :changes	Show the current buffer's change list.	nvim native native::marks_jumps_changes context::ex
+[Native · Marks/jumps/changes · Ex] :marks	Show defined marks.	nvim native native::marks_jumps_changes context::ex
+[Native · Marks/jumps/changes · Ex] :delmarks a b	Delete selected marks.	nvim native native::marks_jumps_changes context::ex
+[Native · Marks/jumps/changes · Ex] :delmarks!	Delete all lowercase local marks.	nvim native native::marks_jumps_changes context::ex
+[Native · Visual mode · Visual] o	Move the cursor to the other end of the selection.	nvim native native::visual mode::visual
+[Native · Visual mode · Blockwise Visual] O	Move to the other horizontal corner.	nvim native native::visual mode::visual context::blockwise
+[Native · Visual mode · Normal] gv	Reselect the previous Visual area and mode.	nvim native native::visual mode::normal mode::visual
+[Native · Visual mode · Visual] d / c / y	Delete / change / yank the selection.	nvim native native::visual mode::visual
+[Native · Visual mode · Visual] r{char}	Replace every selected character with char.	nvim native native::visual mode::visual
+[Native · Visual mode · Visual] ~ / u / U	Swap / lowercase / uppercase the selection.	nvim native native::visual mode::visual
+[Native · Visual mode · Visual] > / <	Indent / unindent selected lines.	nvim native native::visual mode::visual
+[Native · Visual mode · Visual] =	Reindent selected lines.	nvim native native::visual mode::visual
+[Native · Visual mode · Visual] gq	Format the selected text.	nvim native native::visual mode::visual
+[Native · Visual mode · Visual] :	Open Ex with the '<,'> selection range inserted.	nvim native native::visual mode::visual context::ex
+[Native · Visual mode · Blockwise Visual] I / A	Insert before / append after every selected line.	nvim native native::visual mode::visual context::blockwise
+[Native · Visual mode · Blockwise Visual] $	Extend each selected row to its line end.	nvim native native::visual mode::visual context::blockwise
+[Native · Visual mode · Visual] J	CONFIG OVERRIDE: stock joins selected lines; config moves the selection down.	nvim native native::visual mode::visual config::override
+[Native · Visual mode · Visual] K	CONFIG OVERRIDE: stock runs keyword lookup; config moves the selection up.	nvim native native::visual mode::visual config::override
+[Native · Visual mode · Visual] <C-a> / <C-x>	CONFIG OVERRIDE: stock increments / decrements selected values; Dial owns them.	nvim native native::visual mode::visual config::override
+[Native · Visual mode · Visual] g<C-a> / g<C-x>	CONFIG OVERRIDE: stock creates progressive numeric sequences; Dial owns them.	nvim native native::visual mode::visual config::override
+[Native · Files · Ex] :edit {file}	Edit a file in the current window.	nvim native native::files context::ex
+[Native · Files · Ex] :enew	Create a new unnamed buffer in the current window.	nvim native native::files context::ex
+[Native · Files · Ex] :find {file}	Find and edit a file using the path option.	nvim native native::files context::ex
+[Native · Files · Normal] gf	Edit the file name under the cursor.	nvim native native::files mode::normal
+[Native · Files · Normal] gF	Edit the file under the cursor and jump to a following line number.	nvim native native::files mode::normal
+[Native · Files · Ex] :write	Write the current buffer.	nvim native native::files context::ex
+[Native · Files · Ex] :update	Write only if the current buffer changed.	nvim native native::files context::ex
+[Native · Files · Ex] :wall	Write all changed buffers.	nvim native native::files context::ex
+[Native · Files · Ex] :write {file}	Write to another path without necessarily renaming the buffer.	nvim native native::files context::ex
+[Native · Files · Ex] :saveas {file}	Write and make that path the current file name.	nvim native native::files context::ex
+[Native · Files · Ex] :file {name}	Change the buffer's displayed file name without writing.	nvim native native::files context::ex
+[Native · Files · Ex] :edit!	Reload and discard unsaved buffer changes.	nvim native native::files context::ex
+[Native · Files · Ex] :quit / :quit!	Close the window; bang discards blocking changes.	nvim native native::files context::ex
+[Native · Files · Ex] :wq	Write and close the window.	nvim native native::files context::ex
+[Native · Files · Ex] :x	Write only if changed and close.	nvim native native::files context::ex
+[Native · Files · Normal] ZZ / ZQ	Write-if-changed and quit / quit without writing.	nvim native native::files mode::normal
+[Native · Files · Ex] :qall / :qall!	Quit all windows; bang discards changes.	nvim native native::files context::ex
+[Native · Files · Ex] :pwd	Show the current working directory.	nvim native native::files context::ex
+[Native · Files · Ex] :cd {dir}	Change the global working directory.	nvim native native::files context::ex
+[Native · Files · Ex] :lcd {dir}	Change the current window's working directory.	nvim native native::files context::ex
+[Native · Files · Ex] :tcd {dir}	Change the current tabpage's working directory.	nvim native native::files context::ex
+[Native · Files · Ex] :oldfiles	List files remembered in Viminfo/ShaDa.	nvim native native::files context::ex
+[Native · Files · Ex] :read {file}	Insert another file below the addressed line.	nvim native native::files context::ex
+[Native · Buffers · Ex] :buffers / :ls	List buffers and their state flags.	nvim native native::buffers context::ex
+[Native · Buffers · Ex] :buffer {number-or-name}	Display a listed buffer in the current window.	nvim native native::buffers context::ex
+[Native · Buffers · Normal/Ex] :b# / <C-^>	Switch to the alternate buffer.	nvim native native::buffers mode::normal context::ex
+[Native · Buffers · Ex] :bnext / :bprevious	Move through listed buffers.	nvim native native::buffers context::ex
+[Native · Buffers · Ex] :bfirst / :blast	Move to the first / last listed buffer.	nvim native native::buffers context::ex
+[Native · Buffers · Ex] :bdelete	Remove a buffer from the list without deleting its file.	nvim native native::buffers context::ex
+[Native · Buffers · Ex] :bwipeout	Remove a buffer plus its marks and buffer-local state.	nvim native native::buffers context::ex
+[Native · Buffers · Ex] :hide	Close the current window while retaining its buffer and changes.	nvim native native::buffers context::ex
+[Native · Buffers · Ex] :sbuffer {buffer}	Open a buffer in a new split.	nvim native native::buffers context::ex
+[Native · Argument list · Ex] :args	Show the argument list and current position.	nvim native native::arglist context::ex
+[Native · Argument list · Ex] :args {files}	Replace the argument list.	nvim native native::arglist context::ex
+[Native · Argument list · Ex] :next / :previous	Edit the next / previous argument.	nvim native native::arglist context::ex
+[Native · Argument list · Ex] :first / :last	Edit the first / last argument.	nvim native native::arglist context::ex
+[Native · Argument list · Ex] :argadd {files}	Add files to the argument list.	nvim native native::arglist context::ex
+[Native · Argument list · Ex] :argdelete {files}	Remove files from the argument list.	nvim native native::arglist context::ex
+[Native · Argument list · Ex] :argdo {command}	Run a command for every argument.	nvim native native::arglist context::ex
+[Native · Argument list · Ex] :wnext / :wprevious	Write and move to the next / previous argument.	nvim native native::arglist context::ex
+[Native · Tabpages · Ex] :tabnew	Create a tabpage with a new buffer.	nvim native native::tabpages context::ex
+[Native · Tabpages · Ex] :tabedit {file}	Edit a file in a new tabpage.	nvim native native::tabpages context::ex
+[Native · Tabpages · Ex] :tabs	List tabpages and their windows.	nvim native native::tabpages context::ex
+[Native · Tabpages · Normal] gt / gT	Go to the next / previous tabpage.	nvim native native::tabpages mode::normal
+[Native · Tabpages · Normal] {N}gt	Go to tabpage N.	nvim native native::tabpages mode::normal
+[Native · Tabpages · Ex] :tabfirst / :tablast	Go to the first / last tabpage.	nvim native native::tabpages context::ex
+[Native · Tabpages · Ex] :tabclose	Close the current tabpage.	nvim native native::tabpages context::ex
+[Native · Tabpages · Ex] :tabonly	Close every other tabpage.	nvim native native::tabpages context::ex
+[Native · Tabpages · Ex] :tabmove {N}	Move the current tabpage after position N.	nvim native native::tabpages context::ex
+[Native · Tabpages · Ex] :tab split	Open the current buffer in a new tabpage.	nvim native native::tabpages context::ex
+[Native · Tabpages · Ex] :tabdo {command}	Run a command in each tabpage.	nvim native native::tabpages context::ex
+[Native · Windows · Ex] :split [file] / :vsplit [file]	Create a horizontal / vertical split.	nvim native native::windows context::ex
+[Native · Windows · Ex] :new / :vnew	Create a horizontal / vertical split with a new buffer.	nvim native native::windows context::ex
+[Native · Windows · Normal] <C-w>s / <C-w>v	Split the current window horizontally / vertically.	nvim native native::windows mode::normal
+[Native · Windows · Normal] <C-w>n	Open a new buffer in a horizontal split.	nvim native native::windows mode::normal
+[Native · Windows · Normal] <C-w>h / j / k / l	Focus the window left / below / above / right.	nvim native native::windows mode::normal
+[Native · Windows · Normal] <C-w>w / <C-w>W	Cycle windows forward / backward.	nvim native native::windows mode::normal
+[Native · Windows · Normal] <C-w>p	Return to the previously focused window.	nvim native native::windows mode::normal
+[Native · Windows · Normal] <C-w>t / <C-w>b	Focus the top-left / bottom-right window.	nvim native native::windows mode::normal
+[Native · Windows · Normal] <C-w>c	Close the current window.	nvim native native::windows mode::normal
+[Native · Windows · Normal] <C-w>q	Quit the current window.	nvim native native::windows mode::normal
+[Native · Windows · Normal] <C-w>o	Keep only the current window.	nvim native native::windows mode::normal
+[Native · Windows · Normal] <C-w>=	Equalize split sizes.	nvim native native::windows mode::normal
+[Native · Windows · Normal] <C-w>_ / <C-w>|	Maximize the current window's height / width.	nvim native native::windows mode::normal
+[Native · Windows · Normal] <C-w>+ / <C-w>-	Increase / decrease window height.	nvim native native::windows mode::normal
+[Native · Windows · Normal] <C-w>> / <C-w><	Increase / decrease window width.	nvim native native::windows mode::normal
+[Native · Windows · Normal] <C-w>H / J / K / L	Move the window to the far left / bottom / top / right.	nvim native native::windows mode::normal
+[Native · Windows · Normal] <C-w>r / <C-w>R	Rotate windows forward / backward.	nvim native native::windows mode::normal
+[Native · Windows · Normal] <C-w>x	Exchange the current window with the next one.	nvim native native::windows mode::normal
+[Native · Windows · Normal] <C-w>f	Open the file under the cursor in a split.	nvim native native::windows mode::normal
+[Native · Windows · Normal] <C-w>gf	Open the file under the cursor in a new tabpage.	nvim native native::windows mode::normal
+[Native · Windows · Ex] :resize {N}	Set the current window's height.	nvim native native::windows context::ex
+[Native · Windows · Ex] :vertical resize {N}	Set the current window's width.	nvim native native::windows context::ex
+[Native · Folds · Normal] zf{motion}	Create a manual fold over motion lines.	nvim native native::folds mode::normal
+[Native · Folds · Visual] zf	Create a manual fold over the selection.	nvim native native::folds mode::visual
+[Native · Folds · Normal] zo / zc	Open / close one fold under the cursor.	nvim native native::folds mode::normal
+[Native · Folds · Normal] za	Toggle one fold under the cursor.	nvim native native::folds mode::normal
+[Native · Folds · Normal] zO / zC	Open / close folds recursively.	nvim native native::folds mode::normal
+[Native · Folds · Normal] zA	Toggle a fold recursively.	nvim native native::folds mode::normal
+[Native · Folds · Normal] zR / zM	Open / close all folds in the window.	nvim native native::folds mode::normal
+[Native · Folds · Normal] zr / zm	Reduce / increase global folding by one level.	nvim native native::folds mode::normal
+[Native · Folds · Normal] zj / zk	Jump to the next / previous fold boundary.	nvim native native::folds mode::normal
+[Native · Folds · Normal] [z / ]z	Jump to the start / end of the containing open fold.	nvim native native::folds mode::normal
+[Native · Folds · Normal] zv	Open enough folds to reveal the cursor line.	nvim native native::folds mode::normal
+[Native · Folds · Normal] zx	Recompute folds, reset manual fold state, and reveal the cursor.	nvim native native::folds mode::normal
+[Native · Folds · Normal] zi	Toggle fold display through foldenable.	nvim native native::folds mode::normal
+[Native · Folds · Normal] zd	Delete one manual fold.	nvim native native::folds mode::normal
+[Native · Folds · Normal] zD	Delete manual folds recursively under the cursor.	nvim native native::folds mode::normal
+[Native · Folds · Normal] zE	Delete all manual folds in the window.	nvim native native::folds mode::normal
+[Native · Quickfix · Ex] :copen / :cclose	Open / close the global quickfix window.	nvim native native::quickfix context::ex
+[Native · Quickfix · Ex] :cwindow	Open quickfix only when it contains valid entries.	nvim native native::quickfix context::ex
+[Native · Quickfix · Ex] :cnext / :cprevious	Go to the next / previous quickfix entry.	nvim native native::quickfix context::ex
+[Native · Quickfix · Ex] :cfirst / :clast	Go to the first / last quickfix entry.	nvim native native::quickfix context::ex
+[Native · Quickfix · Ex] :cc {N}	Go to quickfix entry N.	nvim native native::quickfix context::ex
+[Native · Quickfix · Ex] :colder / :cnewer	Move through older / newer quickfix lists.	nvim native native::quickfix context::ex
+[Native · Quickfix · Ex] :cdo {command}	Run a command at every valid quickfix entry.	nvim native native::quickfix context::ex
+[Native · Quickfix · Ex] :cfdo {command}	Run a command once per file in quickfix.	nvim native native::quickfix context::ex
+[Native · Quickfix · Ex] :make	Run makeprg and load errors into quickfix.	nvim native native::quickfix context::ex
+[Native · Quickfix · Ex] :grep {pattern} {files}	Run grepprg and load matches into quickfix.	nvim native native::quickfix context::ex
+[Native · Quickfix · Ex] :vimgrep /pattern/gj {files}	Search files internally and populate quickfix.	nvim native native::quickfix context::ex
+[Native · Quickfix · Quickfix window] <CR>	Open the selected entry.	nvim native native::quickfix context::quickfix-window
+[Native · Location list · Ex] :lopen / :lclose	Open / close the current window's location list.	nvim native native::location_list context::ex
+[Native · Location list · Ex] :lwindow	Open the location list only when it has valid entries.	nvim native native::location_list context::ex
+[Native · Location list · Ex] :lnext / :lprevious	Go to the next / previous location-list entry.	nvim native native::location_list context::ex
+[Native · Location list · Ex] :lfirst / :llast	Go to the first / last location-list entry.	nvim native native::location_list context::ex
+[Native · Location list · Ex] :ll {N}	Go to location-list entry N.	nvim native native::location_list context::ex
+[Native · Location list · Ex] :lolder / :lnewer	Move through older / newer location lists.	nvim native native::location_list context::ex
+[Native · Location list · Ex] :ldo {command}	Run a command at each location-list entry.	nvim native native::location_list context::ex
+[Native · Location list · Ex] :lfdo {command}	Run a command once per location-list file.	nvim native native::location_list context::ex
+[Native · Location list · Ex] :lvimgrep /pattern/gj {files}	Search files and populate the location list.	nvim native native::location_list context::ex
+[Native · Command line/history · Command-line] <Esc> / <C-c>	Cancel the current command line.	nvim native native::command_line mode::command-line
+[Native · Command line/history · Command-line] <Left> / <Right>	Move through command-line characters.	nvim native native::command_line mode::command-line
+[Native · Command line/history · Command-line] <C-b> / <C-e>	Move to the command-line beginning / end.	nvim native native::command_line mode::command-line
+[Native · Command line/history · Command-line] <C-w> / <C-u>	Delete the previous word / back to line start.	nvim native native::command_line mode::command-line
+[Native · Command line/history · Command-line] <C-r>{reg}	Insert a register into the command line.	nvim native native::command_line mode::command-line
+[Native · Command line/history · Command-line] <C-r><C-w>	Insert the word under the cursor.	nvim native native::command_line mode::command-line
+[Native · Command line/history · Command-line] <Tab> / <S-Tab>	Cycle forward / backward through completions.	nvim native native::command_line mode::command-line
+[Native · Command line/history · Command-line] <C-d>	List available completions.	nvim native native::command_line mode::command-line
+[Native · Command line/history · Command-line] <Up> / <Down>	Move through command or search history.	nvim native native::command_line mode::command-line
+[Native · Command line/history · Command-line] <C-p> / <C-n>	Select the previous / next history entry.	nvim native native::command_line mode::command-line
+[Native · Command line/history · Normal] q:	Open editable Ex command history.	nvim native native::command_line mode::normal context::history
+[Native · Command line/history · Normal] q/ / q?	Open editable forward / backward search history.	nvim native native::command_line mode::normal context::history
+[Native · Command line/history · Command-line] <C-f>	Open the editable command-line window.	nvim native native::command_line mode::command-line context::history
+[Native · Command line/history · Ex] :history	Show command and search histories.	nvim native native::command_line context::ex context::history
+[Native · Command line/history · Ex range] :%{command}	Run a line command over the whole buffer.	nvim native native::command_line context::ex context::ex-range
+[Native · Command line/history · Ex range] :.{command} / :${command}	Address the current / last line.	nvim native native::command_line context::ex context::ex-range
+[Native · Command line/history · Ex range] :1,10{command}	Address lines 1 through 10.	nvim native native::command_line context::ex context::ex-range
+[Native · Command line/history · Ex range] :'<,'>{command}	Address the previous Visual line range.	nvim native native::command_line context::ex context::ex-range mode::visual
+[Native · Command line/history · Ex] :command1 | command2	Run multiple Ex commands in sequence.	nvim native native::command_line context::ex
+[Native · Macros · Normal] q{reg}	Start recording typed commands into a register.	nvim native native::macros mode::normal
+[Native · Macros · Normal, recording] q	Stop macro recording.	nvim native native::macros mode::normal context::recording
+[Native · Macros · Normal] @{reg}	Execute a recorded macro.	nvim native native::macros mode::normal
+[Native · Macros · Normal] @@	Repeat the most recently executed macro.	nvim native native::macros mode::normal
+[Native · Macros · Normal] {N}@{reg}	Execute a macro N times.	nvim native native::macros mode::normal
+[Native · Macros · Normal] qA	Append a recording to named register a.	nvim native native::macros mode::normal
+[Native · Macros · Normal] "ap	Put register a into the buffer for inspection or editing.	nvim native native::macros mode::normal
+[Native · Macros · Normal] "ay{motion}	Replace register a with corrected macro text.	nvim native native::macros mode::normal
+[Native · Macros · Normal] @:	Repeat the most recently executed Ex command.	nvim native native::macros mode::normal
+[Native · Spelling · Ex] :set spell!	Toggle spell checking in the current window.	nvim native native::spelling context::ex
+[Native · Spelling · Ex] :set spelllang=en_us	Choose spell-check languages.	nvim native native::spelling context::ex
+[Native · Spelling · Normal] ]s / [s	Jump to the next / previous spelling issue.	nvim native native::spelling mode::normal
+[Native · Spelling · Normal] ]S / [S	Jump to the next / previous definitely bad word.	nvim native native::spelling mode::normal
+[Native · Spelling · Normal] z=	Show correction suggestions for the word under the cursor.	nvim native native::spelling mode::normal
+[Native · Spelling · Normal] 1z=	Apply the first spelling suggestion immediately.	nvim native native::spelling mode::normal
+[Native · Spelling · Normal] zg / zG	Mark the word good persistently / for this session.	nvim native native::spelling mode::normal
+[Native · Spelling · Normal] zw / zW	Mark the word wrong persistently / for this session.	nvim native native::spelling mode::normal
+[Native · Spelling · Normal] zug / zuw	Undo the latest zg / zw addition.	nvim native native::spelling mode::normal
+[Native · Terminal · Neovim Ex] :terminal [command]	Open an interactive shell or command in a terminal buffer.	nvim native native::terminal context::ex context::neovim
+[Native · Terminal · Terminal-job] <C-\><C-n>	Return to Terminal-Normal mode.	nvim native native::terminal mode::terminal context::terminal-job
+[Native · Terminal · Terminal-Normal] i / a	Return to terminal-job input mode.	nvim native native::terminal mode::normal context::terminal-normal
+[Native · Terminal · Ex] :split | terminal	Open an interactive terminal in a horizontal split.	nvim native native::terminal context::ex
+[Native · Terminal · Ex] :vsplit | terminal	Open an interactive terminal in a vertical split.	nvim native native::terminal context::ex
+[Native · Terminal · Ex] :!{command}	Run one shell command and return; this is not an interactive terminal.	nvim native native::terminal context::ex
+[Native · Terminal · Ex] :read !{command}	Insert command output into the buffer.	nvim native native::terminal context::ex
+[Native · Terminal · Ex] :{range}!{command}	Filter addressed lines through a command.	nvim native native::terminal context::ex
+[Native · Terminal · Ex] :write !{command}	Send buffer text to a command's standard input.	nvim native native::terminal context::ex
+[Native · Useful Ex · Ex] :set {option}	Enable or assign an option.	nvim native native::ex context::ex
+[Native · Useful Ex · Ex] :set {option}?	Show an option's current value.	nvim native native::ex context::ex
+[Native · Useful Ex · Ex] :set no{option}	Disable a boolean option.	nvim native native::ex context::ex
+[Native · Useful Ex · Ex] :set {option}!	Toggle a boolean option.	nvim native native::ex context::ex
+[Native · Useful Ex · Ex] :set {option}&	Reset an option to its default.	nvim native native::ex context::ex
+[Native · Useful Ex · Ex] :setlocal {option}	Set an option only for the current buffer or window.	nvim native native::ex context::ex
+[Native · Useful Ex · Ex] :setglobal {option}	Set the global default for future local values.	nvim native native::ex context::ex
+[Native · Useful Ex · Ex] :source %	Source the current Vimscript or Lua config file.	nvim native native::ex context::ex
+[Native · Useful Ex · Neovim Ex] :luafile %	Execute the current file as Lua.	nvim native native::ex context::ex context::neovim
+[Native · Useful Ex · Neovim Ex] :lua =expression	Evaluate and print a Lua expression.	nvim native native::ex context::ex context::neovim
+[Native · Useful Ex · Ex] :messages	Show recent messages and errors.	nvim native native::ex context::ex
+[Native · Useful Ex · Ex] :map / :nmap	List general / Normal-mode mappings.	nvim native native::ex context::ex
+[Native · Useful Ex · Ex] :verbose nmap {lhs}	Show a mapping and where it was last defined.	nvim native native::ex context::ex
+[Native · Useful Ex · Ex] :autocmd	List active autocommands.	nvim native native::ex context::ex
+[Native · Useful Ex · Ex] :verbose autocmd {event}	Show autocommands and their defining locations.	nvim native native::ex context::ex
+[Native · Useful Ex · Ex] :checktime	Check whether files changed outside the editor.	nvim native native::ex context::ex
+[Native · Useful Ex · Ex] :{range}delete [reg]	Delete addressed lines, optionally into a register.	nvim native native::ex context::ex
+[Native · Useful Ex · Ex] :{range}yank [reg]	Yank addressed lines, optionally into a register.	nvim native native::ex context::ex
+[Native · Useful Ex · Ex] :{range}copy {address}	Copy addressed lines after another line.	nvim native native::ex context::ex
+[Native · Useful Ex · Ex] :{range}move {address}	Move addressed lines after another line.	nvim native native::ex context::ex
+[Native · Useful Ex · Ex] :{range}join	Join addressed lines.	nvim native native::ex context::ex
+[Native · Useful Ex · Ex] :{range}sort	Sort addressed lines.	nvim native native::ex context::ex
+[Native · Useful Ex · Ex] :{range}sort u	Sort addressed lines and remove duplicates.	nvim native native::ex context::ex
+[Native · Useful Ex · Ex] :global/pattern/command	Run a command on every matching line.	nvim native native::ex context::ex
+[Native · Useful Ex · Ex] :vglobal/pattern/command	Run a command on every nonmatching line.	nvim native native::ex context::ex
+[Native · Useful Ex · Ex] :{range}normal {keys}	Execute Normal-mode keys on addressed lines.	nvim native native::ex context::ex mode::normal
+[Native · Useful Ex · Ex] :{range}normal! {keys}	Execute unmapped Normal-mode keys on addressed lines.	nvim native native::ex context::ex mode::normal
+[Native · Useful Ex · Ex] :bufdo {command}	Run a command in every buffer.	nvim native native::ex context::ex
+[Native · Useful Ex · Ex] :windo {command}	Run a command in every window.	nvim native native::ex context::ex
+[Native · Useful Ex · Ex] :execute {expression}	Evaluate an expression as an Ex command.	nvim native native::ex context::ex
+[Native · Useful Ex · Ex] :silent {command}	Run a command while suppressing ordinary messages.	nvim native native::ex context::ex
+[Native · Useful Ex · Ex] :confirm {command}	Request confirmation when unsaved changes block a command.	nvim native native::ex context::ex
+[Native · Useful Ex · Ex] :scriptnames	List sourced runtime scripts in order.	nvim native native::ex context::ex

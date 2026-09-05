@@ -56,12 +56,14 @@ You start in **insert** mode in the prompt (type to filter).
 | Type text | i | Narrow results |
 | `<C-j>` / `<C-k>` | i | Move selection down / up (our custom maps) |
 | `<CR>` | i/n | Open the selected item |
-| `<C-x>` | i | Open in horizontal split (Telescope default) |
-| `<C-v>` | i | Open in vertical split (default) |
-| `<C-t>` | i | Open in new tabpage (default) |
-| `<C-q>` | i | Send results to the **quickfix** (default) |
-| `<C-u>` / `<C-d>` | i | Scroll preview up / down (default) |
-| `<Esc>` | i | Leave insert → normal in the picker, or close depending on setup; often `<C-c>` closes |
+| `<C-x>` | i/n | Open in horizontal split (Telescope default) |
+| `<C-v>` | i/n | Open in vertical split (default) |
+| `<C-t>` | i/n | Open in new tabpage (default) |
+| `<C-q>` | i/n | Send results to the **quickfix** (default) |
+| `<C-u>` / `<C-d>` | i/n | Scroll preview up / down (default) |
+| `<Esc>` | i | Leave insert mode for picker Normal mode |
+| `<Esc>` | n | Close the picker |
+| `<C-c>` | i | Close the picker immediately |
 | `?` | n | Show Telescope help for mappings (when in normal mode in the picker) |
 
 Tip: `<leader>sr` reopens whatever you just closed — handy after a mis-click.
