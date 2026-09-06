@@ -46,7 +46,7 @@ blink.cmp + LuaSnip. **Accept with `<C-y>`** (Kickstart / `:help ins-completion`
 
 Blink and LuaSnip load on the first `InsertEnter`. LSP clients receive the same locked Blink completion capabilities from `lsp.lua` beforehand, so deferring the UI/snippet modules does not remove server snippets or completion edits.
 
-| Key (insert, menu open) | Action |
+| Key (Insert/Select mode) | Action |
 | --- | --- |
 | `<C-n>` / `<C-p>` | Next / previous item |
 | `<Down>` / `<Up>` | Next / previous item; fall back when the menu is closed |
@@ -54,7 +54,7 @@ Blink and LuaSnip load on the first `InsertEnter`. LSP clients receive the same 
 | `<C-e>` | Cancel |
 | `<C-space>` | Open menu / docs |
 | `<C-b>` / `<C-f>` | Scroll completion documentation |
-| `<Tab>` / `<S-Tab>` | Jump forward / backward through snippet placeholders |
+| `<Tab>` / `<S-Tab>` | Jump through the current snippet; otherwise indent / unindent |
 | `<C-k>` | Show or hide signature help |
 
 For `.soql` buffers, Blink adds a custom **SOQL** source backed by the selected org’s project-local schema cache. It completes SObjects, fields, relationships, keywords, functions, and date literals without contacting the org while typing. Refresh/populate the cache through the [SOQL builder](./salesforce.md#soql-builder-completion-and-runner).

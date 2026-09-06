@@ -4,6 +4,21 @@
 -- Alts: nvim-cmp (older) · blink without LuaSnip (vim.snippet only).
 --------------------------------------------------------------------------------
 
+--- Jump only while the cursor remains inside the active snippet.
+local function jump_local_snippet(direction, fallback)
+  return function()
+    vim.schedule(function()
+      local luasnip = require("luasnip")
+      if luasnip.locally_jumpable(direction) then
+        luasnip.jump(direction)
+      else
+        vim.api.nvim_feedkeys(fallback, "n", false)
+      end
+    end)
+    return true
+  end
+end
+
 return {
   {
     "L3MON4D3/LuaSnip", -- snippet engine (expand/jump placeholders)
@@ -15,8 +30,13 @@ return {
     dependencies = { "rafamadriz/friendly-snippets" }, -- VS Code–style snippet packs
     config = function()
       require("luasnip").config.setup({
-        history = true, -- remember last snippet for re-jump
-        -- history = false,
+        -- Finished snippets leave the jump chain so they cannot steal Tab later.
+        keep_roots = false,
+        link_roots = false,
+        exit_roots = true,
+        link_children = false,
+        -- history = true, -- deprecated shortcut for retaining and linking old snippets
+
         updateevents = "TextChanged,TextChangedI", -- live-update snippet nodes while typing
       })
       require("luasnip.loaders.from_vscode").lazy_load() -- load friendly-snippets lazily
@@ -36,6 +56,9 @@ return {
       keymap = {
         -- Kickstart: built-in-like; accept with <C-y>. See :help ins-completion.
         preset = "default", -- <C-n>/<C-p> select, <C-y> accept, <C-e> cancel
+        -- Outside the current snippet, preserve Tab/S-Tab as normal indentation.
+        ["<Tab>"] = { jump_local_snippet(1, vim.keycode("<Tab>")) },
+        ["<S-Tab>"] = { jump_local_snippet(-1, vim.keycode("<C-d>")) },
         -- preset = "super-tab", -- Tab accepts (blink built-in)
         -- preset = "enter", -- Enter accepts
         -- CodeOSS-style Tab / S-Tab / Enter (uncomment to use instead of <C-y>):
