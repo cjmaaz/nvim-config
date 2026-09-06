@@ -23,10 +23,11 @@ opt.winborder = "rounded" -- consistent soft boxes for diagnostics, menus, and p
 
 -- Blink with a shape that identifies the current editing mode.
 -- Terminals control the real blink cadence; Neovim requests the shape/timing.
+-- Cursor/lCursor supplies the active theme's color instead of terminal white.
 opt.guicursor = table.concat({
-  "n-v-c-sm:block-blinkwait700-blinkoff400-blinkon250",
-  "i-ci-ve:ver25-blinkwait700-blinkoff400-blinkon250",
-  "r-cr-o:hor20-blinkwait700-blinkoff400-blinkon250",
+  "n-v-c-sm:block-blinkwait700-blinkoff400-blinkon250-Cursor/lCursor",
+  "i-ci-ve:ver25-blinkwait700-blinkoff400-blinkon250-Cursor/lCursor",
+  "r-cr-o:hor20-blinkwait700-blinkoff400-blinkon250-Cursor/lCursor",
   "t:block-blinkwait700-blinkoff400-blinkon250-TermCursor",
 }, ",")
 -- opt.guicursor = "" -- let the terminal keep one cursor style in every mode

@@ -456,6 +456,12 @@ return {
         local editor_bg = opts.transparent and "NONE" or chrome.base
         hl(0, "Normal", { fg = pal.fg, bg = editor_bg })
         hl(0, "NormalNC", { fg = opts.dimInactive and pal.light_grey or pal.fg, bg = editor_bg })
+
+        -- Purple stays distinct from Bordo's gold LSP-reference highlights.
+        hl(0, "Cursor", { fg = chrome.base, bg = pal.purple, nocombine = true })
+        -- hl(0, "Cursor", { fg = chrome.base, bg = pal.blue, nocombine = true }) -- cooler high-contrast alternate
+        hl(0, "lCursor", { link = "Cursor" })
+
         hl(0, "SignColumn", { bg = editor_bg })
         hl(0, "FoldColumn", { bg = editor_bg })
         hl(0, "LineNr", { fg = pal.grey, bg = editor_bg })
