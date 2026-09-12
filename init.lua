@@ -24,6 +24,8 @@ vim.g.have_nerd_font = true -- terminal uses a Nerd Font
 require("config.options")
 -- Loads lua/config/keymaps.lua (after leaders above so <leader> maps resolve)
 require("config.keymaps")
+-- Installs context-aware, buffer-local <localleader> project actions.
+require("config.local_actions").setup()
 -- Loads lua/config/lazy.lua (bootstraps the plugin manager)
 require("config.lazy")
 -- Loads lua/config/autocmds.lua

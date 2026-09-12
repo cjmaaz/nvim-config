@@ -19,6 +19,7 @@ Only maps we actually set are listed. Built-in Vim/Neovim keys (`hjkl`, `:w`, `g
 | Git (gitsigns) | [git.md](./git.md) |
 | File managers (Neo-tree / optional Yazi) | [explorer.md](./explorer.md) |
 | Project scaffolding and tasks | [project.md](./project.md) |
+| Context-aware localleader actions | [localleader.md](./localleader.md) |
 | Markdown rendering | [markdown.md](./markdown.md) |
 | Telescope / project search and replace | [telescope.md](./telescope.md) |
 | Treesitter text objects / indent / autopairs | [treesitter.md](./treesitter.md) |
@@ -36,7 +37,7 @@ Only maps we actually set are listed. Built-in Vim/Neovim keys (`hjkl`, `:w`, `g
 | Key | Meaning |
 | --- | --- |
 | `<Space>` (`mapleader`) | Global leader prefix for custom maps |
-| `\` (`maplocalleader`) | Buffer-local leader (SOQL drafts use `\f` / `\o` / `\r` / `\t`) |
+| `\` (`maplocalleader`) | Context-aware buffer/project actions (`\p`, plus available run/build/test/domain keys) |
 
 Defined in `init.lua`.
 
@@ -49,7 +50,7 @@ Defined in `init.lua`.
 | Statusline (lualine) | 40%-lightened palette, darker Visual mode, SF/language icon + non-UTF-8 encoding |
 | Bufferline | Filetype icon + filename only; dirty state moved to footer — [core.md](./core.md) |
 | File managers | Neo-tree `<leader>fe`/`fE`; optional Yazi `<leader>fy`/`fY`/`fr` when installed — [explorer.md](./explorer.md) |
-| Project workflows | `<leader>pn` scaffold · `<leader>pr` run/build/test — [project.md](./project.md) |
+| Project workflows | `<leader>pn` scaffold · `<leader>pr` menu · local `\p/\r/\b/\t` — [project.md](./project.md) |
 | Markdown | `<leader>mr` inline render · `<leader>mp` side preview — [markdown.md](./markdown.md) |
 | Lazygit | `<leader>gg` · `<leader>gf` — [git.md](./git.md) |
 | Search | Telescope `<leader>sf`/`sg`; multi-grep `sm`; Grug Far replace `sR` — [telescope.md](./telescope.md) |

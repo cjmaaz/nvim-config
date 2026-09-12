@@ -8,7 +8,7 @@ Plugin: `lua/plugins/salesforce.lua`. Language intelligence stays in [lsp.md](./
 **Project:** cwd or file under a folder with `sfdx-project.json` or `.forceignore`.  
 **Check:** `:check sf` · `:lua require("sf.util").get_sf_root()`
 
-Nav: [index](./README.md) · [lsp](./lsp.md) · [which-key](./which-key.md) · [telescope](./telescope.md)
+Nav: [index](./README.md) · [localleader](./localleader.md) · [lsp](./lsp.md) · [which-key](./which-key.md) · [telescope](./telescope.md)
 
 ---
 
@@ -58,6 +58,22 @@ Also: `:SF` then Tab for command categories.
 
 ---
 
+## Context-aware localleader
+
+Salesforce project buffers add cloud actions to backslash (`\`) without removing matching Node/Vite actions from the menu:
+
+| Key | Where | Action |
+| --- | --- | --- |
+| `<localleader>p` (`\p`) | Any Salesforce project file | Open all relevant Salesforce and detected project actions |
+| `<localleader>b` (`\b`) | Apex/LWC/Aura metadata file | Save and deploy the current metadata |
+| `<localleader>t` (`\t`) | Apex file | Run the test under the cursor |
+
+In an LWC JavaScript/TypeScript buffer, `\p` can show both **Salesforce** and **Node / TypeScript** sections. Salesforce’s higher-priority save-and-deploy action owns `\b`; Node still supplies `\r` and `\t` when its corresponding scripts exist. SOQL is the highest-priority file domain and preserves the four mappings documented below.
+
+Full behavior and project matrices: [localleader.md](./localleader.md).
+
+---
+
 ## Managed-package Vlocity retrieval (`<leader>SV`)
 
 This is Vlocity Build Tool **DataPack** retrieval for managed-package CMT orgs. It is separate from Metadata API OmniStudio types such as `OmniScript`; `sf project retrieve -m Omni*` is not a substitute.
@@ -97,6 +113,8 @@ Inside the SOQL field picker, `<Tab>` toggles a field and `<CR>` confirms the se
 | `<localleader>o` (`\o`) | Change SObject / open its draft |
 | `<localleader>r` (`\r`) | Save and run standard SOQL |
 | `<localleader>t` (`\t`) | Save and run through the Tooling API |
+
+These remain buffer-local but are now owned by the shared context registry, so they appear alongside Salesforce/project actions in `\p` and clean up consistently when the buffer context changes.
 
 Normal `<leader>Sq` saves the whole `.soql` buffer before execution. Visual `<leader>Sq` keeps sf.nvim’s existing selected-text runner. Results use SFTerm and the captured project/org context.
 
@@ -184,4 +202,4 @@ Both actions run in SFTerm. Toggle the float with `<leader>Se`; cancel with `Esc
 - Custom objects / `__mdt` “Invalid type” in `apex_ls`: set target org, then `<leader>Ss` (needs `curl`) to refresh SObject stubs under `.sfdx/tools/sobjects/`.
 - **Note:** modern `sf org display --json` **redacts** `accessToken`. Upstream sf.nvim still feeds that into curl → HTTP 401 on `<leader>Ss` even when retrieve/deploy work. `salesforce.lua` wraps `vim.system` and splices a real token from `sf org auth show-access-token` (config-side; survives `:Lazy sync`).
 
-Nav: [index](./README.md) · [lsp](./lsp.md) · [which-key](./which-key.md)
+Nav: [index](./README.md) · [localleader](./localleader.md) · [lsp](./lsp.md) · [which-key](./which-key.md)

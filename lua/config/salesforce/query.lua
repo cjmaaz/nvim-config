@@ -25,7 +25,7 @@ local function buffer_context(bufnr)
       paths = { browser = browser },
     }
   end
-  return metadata.get_context()
+  return vim.api.nvim_buf_call(bufnr, metadata.get_context)
 end
 
 local function object_from_buffer(bufnr)
@@ -103,22 +103,6 @@ local function field_picker(described, callback)
   })
 end
 
-local function attach_buffer(bufnr)
-  local opts = { buffer = bufnr, silent = true }
-  vim.keymap.set("n", "<localleader>f", function()
-    M.pick_fields(bufnr)
-  end, vim.tbl_extend("force", opts, { desc = "SOQL: pick fields" }))
-  vim.keymap.set("n", "<localleader>o", function()
-    M.change_object(bufnr)
-  end, vim.tbl_extend("force", opts, { desc = "SOQL: change SObject" }))
-  vim.keymap.set("n", "<localleader>r", function()
-    M.run_current(false, bufnr)
-  end, vim.tbl_extend("force", opts, { desc = "SOQL: run query" }))
-  vim.keymap.set("n", "<localleader>t", function()
-    M.run_current(true, bufnr)
-  end, vim.tbl_extend("force", opts, { desc = "SOQL: run Tooling query" }))
-end
-
 local function open_draft(ctx, object_name, fields, replace)
   local path = draft_path(ctx, object_name)
   vim.fn.mkdir(vim.fs.dirname(path), "p")
@@ -134,7 +118,7 @@ local function open_draft(ctx, object_name, fields, replace)
   vim.cmd("edit " .. vim.fn.fnameescape(path))
   vim.bo.filetype = "soql"
   set_buffer_context(0, ctx, object_name)
-  attach_buffer(0)
+  require("config.local_actions").reconcile(0)
 end
 
 local function choose_object(objects, callback)
@@ -262,21 +246,65 @@ function M.run_current(tooling, bufnr)
 end
 
 function M.setup()
-  local group = vim.api.nvim_create_augroup("user_soql_buffers", { clear = true })
-  vim.api.nvim_create_autocmd("FileType", {
-    group = group,
-    pattern = "soql",
-    callback = function(event)
-      attach_buffer(event.buf)
+  require("config.local_actions").register({
+    id = "soql",
+    label = "SOQL",
+    priority = 100,
+    resolve = function(context)
+      if context.filetype ~= "soql" then
+        return nil
+      end
+      local bufnr = context.bufnr
+      return {
+        label = "SOQL",
+        root = vim.b[bufnr].soql_root or require("config.project_context").salesforce_root(bufnr),
+        actions = {
+          {
+            id = "pick-fields",
+            label = "Pick fields",
+            desc = "SOQL: pick fields",
+            lhs = "<localleader>f",
+            run = function()
+              M.pick_fields(bufnr)
+            end,
+          },
+          {
+            id = "change-object",
+            label = "Change SObject",
+            desc = "SOQL: change SObject",
+            lhs = "<localleader>o",
+            run = function()
+              M.change_object(bufnr)
+            end,
+          },
+          {
+            id = "run-query",
+            label = "Run query",
+            desc = "SOQL: run query",
+            lhs = "<localleader>r",
+            slot = "run",
+            run = function()
+              M.run_current(false, bufnr)
+            end,
+          },
+          {
+            id = "run-tooling-query",
+            label = "Run Tooling query",
+            desc = "SOQL: run Tooling query",
+            lhs = "<localleader>t",
+            run = function()
+              M.run_current(true, bufnr)
+            end,
+          },
+        },
+      }
     end,
   })
-  if vim.bo.filetype == "soql" then
-    attach_buffer(0)
-  end
 end
 
 M._test = {
   object_from_buffer = object_from_buffer,
+  open_draft = open_draft,
   query_lines = query_lines,
 }
 

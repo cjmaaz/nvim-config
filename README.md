@@ -23,6 +23,7 @@ nvim-config/
 │   │   ├── git.md
 │   │   ├── explorer.md
 │   │   ├── project.md     # multi-ecosystem scaffolds + task runner
+│   │   ├── localleader.md # context-aware file/project actions
 │   │   ├── markdown.md    # inline render + side preview
 │   │   ├── telescope.md
 │   │   ├── treesitter.md
@@ -32,7 +33,7 @@ nvim-config/
 │   │   └── which-key.md
 │   ├── anki/
 │   │   ├── README.md     # import instructions and tag guide
-│   │   └── neovim-keymaps.tsv # 742-card Anki import
+│   │   └── neovim-keymaps.tsv # 748-card Anki import
 │   ├── diagnostics/      # where diagnostics show + settings + Java FAQ
 │   │   ├── README.md
 │   │   ├── display.md
@@ -46,6 +47,7 @@ nvim-config/
 │   └── COMMITIZEN.md     # optional cz helper
 ├── tests/
 │   ├── minimal_init.lua  # headless Plenary runtime
+│   ├── local_actions_spec.lua # project/provider/map lifecycle specs
 │   └── salesforce/       # mocked Org Browser/cache/retrieve specs
 ├── init.lua              # entry: loader, leaders, require config.*
 ├── lazy-lock.json        # pinned plugin commits (commit this)
@@ -58,7 +60,11 @@ nvim-config/
     │   ├── keymaps.lua   # non-plugin maps (buffers, windows, diagnostics, …)
     │   ├── project_scaffold.lua # CLI-backed new-project picker
     │   ├── project_runner.lua # project-aware run / build / test terminal
-    │   ├── project_context.lua # lightweight Salesforce root gate
+    │   ├── project_context.lua # shared start-path/root helpers + SF gate
+    │   ├── local_actions.lua # context provider registry + owned buffer maps
+    │   ├── local_actions/
+    │   │   ├── project.lua # native runner capabilities
+    │   │   └── salesforce.lua # guarded Salesforce capabilities
     │   ├── gremlins.lua  # invisible/confusable Unicode diagnostics
     │   ├── autocmds.lua  # yank, trim, final newline (Apex exempt), filetypes
     │   ├── winbar.lua    # non-overlapping file + LSP context row
@@ -106,11 +112,11 @@ nvim-config/
 
 ## Tests
 
-Run the mocked Salesforce Org Browser suite without contacting an org:
+Run all mocked project/localleader/Salesforce suites without executing a project task or contacting an org:
 
 ```sh
 nvim --headless -u tests/minimal_init.lua \
-  -c "PlenaryBustedDirectory tests/salesforce { minimal_init = 'tests/minimal_init.lua' }"
+  -c "PlenaryBustedDirectory tests { minimal_init = 'tests/minimal_init.lua', sequential = true }"
 ```
 
 ## Quick start
@@ -118,4 +124,4 @@ nvim --headless -u tests/minimal_init.lua \
 1. Install host tools from [docs/TOOLS.md](docs/TOOLS.md) (Neovim **0.12+**, Git, a Nerd Font, **`rg` + `fd`**, **tree-sitter CLI** + C compiler; **JDK** if you edit Apex; **`sf` CLI** for Salesforce projects).
 2. Point Neovim at this config (symlink, `NVIM_APPNAME`, or clone as your `~/.config/nvim`).
 3. Open Neovim once — lazy.nvim bootstraps and installs plugins from `lazy-lock.json` (Treesitter/Mason may download on first use).
-4. Skim [docs/keymaps/](docs/keymaps/README.md) — find `<leader>sf` / replace `<leader>sR` / project `<leader>pn`/`pr` / `<leader>cf` / `gd` / neo-tree `<leader>fe` / Salesforce `<leader>S`.
+4. Skim [docs/keymaps/](docs/keymaps/README.md) — global actions use Space; contextual project/file actions use `\p`, `\r`, `\b`, and `\t` when available.

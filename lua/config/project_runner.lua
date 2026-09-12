@@ -7,6 +7,7 @@
 local M = {}
 
 local uv = vim.uv or vim.loop
+local project_context = require("config.project_context")
 local title = "Project runner"
 local terminal = { buf = nil, win = nil, job = nil, serial = 0 }
 
@@ -160,15 +161,38 @@ local function start_task(project, label, steps)
   vim.cmd("startinsert")
 end
 
+local function action_kind(label)
+  local prefix = tostring(label):match("^([%a]+)")
+  prefix = prefix and prefix:lower() or ""
+  if prefix == "run" then
+    return "run"
+  elseif prefix == "build" then
+    return "build"
+  elseif prefix == "test" then
+    return "test"
+  end
+  return "other"
+end
+
+local function action_id(kind, label)
+  return (kind .. "-" .. tostring(label):lower():gsub("[^%w]+", "-")):gsub("%-+$", "")
+end
+
 local function static_action(label, args)
+  local kind = action_kind(label)
   return {
+    id = action_id(kind, label),
+    kind = kind,
     label = label,
     steps = { { args = args } },
   }
 end
 
 local function multi_action(label, steps)
+  local kind = action_kind(label)
   return {
+    id = action_id(kind, label),
+    kind = kind,
     label = label,
     steps = steps,
   }
@@ -304,6 +328,8 @@ local function maven_actions(root)
   local mvn = maven_executable(root)
   return {
     {
+      id = "run-main-class",
+      kind = "run",
       label = "Run main class (builds first)",
       resolve = function(done)
         vim.ui.input({
@@ -360,6 +386,8 @@ local function flutter_actions(root)
   end
   if #targets > 0 then
     actions[#actions + 1] = {
+      id = "build-release",
+      kind = "build",
       label = "Build release…",
       resolve = function(done)
         vim.ui.select(targets, {
@@ -440,27 +468,11 @@ local project_types = {
   { id = "cmake", label = "C / C++ — CMake", marker = "CMakeLists.txt", actions = cmake_actions },
 }
 
-local function starting_directory()
-  local name = vim.api.nvim_buf_get_name(0)
-  if name ~= "" then
-    local stat = uv.fs_stat(name)
-    if stat and stat.type == "file" then
-      return vim.fs.dirname(name)
-    end
-    if stat and stat.type == "directory" then
-      return name
-    end
-  end
-  return vim.fn.getcwd()
-end
-
-local function detected_projects()
-  local start = starting_directory()
+local function detected_projects(bufnr)
   local candidates, nearest_length = {}, 0
   for _, project_type in ipairs(project_types) do
-    local marker = vim.fs.find(project_type.marker, { path = start, upward = true, type = "file" })[1]
-    if marker then
-      local root = vim.fs.dirname(marker)
+    local root = project_context.find_root(project_type.marker, bufnr)
+    if root then
       local length = #root
       if length > nearest_length then
         candidates = {}
@@ -474,8 +486,8 @@ local function detected_projects()
   return candidates
 end
 
-local function choose_project(done)
-  local projects = detected_projects()
+local function choose_project(done, bufnr)
+  local projects = detected_projects(bufnr)
   if #projects == 0 then
     notify("No supported project marker found above the current buffer.", vim.log.levels.WARN)
     return
@@ -492,8 +504,61 @@ local function choose_project(done)
   }, done)
 end
 
-local function select_action(project)
+local function actions_for_project(project)
   local actions = project.actions(project.root)
+  local candidates = {}
+  for index, action in ipairs(actions) do
+    action.kind = action.kind or action_kind(action.label)
+    action.id = action.id or action_id(action.kind, action.label or tostring(index))
+    candidates[#candidates + 1] = {
+      id = project.id .. ":" .. action.id,
+      kind = action.kind,
+      label = action.label,
+      project = project,
+      action = action,
+    }
+  end
+  return candidates
+end
+
+local function execute_now(candidate)
+  local project = candidate.project
+  local action = candidate.action
+  local function launch(steps)
+    if steps and #steps > 0 then
+      start_task(project, action.label, steps)
+    end
+  end
+  if action.resolve then
+    action.resolve(launch)
+  else
+    launch(action.steps)
+  end
+end
+
+function M.execute(candidate)
+  if not job_running() then
+    execute_now(candidate)
+    return
+  end
+  vim.ui.select({ "Focus running task", "Stop and run selected action", "Cancel" }, {
+    prompt = "A project task is already running: ",
+  }, function(choice)
+    if choice == "Focus running task" then
+      focus_terminal()
+    elseif choice == "Stop and run selected action" then
+      local job = terminal.job
+      terminal.job = nil
+      vim.fn.jobstop(job)
+      vim.schedule(function()
+        execute_now(candidate)
+      end)
+    end
+  end)
+end
+
+local function select_action(project)
+  local actions = actions_for_project(project)
   if #actions == 0 then
     notify("No runnable actions were detected for this project.", vim.log.levels.WARN)
     return
@@ -507,26 +572,33 @@ local function select_action(project)
     if not action then
       return
     end
-    local function launch(steps)
-      if steps and #steps > 0 then
-        start_task(project, action.label, steps)
-      end
-    end
-    if action.resolve then
-      action.resolve(launch)
-    else
-      launch(action.steps)
-    end
+    M.execute(action)
   end)
 end
 
-local function choose_and_run()
-  choose_project(select_action)
+local function choose_and_run(bufnr)
+  choose_project(select_action, bufnr)
 end
 
-function M.open()
+function M.detect(bufnr)
+  return detected_projects(bufnr)
+end
+
+function M.get_actions(bufnr)
+  local actions = {}
+  for _, project in ipairs(detected_projects(bufnr)) do
+    vim.list_extend(actions, actions_for_project(project))
+  end
+  return actions
+end
+
+function M.is_running()
+  return job_running()
+end
+
+function M.open(bufnr)
   if not job_running() then
-    choose_and_run()
+    choose_and_run(bufnr)
     return
   end
   vim.ui.select({ "Focus running task", "Stop and choose another task", "Cancel" }, {
@@ -538,9 +610,18 @@ function M.open()
       local job = terminal.job
       terminal.job = nil
       vim.fn.jobstop(job)
-      vim.schedule(choose_and_run)
+      vim.schedule(function()
+        choose_and_run(bufnr)
+      end)
     end
   end)
 end
+
+M._test = {
+  action_kind = action_kind,
+  actions_for_project = actions_for_project,
+  detected_projects = detected_projects,
+  project_types = project_types,
+}
 
 return M

@@ -9,7 +9,7 @@ local uv = vim.uv or vim.loop
 local SALESFORCE_MARKERS = { "sfdx-project.json", ".forceignore" }
 local cache = {}
 
-local function start_path(bufnr)
+function M.start_path(bufnr)
   bufnr = bufnr or vim.api.nvim_get_current_buf()
   if vim.api.nvim_buf_is_valid(bufnr) then
     local name = vim.api.nvim_buf_get_name(bufnr)
@@ -21,9 +21,22 @@ local function start_path(bufnr)
       if stat and stat.type == "directory" then
         return name
       end
+      local parent = vim.fs.dirname(name)
+      if parent and parent ~= "." then
+        return parent
+      end
     end
   end
   return vim.fn.getcwd()
+end
+
+function M.find_root(markers, bufnr)
+  local marker = vim.fs.find(markers, {
+    path = M.start_path(bufnr),
+    upward = true,
+    type = "file",
+  })[1]
+  return marker and vim.fs.dirname(marker) or nil, marker
 end
 
 function M.salesforce_root(bufnr)
@@ -34,12 +47,7 @@ function M.salesforce_root(bufnr)
   if cache[bufnr] and cache[bufnr].key == key then
     return cache[bufnr].root or nil
   end
-  local marker = vim.fs.find(SALESFORCE_MARKERS, {
-    path = start_path(bufnr),
-    upward = true,
-    type = "file",
-  })[1]
-  local root = marker and vim.fs.dirname(marker) or nil
+  local root = M.find_root(SALESFORCE_MARKERS, bufnr)
   cache[bufnr] = { key = key, root = root or false }
   return root
 end
@@ -57,7 +65,7 @@ function M.invalidate(bufnr)
 end
 
 M._test = {
-  start_path = start_path,
+  start_path = M.start_path,
 }
 
 return M

@@ -286,6 +286,10 @@ return {
           -------------------------------------------------------------- Projects
           { pattern = "project: new scaffold", icon = "󰏗", color = "green" },
           { pattern = "project: run/build/test", icon = "󰐊", color = "green" },
+          { pattern = "local: .*run", icon = "󰐊", color = "green" },
+          { pattern = "local: .*build", icon = "󰜘", color = "orange" },
+          { pattern = "local: .*test", icon = "󰙨", color = "green" },
+          { pattern = "local: .*actions", icon = "󰘳", color = "purple" },
           { pattern = "project", icon = "󰏗", color = "green" },
 
           -------------------------------------------------------------- Markdown
@@ -401,6 +405,14 @@ return {
         { "<leader>q", group = "Session", icon = { icon = "", color = "purple" } },
         { "<leader>x", group = "Trouble", icon = { icon = "󰔫", color = "red" } },
         { "<leader>u", group = "Undotree", icon = { icon = "󰕌", color = "purple" } },
+        {
+          "<localleader>",
+          group = function()
+            local context = vim.b.local_actions_context
+            return context and ("Local · " .. context) or "Local"
+          end,
+          icon = { icon = "󰘳", color = "purple" },
+        },
         { "gc", group = "Comment line", mode = { "n", "v" }, icon = { icon = "󰅺", color = "grey" } },
         { "gb", group = "Comment block", mode = { "n", "v" }, icon = { icon = "󰅺", color = "grey" } },
         { "gs", group = "Flash jump", icon = { icon = "⚡", color = "yellow" } },

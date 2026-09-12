@@ -1087,6 +1087,10 @@ start_target_selection = function(request)
       if request.callback then
         request.callback(request.choice)
       end
+      local local_actions = package.loaded["config.local_actions"]
+      if local_actions then
+        local_actions.refresh_all()
+      end
     end
 
     target_selection_running = false

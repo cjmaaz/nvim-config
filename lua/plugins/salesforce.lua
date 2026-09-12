@@ -176,6 +176,16 @@ local function guarded_load(callback, bufnr)
   return true
 end
 
+local function register_local_actions()
+  local provider = require("config.local_actions.salesforce").new({
+    cancel = cancel_sf_actions,
+    guarded_load = guarded_load,
+    salesforce_root = salesforce_root,
+    sf_action = sf_action,
+  })
+  require("config.local_actions").register(provider)
+end
+
 local plugin = {
     "xixiaofinland/sf.nvim",
     cmd = "SF", -- :SF … user commands
@@ -421,6 +431,8 @@ plugin.cmd = nil
 plugin.ft = nil
 
 plugin.init = function()
+  register_local_actions()
+
   for _, key in ipairs(guarded_keys) do
     local mapping = key
     local mode = mapping.mode or "n"

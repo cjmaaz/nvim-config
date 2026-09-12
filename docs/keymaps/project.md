@@ -2,7 +2,7 @@
 
 Defined in `lua/config/project_scaffold.lua` and `lua/config/project_runner.lua`, with maps in `lua/config/keymaps.lua`. It uses Neovim’s built-in inputs plus the existing Telescope `vim.ui.select` interface; no scaffolding or task-runner plugin is installed.
 
-Nav: [index](./README.md) · [core](./core.md) · [telescope](./telescope.md) · [explorer](./explorer.md) · [TOOLS](../TOOLS.md)
+Nav: [index](./README.md) · [localleader](./localleader.md) · [core](./core.md) · [telescope](./telescope.md) · [explorer](./explorer.md) · [TOOLS](../TOOLS.md)
 
 ---
 
@@ -12,8 +12,12 @@ Nav: [index](./README.md) · [core](./core.md) · [telescope](./telescope.md) ·
 | --- | --- | --- |
 | `<leader>pn` | n | Select and generate a new project |
 | `<leader>pr` | n | Detect the current project and select Run / Build / Test |
+| `<localleader>p` (`\p`) | n | Show all actions detected for the current buffer/project |
+| `<localleader>r` (`\r`) | n | Run when the current project provides a Run action |
+| `<localleader>b` (`\b`) | n | Build when the current project provides a Build action |
+| `<localleader>t` (`\t`) | n | Test when the current project provides a Test action |
 
-`<leader>` is **Space**, so use `Space`, `p`, `n` to create or `Space`, `p`, `r` for project actions.
+`<leader>` is **Space**, so use `Space`, `p`, `n` to create or `Space`, `p`, `r` for global project actions. `<localleader>` is backslash and appears only in supported project buffers—see [localleader.md](./localleader.md).
 
 The flow is:
 
@@ -49,7 +53,7 @@ Install only the generators you use; missing executables produce a focused error
 
 ## Run, build, and test
 
-`<leader>pr` starts from the current file (or current working directory), walks upward, and chooses the nearest supported marker:
+`<leader>pr` and the localleader provider share one runner. Both start from the current file (or current working directory), walk upward, and choose the nearest supported marker:
 
 | Project | Marker | Available actions |
 | --- | --- | --- |
@@ -64,6 +68,8 @@ Install only the generators you use; missing executables produce a focused error
 When multiple marker types share the nearest root, another picker asks which ecosystem to use. **Run** actions compile first when required by that ecosystem.
 
 Tasks open in a reusable bottom terminal with live and interactive output. Use `<Esc><Esc>` to leave terminal mode, then `q` to hide the task window without stopping its job. If a task is already running, `<leader>pr` offers to focus it, stop it and choose another task, or cancel.
+
+`\p` merges every action at the nearest root. `\r`, `\b`, and `\t` execute the matching capability directly when only one exists, or narrow the picker to that capability when equal-priority ecosystems provide several. Missing capabilities do not create dead mappings.
 
 Task chains are rendered from individually shell-escaped argv values and joined with `&&`, so later steps only run after earlier steps succeed.
 
@@ -82,4 +88,4 @@ Future generators such as `meson init` can be added without changing the picker 
 
 ---
 
-Nav: [index](./README.md) · [core](./core.md) · [telescope](./telescope.md) · [explorer](./explorer.md) · [TOOLS](../TOOLS.md)
+Nav: [index](./README.md) · [localleader](./localleader.md) · [core](./core.md) · [telescope](./telescope.md) · [explorer](./explorer.md) · [TOOLS](../TOOLS.md)

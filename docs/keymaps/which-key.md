@@ -6,13 +6,14 @@ Popup: **classic** full-width strip with a rounded neutral border and charcoal C
 
 Icons (when `vim.g.have_nerd_font`): **color = related-action family**, not the whole leader group. Similar/paired maps share a color with different glyphs (e.g. SF tests `a`/`A`/`t`/`T` green; retrieve/metadata azure; `<leader>c` format/lint/action each their own color). `]a`/`A`/`b`/`B` (and `[` twins) are mapped in `keymaps.lua` with buffer=cyan / argument=azure.
 
-Nav: [index](./README.md) · [core](./core.md) · [git](./git.md) · [explorer](./explorer.md) · [project](./project.md) · [markdown](./markdown.md) · [telescope](./telescope.md) · [treesitter](./treesitter.md) · [lsp](./lsp.md) · [salesforce](./salesforce.md) · [comment](./comment.md) · [qol](./qol.md)
+Nav: [index](./README.md) · [localleader](./localleader.md) · [core](./core.md) · [git](./git.md) · [explorer](./explorer.md) · [project](./project.md) · [markdown](./markdown.md) · [telescope](./telescope.md) · [treesitter](./treesitter.md) · [lsp](./lsp.md) · [salesforce](./salesforce.md) · [comment](./comment.md) · [qol](./qol.md)
 
 ---
 
 | Action | How |
 | --- | --- |
 | See leader groups | Press `<Space>`, wait ~300ms (`delay`) |
+| See current file/project actions | Press `\`, wait ~300ms; the group label and children change by buffer |
 | Open a group | Press the next key (`h` = Git hunk, `b` = Buffer, `f` = File/Find, …) |
 | Scroll popup | `Ctrl-d` / `Ctrl-u`; those mappings are filtered from which-key’s tree but still recenter-scroll normal buffers when the popup is closed |
 | Leave the popup | `<Esc>` |
@@ -33,6 +34,7 @@ Nav: [index](./README.md) · [core](./core.md) · [git](./git.md) · [explorer](
 | `<leader>q` | Session | `persistence.lua` (`qs`, `qS`, `ql`, `qd`) | [qol.md](./qol.md) |
 | `<leader>x` | Trouble | diagnostics `xx`/`xX`; TODO tree `xt` | [qol.md](./qol.md) · [comment.md](./comment.md) |
 | `<leader>u` | Undotree | `undotree.lua` | [qol.md](./qol.md) |
+| `<localleader>` (`\`) | `Local · <current contexts>` | Buffer-local provider registry; only available actions are mapped | [localleader.md](./localleader.md) |
 | `gc` / `gb` | Comment line / block | `lua/plugins/comment.lua` | [comment.md](./comment.md) |
 | `gs` / `gS` | Flash jump / treesitter | `lua/plugins/flash.lua` | [qol.md](./qol.md) |
 | `s` | Split / window | `ss`/`sv` · `sh`/`sj`/`sk`/`sl` | [core.md](./core.md) |
@@ -43,4 +45,4 @@ Pairs with `vim.opt.timeoutlen = 300` in `lua/config/options.lua`.
 
 ---
 
-Nav: [index](./README.md) · [core](./core.md) · [git](./git.md) · [explorer](./explorer.md) · [project](./project.md) · [markdown](./markdown.md) · [telescope](./telescope.md) · [treesitter](./treesitter.md) · [lsp](./lsp.md) · [salesforce](./salesforce.md) · [comment](./comment.md) · [qol](./qol.md)
+Nav: [index](./README.md) · [localleader](./localleader.md) · [core](./core.md) · [git](./git.md) · [explorer](./explorer.md) · [project](./project.md) · [markdown](./markdown.md) · [telescope](./telescope.md) · [treesitter](./treesitter.md) · [lsp](./lsp.md) · [salesforce](./salesforce.md) · [comment](./comment.md) · [qol](./qol.md)
