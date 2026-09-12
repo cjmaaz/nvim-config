@@ -47,8 +47,10 @@ nvim-config/
 │   └── COMMITIZEN.md     # optional cz helper
 ├── tests/
 │   ├── minimal_init.lua  # headless Plenary runtime
+│   ├── async_scoping_spec.lua # cursor/TS/linter async target regressions
+│   ├── dependency_pins_spec.lua # reproducible tool/scaffold specs
 │   ├── local_actions_spec.lua # project/provider/map lifecycle specs
-│   └── salesforce/       # mocked Org Browser/cache/retrieve specs
+│   └── salesforce/       # mocked Org Browser/security/cache/retrieve specs
 ├── init.lua              # entry: loader, leaders, require config.*
 ├── lazy-lock.json        # pinned plugin commits (commit this)
 ├── queries/
@@ -62,6 +64,7 @@ nvim-config/
     │   ├── project_runner.lua # project-aware run / build / test terminal
     │   ├── project_context.lua # shared start-path/root helpers + SF gate
     │   ├── local_actions.lua # context provider registry + owned buffer maps
+    │   ├── tool_versions.lua # exact Mason/scaffold dependency pins
     │   ├── local_actions/
     │   │   ├── project.lua # native runner capabilities
     │   │   ├── salesforce.lua # guarded Salesforce capabilities
@@ -73,7 +76,12 @@ nvim-config/
     │   ├── telescope/
     │   │   └── multigrep.lua # content grep + raw file-glob mode
     │   └── salesforce/
-    │       ├── process.lua # shared safe CLI/SFTerm/cancellation helpers
+    │       ├── process.lua # shared argv-only CLI/cancellation helpers
+    │       ├── terminal.lua # argv-only SFTerm float
+    │       ├── actions.lua # captured-buffer Salesforce command adapters
+    │       ├── org_context.lua # project-scoped effective target orgs
+    │       ├── safety.lua # contained cache writes/removal
+    │       ├── sobject.lua # staged apex_ls SObject definitions
     │       ├── metadata.lua # org inventory, sf_cache, manifests, actions
     │       ├── browser.lua # advanced fzf metadata batch actions
     │       ├── org_browser/ # Neo-tree source, nodes, renderers, commands

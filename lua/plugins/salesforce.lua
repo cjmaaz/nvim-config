@@ -8,14 +8,36 @@
 
 local function sf_action(method, ...)
   local args = { ... }
-  return function()
-    local sf = require("sf")
-    sf[method](unpack(args))
+  return function(ctx)
+    local function invoke()
+      local sf = require("sf")
+      sf[method](unpack(args))
+    end
+    if ctx and ctx.win and vim.api.nvim_win_is_valid(ctx.win) and vim.api.nvim_win_get_buf(ctx.win) == ctx.bufnr then
+      vim.api.nvim_win_call(ctx.win, invoke)
+    elseif ctx and ctx.bufnr and vim.api.nvim_buf_is_valid(ctx.bufnr) then
+      vim.api.nvim_buf_call(ctx.bufnr, invoke)
+    else
+      invoke()
+    end
   end
 end
 
 local function sf_metadata()
   return require("config.salesforce.metadata")
+end
+
+local function sf_actions()
+  return require("config.salesforce.actions")
+end
+
+local project_caps = {}
+
+local function in_captured_buffer(ctx, callback)
+  if not ctx or not ctx.bufnr or not vim.api.nvim_buf_is_valid(ctx.bufnr) then
+    return
+  end
+  return vim.api.nvim_buf_call(ctx.bufnr, callback)
 end
 
 local function sf_term_windows()
@@ -32,6 +54,9 @@ end
 
 --- Hide SFTerm floats without touching their terminal jobs.
 local function hide_visible_sf_terms()
+  if require("config.salesforce.terminal").hide() then
+    return true
+  end
   local wins = sf_term_windows()
   for _, win in ipairs(wins) do
     pcall(vim.api.nvim_win_close, win, false)
@@ -43,9 +68,17 @@ end
 local function cancel_sf_actions(opts)
   opts = opts or {}
   local cancelled = sf_metadata().cancel_background()
+  local owned_terminal = require("config.salesforce.terminal")
+  cancelled = cancelled + owned_terminal.cancel()
+  local owned_buf = owned_terminal.current_buffer()
 
   for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-    if vim.api.nvim_buf_is_loaded(buf) and vim.bo[buf].filetype == "SFTerm" and vim.bo[buf].buftype == "terminal" then
+    if
+      buf ~= owned_buf
+      and vim.api.nvim_buf_is_loaded(buf)
+      and vim.bo[buf].filetype == "SFTerm"
+      and vim.bo[buf].buftype == "terminal"
+    then
       local channel = vim.bo[buf].channel
       if channel and channel > 0 and vim.fn.jobwait({ channel }, 0)[1] == -1 then
         local ok = pcall(vim.api.nvim_chan_send, channel, "\003")
@@ -72,83 +105,6 @@ local function cancel_sf_or_clear_search()
   end
 end
 
--- Modern `sf org display --json` redacts accessToken ("[REDACTED] Use 'sf org auth
--- show-access-token'…"). sf.nvim still feeds that into curl → HTTP 401 on
--- <leader>Ss even when retrieve/deploy work. Intercept display --json and splice
--- in a real token from `sf org auth show-access-token`.
-local function install_sf_access_token_fix()
-  if vim.g._sf_access_token_fix then
-    return
-  end
-  vim.g._sf_access_token_fix = true
-
-  local orig_system = vim.system
-  vim.system = function(cmd, opts, on_exit)
-    local is_org_display_json = type(cmd) == "table"
-      and cmd[1] == "sf"
-      and cmd[2] == "org"
-      and cmd[3] == "display"
-      and vim.tbl_contains(cmd, "--json")
-
-    if not is_org_display_json then
-      return orig_system(cmd, opts, on_exit)
-    end
-
-    -- Support vim.system(cmd, on_exit) two-arg form.
-    if type(opts) == "function" then
-      on_exit = opts
-      opts = nil
-    end
-
-    local org
-    for i, v in ipairs(cmd) do
-      if (v == "-o" or v == "--target-org") and cmd[i + 1] then
-        org = cmd[i + 1]
-        break
-      end
-    end
-
-    if type(on_exit) ~= "function" or not org then
-      return orig_system(cmd, opts, on_exit)
-    end
-
-    return orig_system(cmd, opts, function(obj)
-      if obj.code ~= 0 then
-        return on_exit(obj)
-      end
-
-      local ok, parsed = pcall(vim.json.decode, obj.stdout or "")
-      if not ok or type(parsed) ~= "table" or type(parsed.result) ~= "table" then
-        return on_exit(obj)
-      end
-
-      local token = parsed.result.accessToken
-      if type(token) == "string" and token ~= "" and not token:find("REDACTED", 1, true) then
-        return on_exit(obj)
-      end
-
-      orig_system(
-        { "sf", "org", "auth", "show-access-token", "-o", org, "--json", "-p" },
-        { text = true },
-        function(tok_obj)
-          if tok_obj.code == 0 then
-            local tok_ok, tok_parsed = pcall(vim.json.decode, tok_obj.stdout or "")
-            local real = tok_ok
-              and type(tok_parsed) == "table"
-              and tok_parsed.result
-              and tok_parsed.result.accessToken
-            if type(real) == "string" and real ~= "" then
-              parsed.result.accessToken = real
-              obj.stdout = vim.json.encode(parsed)
-            end
-          end
-          on_exit(obj)
-        end
-      )
-    end)
-  end
-end
-
 local function salesforce_root(bufnr, refresh)
   local project_context = require("config.project_context")
   if refresh then
@@ -158,10 +114,18 @@ local function salesforce_root(bufnr, refresh)
 end
 
 local function guarded_load(callback, bufnr)
-  if not salesforce_root(bufnr, true) then
+  bufnr = bufnr or vim.api.nvim_get_current_buf()
+  local root = salesforce_root(bufnr, true)
+  if not root then
     vim.notify("Open this from a Salesforce project first.", vim.log.levels.WARN, { title = "sf.nvim" })
     return false
   end
+  local cap, safety_error = require("config.salesforce.safety").preflight(root)
+  if not cap then
+    vim.notify(safety_error, vim.log.levels.ERROR, { title = "sf.nvim" })
+    return false
+  end
+  project_caps[cap.root] = cap
   if not package.loaded.sf then
     pcall(vim.api.nvim_del_user_command, "SF")
     require("lazy").load({ plugins = { "sf.nvim" } })
@@ -170,9 +134,24 @@ local function guarded_load(callback, bufnr)
       return false
     end
   end
-  if callback then
-    callback()
-  end
+  require("config.salesforce.org_context").capture(bufnr, function(ctx, err)
+    if ctx then
+      local ok, util = pcall(require, "sf.util")
+      if ok then
+        util.target_org = ctx.org -- compatibility mirror; commands still receive explicit --target-org
+      end
+    elseif err then
+      vim.notify(err, vim.log.levels.WARN, { title = "sf.nvim" })
+      ctx = {
+        bufnr = bufnr,
+        path = vim.api.nvim_buf_is_valid(bufnr) and vim.api.nvim_buf_get_name(bufnr) or nil,
+        root = root,
+      }
+    end
+    if callback then
+      callback(ctx)
+    end
+  end)
   return true
 end
 
@@ -181,7 +160,7 @@ local function register_local_actions()
     cancel = cancel_sf_actions,
     guarded_load = guarded_load,
     salesforce_root = salesforce_root,
-    sf_action = sf_action,
+    actions = sf_actions,
   })
   require("config.local_actions").register(provider)
 end
@@ -214,52 +193,66 @@ local plugin = {
     },
     keys = {
       -- Keep upstream fetch semantics: refresh orgs/default target, not metadata.
-      { "<leader>SF", sf_action("fetch_org_list"), desc = "Fetch orgs" },
+      { "<leader>SF", sf_actions().fetch_orgs, desc = "Fetch orgs" },
       {
         "<leader>So",
-        function()
-          sf_metadata().select_target()
+        function(ctx)
+          in_captured_buffer(ctx, function()
+            sf_metadata().select_target()
+          end)
         end,
         desc = "Set local target org",
       },
       {
         "<leader>SO",
-        function()
-          sf_metadata().select_global_target()
+        function(ctx)
+          in_captured_buffer(ctx, function()
+            sf_metadata().select_global_target()
+          end)
         end,
         desc = "Set global target org",
       },
-      { "<leader>Sb", sf_action("org_open"), desc = "Open org in browser" },
-      { "<leader>SB", sf_action("org_open_current_file"), desc = "Open current metadata in org" },
+      { "<leader>Sb", sf_actions().open_org, desc = "Open org in browser" },
+      { "<leader>SB", sf_actions().open_current, desc = "Open current metadata in org" },
 
       -- Retrieve / diff / logs / term
-      { "<leader>Sr", sf_action("retrieve"), desc = "Retrieve current file" },
-      { "<leader>Sd", sf_action("diff_in_target_org"), desc = "Diff with target org" },
-      { "<leader>Sl", sf_action("pull_log"), desc = "Pull debug log" },
-      { "<leader>Se", sf_action("toggle_term"), desc = "Toggle terminal" },
+      { "<leader>Sr", sf_actions().retrieve, desc = "Retrieve current file" },
+      { "<leader>Sd", sf_actions().diff, desc = "Diff with target org" },
+      { "<leader>Sl", sf_actions().pull_log, desc = "Pull debug log" },
+      { "<leader>Se", sf_actions().toggle_terminal, desc = "Toggle terminal" },
       { "<leader>Sx", cancel_sf_actions, desc = "Cancel active actions" },
       {
         "<leader>SV",
-        function()
-          require("config.salesforce.vlocity").open()
+        function(ctx)
+          in_captured_buffer(ctx, function()
+            require("config.salesforce.vlocity").open()
+          end)
         end,
         desc = "Retrieve Vlocity DataPacks",
       },
 
       -- Deploy (save + push current file)
-      { "<leader>Sp", sf_action("save_and_push"), desc = "Save and deploy current file" },
+      { "<leader>Sp", sf_actions().deploy, desc = "Save and deploy current file" },
       -- { "<leader>Sp", sf_action("push"), desc = "Push without save-first" }, -- if API exists / prefer
 
       -- Tests
-      { "<leader>St", sf_action("run_current_test"), desc = "Test under cursor" },
-      { "<leader>ST", sf_action("run_current_test_with_coverage"), desc = "Test under cursor + coverage" },
-      { "<leader>Sa", sf_action("run_all_tests_in_this_file"), desc = "All tests in file" },
+      { "<leader>St", sf_actions().run_current_test, desc = "Test under cursor" },
+      {
+        "<leader>ST",
+        function(ctx)
+          sf_actions().run_current_test(ctx, true)
+        end,
+        desc = "Test under cursor + coverage",
+      },
+      { "<leader>Sa", sf_actions().run_file_tests, desc = "All tests in file" },
       {
         "<leader>SA",
-        sf_action("run_all_tests_in_this_file_with_coverage"),
+        function(ctx)
+          sf_actions().run_file_tests(ctx, true)
+        end,
         desc = "All tests in file + coverage",
       },
-      { "<leader>SR", sf_action("repeat_last_tests"), desc = "Repeat last tests" },
+      { "<leader>SR", sf_actions().repeat_tests, desc = "Repeat last tests" },
       { "<leader>Sv", sf_action("toggle_sign"), desc = "Toggle coverage signs" },
       { "[v", sf_action("uncovered_jump_backward"), desc = "Previous uncovered line" },
       { "]v", sf_action("uncovered_jump_forward"), desc = "Next uncovered line" },
@@ -267,54 +260,67 @@ local plugin = {
       -- SOQL builder / whole-file / visual selection.
       {
         "<leader>SQ",
-        function()
-          require("config.salesforce.query").open()
+        function(ctx)
+          in_captured_buffer(ctx, function()
+            require("config.salesforce.query").open()
+          end)
         end,
         desc = "Build SOQL query",
       },
       {
         "<leader>Sq",
-        function()
-          require("config.salesforce.query").run_current(false)
+        function(ctx)
+          in_captured_buffer(ctx, function()
+            require("config.salesforce.query").run_current(false, ctx.bufnr)
+          end)
         end,
         mode = "n",
         desc = "Run SOQL file",
       },
       {
         "<leader>Sq",
-        sf_action("run_highlighted_soql"),
+        sf_actions().run_query_selection,
         mode = "x",
+        capture_visual = true,
         desc = "Run selected SOQL",
       },
 
       -- Metadata (needs fzf-lua for list pickers)
-      { "<leader>Sm", sf_action("list_md_to_retrieve"), desc = "Pick cached metadata to retrieve" },
+      { "<leader>Sm", sf_actions().metadata_list, desc = "Pick cached metadata to retrieve" },
       {
         "<leader>SU",
-        function()
-          sf_metadata().prompt_refresh()
+        function(ctx)
+          in_captured_buffer(ctx, function()
+            sf_metadata().prompt_refresh()
+          end)
         end,
         desc = "Refresh metadata inventory",
       },
       {
         "<leader>Su",
-        function()
-          require("config.salesforce.browser").open()
-          -- vim.cmd("Neotree sf_org toggle left") -- put the Org Browser on Su instead
+        function(ctx)
+          in_captured_buffer(ctx, function()
+            require("config.salesforce.browser").open()
+            -- vim.cmd("Neotree sf_org toggle left") -- put the Org Browser on Su instead
+          end)
         end,
         desc = "Browse metadata inventory",
       },
       {
         "<leader>SE",
-        function()
-          vim.cmd("Neotree sf_org toggle left")
+        function(ctx)
+          in_captured_buffer(ctx, function()
+            vim.cmd("Neotree sf_org toggle left")
+          end)
         end,
         desc = "Toggle Org Browser",
       },
       {
         "<leader>SP",
-        function()
-          require("config.salesforce.manifests").open()
+        function(ctx)
+          in_captured_buffer(ctx, function()
+            require("config.salesforce.manifests").open()
+          end)
         end,
         desc = "Browse package manifests",
       },
@@ -322,19 +328,19 @@ local plugin = {
       -- sObjects for apex_ls completion
       {
         "<leader>Ss",
-        function()
-          require("sf").refresh_sobjects({ category = "ALL" })
+        function(ctx)
+          in_captured_buffer(ctx, function()
+            require("config.salesforce.sobject").refresh({ category = "ALL" })
+          end)
         end,
         desc = "Refresh SObject definitions",
       },
       -- { "<leader>Ss", function() require("sf").refresh_sobjects({ category = "CUSTOM" }) end, desc = "Refresh custom SObjects" },
 
       -- Ctags (optional host tool: universal-ctags)
-      { "<leader>Sc", sf_action("create_ctags"), desc = "Create Apex ctags" },
+      { "<leader>Sc", sf_actions().create_ctags, desc = "Create Apex ctags" },
     },
     config = function()
-      install_sf_access_token_fix()
-
       require("sf").setup({
         enable_hotkeys = false, -- we define <leader>S… above (avoids fighting Telescope <leader>s)
         -- enable_hotkeys = true, -- upstream defaults (many conflicts)
@@ -374,8 +380,30 @@ local plugin = {
 
         auto_display_code_sign = true, -- show coverage signs after coverage test runs
         -- auto_display_code_sign = false, -- only via <leader>Sv
+
+        -- Keep all plugin-generated state in the validated project cache.
+        plugin_folder_name = "/sf_cache/",
+        -- plugin_folder_name = "/.sf-cache/", -- alternate single project-local component
       })
+      sf_actions().install_command_overrides()
       require("config.salesforce.query").setup()
+
+      -- Replace sf.nvim's unchecked recursive diff cleanup with contained removal.
+      for _, autocmd in ipairs(vim.api.nvim_get_autocmds({ group = "SF", event = "VimLeavePre" })) do
+        pcall(vim.api.nvim_del_autocmd, autocmd.id)
+      end
+      vim.api.nvim_create_autocmd("VimLeavePre", {
+        group = vim.api.nvim_create_augroup("salesforce_safe_cleanup", { clear = true }),
+        callback = function()
+          local safety = require("config.salesforce.safety")
+          for _, project_cap in pairs(project_caps) do
+            local diffs = safety.path(project_cap, "sf_cache/diffs", { allow_missing = true })
+            if diffs and (vim.uv or vim.loop).fs_lstat(diffs.path) then
+              safety.remove_tree(diffs)
+            end
+          end
+        end,
+      })
 
       -- SFTerm visibility belongs to <leader>Se (q also hides when focused).
       -- Esc cancels any foreground/background SF action; otherwise it clears search.
@@ -389,6 +417,11 @@ local plugin = {
         callback = function(event)
           local opts = { buffer = event.buf, silent = true, desc = "Hide Salesforce terminal" }
           vim.keymap.set("n", "q", hide_visible_sf_terms, opts)
+          vim.keymap.set("n", "<leader><leader>", require("config.salesforce.terminal").toggle, {
+            buffer = event.buf,
+            silent = true,
+            desc = "Toggle Salesforce terminal",
+          })
           vim.keymap.set("n", "<Esc>", cancel_sf_actions, {
             buffer = event.buf,
             silent = true,
@@ -437,7 +470,11 @@ plugin.init = function()
     local mapping = key
     local mode = mapping.mode or "n"
     vim.keymap.set(mode, mapping[1], function()
-      guarded_load(mapping[2])
+      local bufnr = vim.api.nvim_get_current_buf()
+      local selected = mapping.capture_visual and sf_actions().capture_visual(bufnr) or nil
+      guarded_load(function(ctx)
+        mapping[2](ctx, selected)
+      end, bufnr)
     end, {
       desc = mapping.desc,
       silent = mapping.silent,
@@ -445,9 +482,14 @@ plugin.init = function()
   end
 
   vim.api.nvim_create_user_command("SF", function(opts)
+    local bufnr = vim.api.nvim_get_current_buf()
     guarded_load(function()
-      vim.cmd("SF" .. (opts.args ~= "" and (" " .. opts.args) or ""))
-    end)
+      if vim.api.nvim_buf_is_valid(bufnr) then
+        vim.api.nvim_buf_call(bufnr, function()
+          vim.cmd("SF" .. (opts.args ~= "" and (" " .. opts.args) or ""))
+        end)
+      end
+    end, bufnr)
   end, {
     nargs = "*",
     desc = "Salesforce commands (Salesforce projects only)",

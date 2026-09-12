@@ -7,47 +7,73 @@ local M = {}
 local uv = vim.uv or vim.loop
 local metadata = require("config.salesforce.metadata")
 local process = require("config.salesforce.process")
+local safety = require("config.salesforce.safety")
 
 local function notify(message, level)
   vim.notify(message, level or vim.log.levels.INFO, { title = "Vlocity retrieve" })
 end
 
 local function read_json(path)
-  local ok, lines = pcall(vim.fn.readfile, path, "b")
-  if not ok or #lines == 0 then
-    return nil
-  end
-  local decoded, value = pcall(vim.json.decode, table.concat(lines, "\n"))
-  return decoded and value or nil
+  local root = safety.root_for_path(path)
+  return root and safety.read_json(root, path) or nil
 end
 
 local function atomic_write_json(path, value)
-  vim.fn.mkdir(vim.fs.dirname(path), "p")
-  local encoded_ok, encoded = pcall(vim.json.encode, value)
-  if not encoded_ok then
-    return false, encoded
+  local root = safety.root_for_path(path)
+  if not root then
+    return false, "Could not resolve the Salesforce project for this Vlocity cache."
   end
-  local tmp = string.format("%s.tmp.%s", path, uv.hrtime())
-  local write_ok, write_error = pcall(vim.fn.writefile, { encoded }, tmp, "b")
-  if not write_ok then
-    return false, write_error
-  end
-  local renamed, rename_error = uv.fs_rename(tmp, path)
-  if not renamed then
-    pcall(uv.fs_unlink, tmp)
-    return false, rename_error
-  end
-  return true
+  return safety.atomic_write_json(root, path, value)
 end
 
-local function executable(root)
+local function contained(root, path)
+  root = vim.fs.normalize(root):gsub("/+$", "")
+  path = vim.fs.normalize(path):gsub("/+$", "")
+  return path == root or path:sub(1, #root + 1) == root .. "/"
+end
+
+local function executable(root, require_trust)
   local local_cli = vim.fs.joinpath(root, "node_modules", ".bin", "vlocity")
   if vim.fn.executable(local_cli) == 1 then
-    return local_cli
+    local node_modules = uv.fs_realpath(vim.fs.joinpath(root, "node_modules"))
+    local resolved = uv.fs_realpath(local_cli)
+    local stat = resolved and uv.fs_lstat(resolved) or nil
+    if not node_modules or not resolved or not contained(node_modules, resolved) then
+      return nil, "Project-local Vlocity resolves outside node_modules."
+    end
+    if not stat or stat.type ~= "file" then
+      return nil, "Project-local Vlocity must resolve to a regular file."
+    end
+    if bit.band(stat.mode or 0, 18) ~= 0 then
+      return nil, "Project-local Vlocity is group/world-writable and will not be executed."
+    end
+    if require_trust and not vim.secure.read(resolved) then
+      return nil, "Project-local Vlocity was not trusted."
+    end
+    return resolved
   end
-  if vim.fn.executable("vlocity") == 1 then
-    return "vlocity"
+  local path_cli = vim.fn.exepath("vlocity")
+  if path_cli ~= "" then
+    local resolved = uv.fs_realpath(path_cli) or vim.fs.normalize(path_cli)
+    if contained(uv.fs_realpath(root) or root, resolved) then
+      return nil, "A project-controlled Vlocity executable outside node_modules will not be executed."
+    end
+    return resolved
   end
+  return nil, "Install the npm Vlocity Build Tool: `npm install --global vlocity`."
+end
+
+local function trusted_job(ctx, job)
+  local base = uv.fs_realpath(vim.fs.joinpath(ctx.root, "vlocity"))
+  local resolved = uv.fs_realpath(job)
+  local stat = uv.fs_lstat(job)
+  if not base or not resolved or not stat or stat.type ~= "file" or not contained(base, resolved) then
+    return nil, "Vlocity job must be a regular, non-symlink file below project/vlocity."
+  end
+  if not vim.secure.read(resolved) then
+    return nil, "Vlocity job was not trusted."
+  end
+  return resolved
 end
 
 local function node_supported()
@@ -285,7 +311,7 @@ local function run_export(ctx, cli, job, key)
   local before = uv.fs_stat(log_path)
   local before_mtime = before and before.mtime and before.mtime.sec or nil
   local args = export_args(ctx, cli, job, key)
-  process.run_in_term(args, function(ok)
+  process.run_in_term(args, { cwd = ctx.root }, function(ok)
     local after = uv.fs_stat(log_path)
     local after_mtime = after and after.mtime and after.mtime.sec or nil
     local log_changed = after_mtime and (not before_mtime or after_mtime ~= before_mtime)
@@ -386,9 +412,9 @@ function M.open()
   if not ctx then
     return
   end
-  local cli = executable(ctx.root)
+  local cli, cli_error = executable(ctx.root, true)
   if not cli then
-    notify("Install the npm Vlocity Build Tool: `npm install --global vlocity`.", vim.log.levels.ERROR)
+    notify(cli_error, vim.log.levels.ERROR)
     return
   end
   local supported, node_error = node_supported()
@@ -401,6 +427,12 @@ function M.open()
     if not job then
       return
     end
+    local approved_job, job_error = trusted_job(ctx, job)
+    if not approved_job then
+      notify(job_error, vim.log.levels.ERROR)
+      return
+    end
+    job = approved_job
     vim.ui.select({
       { id = "scoped", label = "Retrieve one DataPack by key" },
       { id = "full", label = "Run the full configured export" },
@@ -437,6 +469,7 @@ M._test = {
   local_keys = local_keys,
   sanitize_records = sanitize_records,
   validate_key = validate_key,
+  trusted_job = trusted_job,
 }
 
 return M

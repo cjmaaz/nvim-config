@@ -7,6 +7,7 @@ local M = {}
 local uv = vim.uv or vim.loop
 local metadata = require("config.salesforce.metadata")
 local process = require("config.salesforce.process")
+local safety = require("config.salesforce.safety")
 local memory = {}
 local CACHE_TTL_SECONDS = 24 * 60 * 60
 
@@ -31,12 +32,8 @@ local function describe_path(ctx, object_name)
 end
 
 local function read_json(path)
-  local ok, lines = pcall(vim.fn.readfile, path, "b")
-  if not ok or #lines == 0 then
-    return nil
-  end
-  local decoded, value = pcall(vim.json.decode, table.concat(lines, "\n"))
-  return decoded and value or nil
+  local root = safety.root_for_path(path)
+  return root and safety.read_json(root, path) or nil
 end
 
 local function cache_is_fresh(path)
@@ -46,22 +43,11 @@ local function cache_is_fresh(path)
 end
 
 local function atomic_write_json(path, value)
-  vim.fn.mkdir(vim.fs.dirname(path), "p")
-  local encoded_ok, encoded = pcall(vim.json.encode, value)
-  if not encoded_ok then
-    return false, encoded
+  local root = safety.root_for_path(path)
+  if not root then
+    return false, "Could not resolve the Salesforce project for this schema cache."
   end
-  local tmp = string.format("%s.tmp.%s", path, uv.hrtime())
-  local write_ok, write_error = pcall(vim.fn.writefile, { encoded }, tmp, "b")
-  if not write_ok then
-    return false, write_error
-  end
-  local renamed, rename_error = uv.fs_rename(tmp, path)
-  if not renamed then
-    pcall(uv.fs_unlink, tmp)
-    return false, rename_error
-  end
-  return true
+  return safety.atomic_write_json(root, path, value)
 end
 
 local function context()

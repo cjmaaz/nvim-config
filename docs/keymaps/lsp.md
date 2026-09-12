@@ -30,7 +30,7 @@ In an attached LSP buffer, the buffer-local `<leader>D` mapping takes precedence
 
 **Always on:** `lua_ls` (+ `stylua` via Mason).
 
-**On demand:** first time you open a matching filetype, Mason installs the server then enables it — Python (`basedpyright`), JS/TS (`ts_ls`), HTML/CSS, Java (`jdtls`), Rust, C/C++ (`clangd`), JSON/YAML, **Apex** (`apex_ls` / `apex-language-server`). Needs **Java** on PATH for Apex. Optional: `$APEX_LS_JAR`.
+**On demand:** first time you open a matching filetype, Mason installs the server at the exact version in `lua/config/tool_versions.lua`, verifies the receipt, then enables it — Python (`basedpyright`), JS/TS (`ts_ls`), HTML/CSS, Java (`jdtls`), Rust, C/C++ (`clangd`), JSON/YAML, **Apex** (`apex_ls` / `apex-language-server`). A failed install clears its single-flight state so another matching `FileType` can retry without restarting Neovim. Needs **Java** on PATH for Apex. Optional: `$APEX_LS_JAR`.
 
 `ts_ls` semantic tokens and same-symbol document highlights are disabled in `on_init`: TypeScript Server 6 can lose file synchronization in large LWC workspaces and repeatedly raise `getEncodedSemanticClassifications` / `getDocumentHighlights: Could not find source file`. Treesitter highlighting remains active, and other LSPs keep document highlights; `lsp.lua` retains a commented plain `ts_ls = {}` alternate if the upstream issue is fixed later.
 
@@ -83,7 +83,7 @@ External linters (ESLint, Ruff, …) → same diagnostic UI as LSP (`]d`, `<lead
 
 **Auto-lint is on** by default. If it’s noisy or slow: `<leader>tl`, or comment the autocmd in `linting.lua` and use `<leader>cl` only.
 
-**Lazy Mason:** first time you open a matching filetype, Neovim installs the tool (`eslint_d`, `ruff`, `sqlfluff`, `shellcheck`, `stylelint`, `markdownlint`, …). Auto-lint **skips** a linter until its binary is on PATH (avoids ENOENT / neo-tree `BufEnter` errors while Mason installs). Manual: `:MasonInstall eslint_d`. If npm fails with `ETARGET` / “date before …”, check `~/.npmrc` `min-release-age` — see [diagnostics/quiet.md](../diagnostics/quiet.md#example-no-eslint-diagnostics--mason-eslint_d-failed). Disable a language by commenting its line in `linters_by_ft` (same style as statusline options).
+**Lazy Mason:** first time you open a matching filetype, Neovim installs the exact pinned tool (`eslint_d`, `ruff`, `sqlfluff`, `shellcheck`, `stylelint`, `markdownlint`, …). Auto-lint **skips** a linter until its binary is on PATH, then retries only the originating buffers when installation finishes. Manual: `:MasonInstall eslint_d@<version>`. If npm fails with `ETARGET` / “date before …”, check `~/.npmrc` `min-release-age` — see [diagnostics/quiet.md](../diagnostics/quiet.md#example-no-eslint-diagnostics--mason-eslint_d-failed). Disable a language by commenting its line in `linters_by_ft` (same style as statusline options).
 
 ---
 

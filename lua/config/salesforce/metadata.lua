@@ -6,6 +6,8 @@
 
 local M = {}
 local process = require("config.salesforce.process")
+local org_context = require("config.salesforce.org_context")
+local safety = require("config.salesforce.safety")
 
 local SCHEMA_VERSION = 1
 local BROWSER_SLICE_SCHEMA = 1
@@ -60,6 +62,11 @@ local function cache_name(value)
 end
 
 local function read_json(path)
+  local root = safety.root_for_path(path)
+  if root then
+    local decoded = safety.read_json(root, path)
+    return decoded
+  end
   local ok, lines = pcall(vim.fn.readfile, path, "b")
   if not ok or not lines or #lines == 0 then
     return nil
@@ -69,40 +76,19 @@ local function read_json(path)
 end
 
 local function atomic_write_json(path, value)
-  vim.fn.mkdir(vim.fs.dirname(path), "p")
-  local tmp = string.format("%s.tmp.%s", path, (vim.uv or vim.loop).hrtime())
-  local ok, encoded = pcall(vim.json.encode, value)
-  if not ok then
-    return false, encoded
+  local root = safety.root_for_path(path)
+  if not root then
+    return false, "Could not resolve the Salesforce project for this cache write."
   end
-
-  local write_ok, write_err = pcall(vim.fn.writefile, { encoded }, tmp, "b")
-  if not write_ok then
-    return false, write_err
-  end
-
-  local renamed, rename_err = (vim.uv or vim.loop).fs_rename(tmp, path)
-  if not renamed then
-    pcall((vim.uv or vim.loop).fs_unlink, tmp)
-    return false, rename_err
-  end
-  return true
+  return safety.atomic_write_json(root, path, value)
 end
 
 local function atomic_write_lines(path, lines)
-  vim.fn.mkdir(vim.fs.dirname(path), "p")
-  local tmp = string.format("%s.tmp.%s", path, (vim.uv or vim.loop).hrtime())
-  local write_ok, write_err = pcall(vim.fn.writefile, lines, tmp)
-  if not write_ok then
-    return false, write_err
+  local root = safety.root_for_path(path)
+  if not root then
+    return false, "Could not resolve the Salesforce project for this cache write."
   end
-
-  local renamed, rename_err = (vim.uv or vim.loop).fs_rename(tmp, path)
-  if not renamed then
-    pcall((vim.uv or vim.loop).fs_unlink, tmp)
-    return false, rename_err
-  end
-  return true
+  return safety.atomic_write_lines(root, path, lines)
 end
 
 local function project_root()
@@ -123,13 +109,13 @@ local function project_root()
   return vim.fs.normalize(root)
 end
 
-local function target_org()
-  local org = sf_util().target_org
-  if not org or org == "" then
+local function target_org(root)
+  local resolved = org_context.current(root)
+  if not resolved or not resolved.org or resolved.org == "" then
     notify("Set a local target org first with <leader>So.", vim.log.levels.ERROR)
     return nil
   end
-  return org
+  return resolved
 end
 
 local function source_api_version(root)
@@ -165,20 +151,17 @@ end
 
 local function context()
   local root = project_root()
-  local org = root and target_org() or nil
-  if not root or not org then
+  local resolved = root and target_org(root) or nil
+  if not root or not resolved then
     return nil
-  end
-  local identity = current_identity
-  if identity and identity.alias ~= org and identity.username ~= org then
-    identity = nil
   end
   return {
     root = root,
-    org = org,
+    org = resolved.org,
+    revision = resolved.revision,
     api_version = source_api_version(root),
-    identity = identity,
-    paths = cache_paths(root, org),
+    identity = resolved.identity,
+    paths = cache_paths(root, resolved.org),
   }
 end
 
@@ -256,6 +239,7 @@ local function save_index(ctx, index)
   if not ok then
     notify("Could not write metadata index: " .. tostring(err), vim.log.levels.ERROR)
   end
+  return ok, err
 end
 
 local function is_stale(timestamp, ttl)
@@ -273,11 +257,7 @@ local function browser_context_is_current(ctx, token)
   if token ~= generation then
     return false
   end
-  local ok, util = pcall(require, "sf.util")
-  if not ok or util.target_org ~= ctx.org then
-    return false
-  end
-  return true
+  return org_context.is_current(ctx)
 end
 
 local function complete_browser_request(key, ...)
@@ -559,7 +539,18 @@ local function begin_refresh(ctx)
     return false
   end
   refreshing = true
-  vim.fn.mkdir(ctx.paths.browser, "p")
+  local browser_cap, cap_error = safety.path_for(ctx.root, ctx.paths.browser, { allow_missing = true })
+  local created, create_error
+  if browser_cap then
+    created, create_error = safety.mkdirs(browser_cap)
+  else
+    create_error = cap_error
+  end
+  if not created then
+    refreshing = false
+    notify(create_error or "Could not create safe metadata cache.", vim.log.levels.ERROR)
+    return false
+  end
   return true
 end
 
@@ -618,10 +609,20 @@ function M.refresh_all(callback)
     end
 
     local index = read_index(ctx)
+    local wrote_types, types_error = atomic_write_json(ctx.paths.metadata_types, result)
+    if not wrote_types then
+      refreshing = false
+      index.catalog_error = tostring(types_error)
+      save_index(ctx, index)
+      notify("Metadata type cache write failed: " .. tostring(types_error), vim.log.levels.ERROR)
+      if callback then
+        callback(false, index)
+      end
+      return
+    end
     index.types = result.metadataObjects or {}
     index.catalog_fetched_at = os.time()
     index.catalog_error = nil
-    atomic_write_json(ctx.paths.metadata_types, result)
 
     local types = {}
     for _, descriptor in ipairs(index.types) do
@@ -730,10 +731,16 @@ function M.refresh_browser_catalog(callback)
         return
       end
 
+      local wrote_types, types_error = atomic_write_json(ctx.paths.metadata_types, { metadataObjects = descriptors })
+      if not wrote_types then
+        index.catalog_error = tostring(types_error)
+        save_index(ctx, index)
+        done(false, browser_catalog_snapshot(ctx, index), index.catalog_error)
+        return
+      end
       index.types = descriptors
       index.catalog_fetched_at = os.time()
       index.catalog_error = nil
-      atomic_write_json(ctx.paths.metadata_types, { metadataObjects = descriptors })
       save_index(ctx, index)
       done(true, browser_catalog_snapshot(ctx, index))
     end)
@@ -892,7 +899,13 @@ function M.refresh_browser_children(reference, callback)
 
       current_index.browser_errors[operation] = nil
       if descriptor.inFolder ~= true and not reference.folder then
-        atomic_write_json(ctx.paths.member(reference.type), result)
+        local wrote_legacy, legacy_error = atomic_write_json(ctx.paths.member(reference.type), result)
+        if not wrote_legacy then
+          current_index.browser_errors[operation] = tostring(legacy_error)
+          save_index(ctx, current_index)
+          done(false, M.load_browser_children(reference), tostring(legacy_error))
+          return
+        end
         current_index.fetched[reference.type] = {
           at = slice.fetched_at,
           count = #result,
@@ -940,7 +953,13 @@ function M.refresh_browser_type_members(metadata_type, callback)
       if index_number > #folders then
         local ctx = root_slice.context
         local index = read_index(ctx)
-        atomic_write_json(ctx.paths.member(metadata_type), members)
+        local wrote_members, members_error = atomic_write_json(ctx.paths.member(metadata_type), members)
+        if not wrote_members then
+          index.errors[metadata_type] = tostring(members_error)
+          save_index(ctx, index)
+          callback(false, members, tostring(members_error))
+          return
+        end
         index.fetched[metadata_type] = {
           at = os.time(),
           count = #members,
@@ -1034,7 +1053,7 @@ local function fetch_orgs(callback)
   )
 end
 
-local function sync_target(choice)
+local function sync_target(choice, root, is_global)
   sf_util().target_org = choice.value
   current_identity = {
     alias = choice.value,
@@ -1043,6 +1062,11 @@ local function sync_target(choice)
     instance_url = choice.instance_url,
     connected_status = choice.connected_status,
   }
+  if is_global then
+    org_context.invalidate()
+  else
+    org_context.seed(root, choice, "local")
+  end
 end
 
 local function choose_org(prompt, callback)
@@ -1081,7 +1105,7 @@ start_target_selection = function(request)
     if is_latest and err then
       notify("Could not set target org: " .. err, vim.log.levels.ERROR)
     elseif is_latest then
-      sync_target(request.choice)
+      sync_target(request.choice, request.root, request.global)
       invalidate_browser_requests("Target org or Salesforce project changed.")
       notify(string.format("%s target org set: %s", request.global and "Global" or "Local", request.choice.value))
       if request.callback then
@@ -1277,16 +1301,32 @@ local function write_manifest_files(ctx, items)
 
   local operation = string.format("%d-%s", os.time(), (vim.uv or vim.loop).hrtime())
   local dir = vim.fs.joinpath(ctx.paths.manifests, operation)
-  vim.fn.mkdir(dir, "p")
+  local dir_cap, cap_error = safety.path_for(ctx.root, dir, { allow_missing = true })
+  local created, create_error
+  if dir_cap then
+    created, create_error = safety.mkdirs(dir_cap)
+  else
+    create_error = cap_error
+  end
+  if not created then
+    return nil, create_error
+  end
 
   local package_path = vim.fs.joinpath(dir, "package.xml")
   local destructive_path = vim.fs.joinpath(dir, "destructiveChangesPost.xml")
   local empty_package = manifest_lines({}, api_version)
   local selected_package = manifest_lines(items, api_version)
 
-  vim.fn.writefile(selected_package, package_path)
-  vim.fn.writefile(empty_package, vim.fs.joinpath(dir, "empty-package.xml"))
-  vim.fn.writefile(selected_package, destructive_path)
+  for path, lines in pairs({
+    [package_path] = selected_package,
+    [vim.fs.joinpath(dir, "empty-package.xml")] = empty_package,
+    [destructive_path] = selected_package,
+  }) do
+    local ok, write_error = safety.atomic_write_lines(ctx.root, path, lines)
+    if not ok then
+      return nil, write_error
+    end
+  end
 
   return {
     dir = dir,
@@ -1304,7 +1344,13 @@ local function manifest_context()
   if not ctx then
     return nil
   end
-  return vim.fs.joinpath(ctx.root, "manifest"), ctx
+  local dir = vim.fs.joinpath(ctx.root, "manifest")
+  local safe_dir, safe_error = safety.path_for(ctx.root, dir, { allow_missing = true })
+  if not safe_dir then
+    notify(safe_error, vim.log.levels.ERROR)
+    return nil
+  end
+  return dir, ctx
 end
 
 local function validate_manifest_path(path)
@@ -1320,6 +1366,10 @@ local function validate_manifest_path(path)
   end
   if real_path:sub(-4):lower() ~= ".xml" then
     return nil, ctx, "Select an XML manifest."
+  end
+  local safe_path, safe_error = safety.path_for(ctx.root, path)
+  if not safe_path then
+    return nil, ctx, safe_error
   end
 
   local relative = vim.fs.relpath(real_dir, real_path)
@@ -1348,7 +1398,7 @@ function M.retrieve_manifest(path, callback)
     ctx.org,
     "--manifest",
     manifest,
-  }, callback)
+  }, { cwd = ctx.root }, callback)
   return true
 end
 
@@ -1367,7 +1417,7 @@ function M.deploy_manifest(path, callback)
     ctx.org,
     "--manifest",
     manifest,
-  }, callback)
+  }, { cwd = ctx.root }, callback)
   return true
 end
 
@@ -1380,7 +1430,12 @@ local function action_context(items)
   if not ctx then
     return nil
   end
-  return ctx, write_manifest_files(ctx, items)
+  local manifests, manifest_error = write_manifest_files(ctx, items)
+  if not manifests then
+    notify("Could not create operation manifests: " .. tostring(manifest_error), vim.log.levels.ERROR)
+    return nil
+  end
+  return ctx, manifests
 end
 
 function M.retrieve(items, callback)
@@ -1397,7 +1452,7 @@ function M.retrieve(items, callback)
     ctx.org,
     "--manifest",
     manifests.selected_package,
-  }, callback)
+  }, { cwd = ctx.root }, callback)
 end
 
 local function retrieve_file_paths(ctx, result)
@@ -1520,7 +1575,7 @@ function M.deploy(items, callback)
     ctx.org,
     "--manifest",
     manifests.selected_package,
-  }, callback)
+  }, { cwd = ctx.root }, callback)
 end
 
 function M.delete_dry_run(items, callback)
@@ -1540,7 +1595,7 @@ function M.delete_dry_run(items, callback)
     "--post-destructive-changes",
     manifests.destructive,
     "--dry-run",
-  }, function(ok, exit_code)
+  }, { cwd = ctx.root }, function(ok, exit_code)
     callback(ok, exit_code, ctx, manifests)
   end)
 end
@@ -1557,7 +1612,7 @@ function M.delete_apply(ctx, manifests, callback)
     manifests.empty_package,
     "--post-destructive-changes",
     manifests.destructive,
-  }, callback)
+  }, { cwd = ctx.root }, callback)
 end
 
 function M.refresh_items(items, callback)
@@ -1592,7 +1647,7 @@ M._test = {
   retrieve_file_paths = retrieve_file_paths,
   safe_name = safe_name,
   set_org = set_org,
-  shell_join = process.shell_join,
+  format_argv = process.format_argv,
   validate_manifest_path = validate_manifest_path,
 }
 

@@ -36,6 +36,7 @@ return {
     },
     config = function()
       local lint = require("lint")
+      local tool_versions = require("config.tool_versions")
 
       -- --- Which linter runs for which filetype ---
       -- To turn a language OFF: comment its line (statusline-style).
@@ -121,7 +122,7 @@ return {
         end
       end
 
-      local ensure_once = {} -- avoid re-queueing the same package
+      local ensure_pending = {} -- package → originating buffers waiting for install
 
       -- nvim-lint notifies ERROR on ENOENT; during BufEnter that aborts the autocmd
       -- (E5108 via neo-tree open, etc.). Only run linters whose cmd is on PATH.
@@ -144,45 +145,90 @@ return {
         return names
       end
 
-      local function ensure_mason_package(pkg_name)
+      local function lint_origin(bufnr, expected_ft)
+        if not vim.api.nvim_buf_is_valid(bufnr) or not vim.api.nvim_buf_is_loaded(bufnr) then
+          return
+        end
+        if
+          vim.g.disable_autolint
+          or vim.b[bufnr].disable_autolint
+          or not vim.bo[bufnr].modifiable
+          or vim.bo[bufnr].filetype ~= expected_ft
+        then
+          return
+        end
+        local names = available_linters(expected_ft)
+        if #names > 0 then
+          vim.api.nvim_buf_call(bufnr, function()
+            lint.try_lint(names, { ignore_errors = true })
+          end)
+        end
+      end
+
+      local function ensure_mason_package(pkg_name, bufnr, ft)
         local ok_reg, registry = pcall(require, "mason-registry")
         if not ok_reg then
           return
+        end
+        if ensure_pending[pkg_name] then
+          if bufnr then
+            ensure_pending[pkg_name][bufnr] = ft
+          end
+          return
+        end
+        ensure_pending[pkg_name] = {}
+        if bufnr then
+          ensure_pending[pkg_name][bufnr] = ft
         end
         registry.refresh(function()
           local ok, pkg = pcall(registry.get_package, pkg_name)
           if not ok or not pkg then
             vim.notify("Mason package not found: " .. pkg_name, vim.log.levels.WARN)
+            ensure_pending[pkg_name] = nil
             return
           end
-          if pkg:is_installed() or ensure_once[pkg_name] then
+          local pin = tool_versions.mason[pkg_name]
+          if not pin then
+            ensure_pending[pkg_name] = nil
+            vim.notify("No exact Mason version pin for " .. pkg_name, vim.log.levels.ERROR)
             return
           end
-          ensure_once[pkg_name] = true
-          vim.notify("Installing " .. pkg_name .. " (first lint filetype)…", vim.log.levels.INFO)
-          pkg:install():once("closed", function()
-            if not pkg:is_installed() then
-              ensure_once[pkg_name] = nil
-              vim.notify("Failed to install " .. pkg_name, vim.log.levels.ERROR)
+          local installed_version = pkg:is_installed() and pkg:get_installed_version() or nil
+          if installed_version == pin then
+            ensure_pending[pkg_name] = nil
+            return
+          end
+          local function on_closed(success)
+            local origins = ensure_pending[pkg_name] or {}
+            ensure_pending[pkg_name] = nil
+            local current_version = pkg:is_installed() and pkg:get_installed_version() or nil
+            if success == false or current_version ~= pin then
+              vim.notify(
+                string.format("Failed to install %s at pinned version %s", pkg_name, pin),
+                vim.log.levels.ERROR
+              )
               return
             end
-            -- Lint current buffer once the tool is ready (if still on a matching ft).
             vim.schedule(function()
-              if vim.g.disable_autolint or not vim.bo.modifiable then
-                return
-              end
-              local names = available_linters(vim.bo.filetype)
-              if #names > 0 then
-                lint.try_lint(names, { ignore_errors = true })
+              for origin, origin_ft in pairs(origins) do
+                lint_origin(origin, origin_ft)
               end
             end)
-          end)
+          end
+          if pkg.is_installing and pkg:is_installing() then
+            pkg:get_install_handle():if_present(function(handle)
+              handle:once("closed", on_closed)
+            end)
+            return
+          end
+          vim.notify(string.format("Installing %s@%s (first lint filetype)…", pkg_name, pin), vim.log.levels.INFO)
+          pkg:install({ version = pin, force = installed_version ~= nil, strict = false }, on_closed)
         end)
       end
 
-      local function ensure_linters_for_ft(ft)
+      local function ensure_linters_for_ft(ft, bufnr)
         for _, pkg in ipairs(mason_by_ft[ft] or {}) do
-          ensure_mason_package(pkg)
+          ensure_mason_package(pkg, bufnr, ft)
         end
       end
 
@@ -198,12 +244,8 @@ return {
           return -- skip hover popups / readonly buffers
         end
         local ft = vim.bo[bufnr].filetype
-        ensure_linters_for_ft(ft) -- kick off Mason install if needed; lint retries on closed
-        local names = available_linters(ft)
-        if #names > 0 then
-          -- ignore_errors: never let a spawn failure abort BufEnter (neo-tree open)
-          lint.try_lint(names, { ignore_errors = true })
-        end
+        ensure_linters_for_ft(ft, bufnr) -- kick off Mason install if needed; lint retries on closed
+        lint_origin(bufnr, ft) -- ignore spawn failures and keep the originating buffer scoped
       end
 
       local lint_group = vim.api.nvim_create_augroup("user_lint", { clear = true })
@@ -213,7 +255,7 @@ return {
         group = lint_group,
         desc = "Lazy Mason-install linters for this filetype",
         callback = function(event)
-          ensure_linters_for_ft(event.match)
+          ensure_linters_for_ft(event.match, event.buf)
         end,
       })
 

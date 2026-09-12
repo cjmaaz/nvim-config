@@ -44,8 +44,16 @@ end
 
 local function buffer_context(bufnr)
   local name = api.nvim_buf_get_name(bufnr)
+  local win
+  for _, candidate in ipairs(vim.fn.win_findbuf(bufnr)) do
+    if api.nvim_win_is_valid(candidate) then
+      win = candidate
+      break
+    end
+  end
   return {
     bufnr = bufnr,
+    win = win,
     buftype = vim.bo[bufnr].buftype,
     filetype = vim.bo[bufnr].filetype,
     name = name,
@@ -172,8 +180,22 @@ local function is_owned_mapping(mapping, item)
   return mapping and item and mapping.callback == item.callback
 end
 
-local function run_action(bufnr, selected)
+local function run_action(bufnr, selected, origin)
   if not api.nvim_buf_is_valid(bufnr) then
+    return
+  end
+  if
+    origin
+    and (
+      api.nvim_buf_get_name(bufnr) ~= origin.name
+      or vim.bo[bufnr].filetype ~= origin.filetype
+      or project_context.start_path(bufnr) ~= origin.start_path
+    )
+  then
+    M.reconcile(bufnr)
+    vim.notify("The originating buffer changed while the local action picker was open.", vim.log.levels.WARN, {
+      title = "Local actions",
+    })
     return
   end
   local fresh = M.collect(bufnr)
@@ -193,18 +215,21 @@ local function run_action(bufnr, selected)
   end
   local ok, err = pcall(action.run, {
     bufnr = bufnr,
+    filetype = origin and origin.filetype or vim.bo[bufnr].filetype,
+    path = origin and origin.path or api.nvim_buf_get_name(bufnr),
     root = action.root,
+    win = origin and origin.win or nil,
   })
   if not ok then
     vim.notify(tostring(err), vim.log.levels.ERROR, { title = "Local actions" })
   end
 end
 
-local function select_action(bufnr, actions, prompt)
+local function select_action(bufnr, actions, prompt, origin)
   if #actions == 0 then
     return
   elseif #actions == 1 then
-    run_action(bufnr, actions[1])
+    run_action(bufnr, actions[1], origin)
     return
   end
   vim.ui.select(actions, {
@@ -214,7 +239,7 @@ local function select_action(bufnr, actions, prompt)
     end,
   }, function(action)
     if action then
-      run_action(bufnr, action)
+      run_action(bufnr, action, origin)
     end
   end)
 end
@@ -222,13 +247,14 @@ end
 function M.invoke(bufnr, lhs)
   bufnr = normalize_bufnr(bufnr)
   local collected = M.collect(bufnr)
+  local origin = buffer_context(bufnr)
   local expanded = expanded_lhs(lhs)
   local actions = expanded == expanded_lhs(MENU_LHS) and collected.actions or collected.direct[expanded] or {}
   if #actions == 0 then
     M.reconcile(bufnr)
     return
   end
-  select_action(bufnr, actions, string.format("%s actions:", collected.context or "Local"))
+  select_action(bufnr, actions, string.format("%s actions:", collected.context or "Local"), origin)
 end
 
 local function clear_owned(bufnr)

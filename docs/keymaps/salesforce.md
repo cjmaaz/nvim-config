@@ -1,4 +1,4 @@
-# Salesforce (sf.nvim)
+# Salesforce (sf.nvim + safe project adapters)
 
 Org, retrieve/deploy, Apex tests/coverage, managed-package Vlocity, SOQL, metadata lists, and SF terminal.
 
@@ -26,7 +26,7 @@ Also: `:SF` then Tab for command categories.
 
 | Key | Mode | Action |
 | --- | --- | --- |
-| `<leader>SF` | n | Run sf.nvim’s default org fetch and adopt the CLI-default target |
+| `<leader>SF` | n | Refresh the org list for the current Salesforce project |
 | `<leader>So` | n | Set the **local target** org only |
 | `<leader>SO` | n | Set the **global target** org (no automatic metadata refresh) |
 | `<leader>Sb` | n | Open target org in browser |
@@ -78,7 +78,7 @@ Full behavior and project matrices: [localleader.md](./localleader.md).
 
 This is Vlocity Build Tool **DataPack** retrieval for managed-package CMT orgs. It is separate from Metadata API OmniStudio types such as `OmniScript`; `sf project retrieve -m Omni*` is not a substitute.
 
-The picker discovers YAML jobs below the Salesforce project’s `vlocity/` directory and prefers `ExportOmni.yaml`. It resolves `node_modules/.bin/vlocity` first, then the npm-global `vlocity` command.
+The picker discovers YAML jobs below the Salesforce project’s `vlocity/` directory and prefers `ExportOmni.yaml`. It resolves `node_modules/.bin/vlocity` first, then the npm-global `vlocity` command. A project-local executable must resolve inside that project’s `node_modules`, and Neovim asks you to trust both its resolved script and the chosen YAML. Editing either file requires renewed trust.
 
 | Mode | Behavior |
 | --- | --- |
@@ -116,7 +116,7 @@ Inside the SOQL field picker, `<Tab>` toggles a field and `<CR>` confirms the se
 
 These are registered on the first named `.soql` buffer even when sf.nvim has not loaded yet. They remain buffer-local and are owned by the shared context registry, so they appear alongside Salesforce/project actions in `\p` and clean up consistently when the buffer context changes. Actions that need an org validate Salesforce project/target context when invoked.
 
-Normal `<leader>Sq` saves the whole `.soql` buffer before execution. Visual `<leader>Sq` keeps sf.nvim’s existing selected-text runner. Results use SFTerm and the captured project/org context.
+Normal `<leader>Sq` saves the whole `.soql` buffer before execution. Visual `<leader>Sq` sends the selected text as one literal CLI argument. Results use the argv-only SFTerm and the captured project/org context.
 
 ---
 
@@ -192,14 +192,14 @@ Both actions run in SFTerm. Toggle the float with `<leader>Se`; cancel with `Esc
 
 ## Notes
 
-- **Project isolation:** sf.nvim, fzf-lua, query schema modules, and the global `vim.system` token workaround load only after a current buffer/cwd resolves to `sfdx-project.json` or `.forceignore`. Ordinary HTML/JS/TS/SOQL projects keep lightweight guarded mappings only. Once sf.nvim has been used in a Neovim process it remains loaded, but mappings, SOQL completion, and statusline output continue to re-check the active project root.
-- **Org flow:** `<leader>SF` refreshes sf.nvim’s org list; `<leader>So` and `<leader>SO` change the local/global target. The Org Browser fetches stale branches lazily; `<leader>SU` remains the explicit Common/All eager inventory refresh.
-- **SFTerm** stays open after current-file, advanced batch, deploy, manifest, query, and test actions. Org Browser sidebar list/retrieve jobs instead report status in the tree and notifications. `<leader>Se` toggles SFTerm; focused `q` also hides it.
+- **Project isolation:** Salesforce actions retain the canonical project root, originating buffer, and that project’s effective CLI target org. Switching to another project while a picker/process is pending cannot retarget it. Ordinary HTML/JS/TS/SOQL projects keep lightweight guarded mappings only.
+- **Org flow:** `<leader>SF` refreshes the current project’s org list; `<leader>So` changes only that project’s local target, while `<leader>SO` changes the CLI global fallback. Every operation still passes its captured org explicitly. The Org Browser fetches stale branches lazily; `<leader>SU` remains the explicit Common/All eager inventory refresh.
+- **SFTerm** executes argv lists directly—filenames, org aliases, and SOQL are never interpolated into a shell command. It stays open after current-file, advanced batch, deploy, manifest, query, and test actions. Org Browser sidebar jobs report status in the tree and notifications. `<leader>Se` toggles SFTerm; focused `q` also hides it.
 - **Cancel:** `Esc` and `<leader>Sx` send Ctrl-C to running SFTerm channels and stop background inventory processes without requiring `<C-w>w`, whether the float is focused, unfocused, hidden, or absent. Normal-mode `<C-c>` inside SFTerm also cancels; terminal-mode `<C-c>` remains the terminal’s native interrupt. With nothing running, normal-mode `Esc` still clears search highlighting. Cancellation is best-effort after Salesforce has accepted a server-side deploy job.
 - **fzf-lua** is installed for metadata pickers only; everyday file search remains **Telescope** (`<leader>sf` / `sg`). Needs host **`fzf`** (`brew install fzf` · `sudo pacman -S fzf`) — see [TOOLS.md](../TOOLS.md).
 - Coverage signs appear after a **coverage** test run (`ST` / `SA`) when `auto_display_code_sign` is on.
 - Optional statusline: target org + coverage appear in lualine once `sf.nvim` is loaded (`statusline.lua` / CodeOSS-style).
-- Custom objects / `__mdt` “Invalid type” in `apex_ls`: set target org, then `<leader>Ss` (needs `curl`) to refresh SObject stubs under `.sfdx/tools/sobjects/`.
-- **Note:** modern `sf org display --json` **redacts** `accessToken`. Upstream sf.nvim still feeds that into curl → HTTP 401 on `<leader>Ss` even when retrieve/deploy work. `salesforce.lua` wraps `vim.system` and splices a real token from `sf org auth show-access-token` (config-side; survives `:Lazy sync`).
+- Custom objects / `__mdt` “Invalid type” in `apex_ls`: set the project target org, then `<leader>Ss` to stage fresh SObject stubs under `.sfdx/tools/sobjects/`. Existing definitions remain intact if any list/describe/write step fails.
+- `sf_cache` and `.sfdx/tools/sobjects` must be real project-contained directories. Escaping symlinks are refused before writes or recursive cleanup, and the destination outside the project is never touched.
 
 Nav: [index](./README.md) · [localleader](./localleader.md) · [lsp](./lsp.md) · [which-key](./which-key.md)

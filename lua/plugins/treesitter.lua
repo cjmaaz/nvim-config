@@ -62,6 +62,24 @@ return {
 
       local auto_install_missing = true -- install when opening an unknown filetype
       -- local auto_install_missing = false -- only the curated list above
+      local folded_buffers = {}
+
+      local function apply_folds(bufnr)
+        if not folded_buffers[bufnr] or not vim.api.nvim_buf_is_valid(bufnr) then
+          return
+        end
+        for _, win in ipairs(vim.fn.win_findbuf(bufnr)) do
+          if vim.api.nvim_win_is_valid(win) and vim.api.nvim_win_get_buf(win) == bufnr then
+            vim.api.nvim_set_option_value("foldmethod", "expr", { scope = "local", win = win })
+            vim.api.nvim_set_option_value(
+              "foldexpr",
+              "v:lua.vim.treesitter.foldexpr()",
+              { scope = "local", win = win }
+            )
+            vim.api.nvim_set_option_value("foldlevel", 99, { scope = "local", win = win })
+          end
+        end
+      end
 
       local function attach(bufnr, language)
         if not vim.api.nvim_buf_is_valid(bufnr) then
@@ -74,10 +92,9 @@ return {
         vim.treesitter.start(bufnr, language) -- highlight (+ injections)
 
         -- Folds (CodeOSS on; Kickstart leaves commented)
-        vim.wo.foldmethod = "expr" -- fold using foldexpr
-        vim.wo.foldexpr = "v:lua.vim.treesitter.foldexpr()" -- treesitter folds
-        vim.wo.foldlevel = 99 -- start with folds open
-        -- vim.wo.foldmethod = "manual" -- disable treesitter folds
+        folded_buffers[bufnr] = true
+        apply_folds(bufnr)
+        -- folded_buffers[bufnr] = nil -- keep manual folds for this buffer
 
         if vim.treesitter.query.get(language, "indents") then
           vim.bo[bufnr].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()" -- TS indent when query exists
@@ -98,14 +115,34 @@ return {
           if vim.tbl_contains(installed, language) then
             attach(event.buf, language) -- already installed → enable now
           elseif auto_install_missing and vim.tbl_contains(available, language) then
-            treesitter.install(language):await(function()
+            treesitter.install(language):await(function(err, success)
               vim.schedule(function()
-                attach(event.buf, language) -- enable after install finishes
+                if
+                  err == nil
+                  and success == true
+                  and vim.api.nvim_buf_is_valid(event.buf)
+                  and vim.api.nvim_buf_is_loaded(event.buf)
+                  and vim.treesitter.language.get_lang(vim.bo[event.buf].filetype) == language
+                then
+                  attach(event.buf, language) -- enable after install finishes
+                end
               end)
             end)
           else
             pcall(attach, event.buf, language) -- try anyway (parser maybe elsewhere)
           end
+        end,
+      })
+
+      vim.api.nvim_create_autocmd({ "BufWinEnter", "WinEnter" }, {
+        desc = "Apply Treesitter folds only to windows showing the parsed buffer",
+        callback = function(event)
+          apply_folds(event.buf)
+        end,
+      })
+      vim.api.nvim_create_autocmd("BufWipeout", {
+        callback = function(event)
+          folded_buffers[event.buf] = nil
         end,
       })
     end,

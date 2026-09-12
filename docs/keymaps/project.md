@@ -41,8 +41,8 @@ Cancelling any picker/input leaves the filesystem unchanged. Existing target dir
 | **C++ — CMake executable** | `cmake-init create <target> -e` | `CMakeLists.txt` |
 | **Rust — Binary / Library** | `cargo new --bin/--lib` | `src/main.rs` / `src/lib.rs` |
 | **Python — Packaged app / Library** | `uv init --package/--lib` | `pyproject.toml` |
-| **Node — TypeScript CLI** | `npm init`, TypeScript/tsx install, scripts, starter source | `src/index.ts` |
-| **Vite — Vanilla TypeScript** | `npm create vite@latest … --template vanilla-ts`, then `npm install` | `src/main.ts` |
+| **Node — TypeScript CLI** | `npm init`, exact TypeScript/tsx/Node type pins, scripts, starter source | `src/index.ts` |
+| **Vite — Vanilla TypeScript** | exact `create-vite` generator, then exact TypeScript/Vite pins | `src/main.ts` |
 | **Go — Application** | `go mod init`, `go fmt`, and a minimal `main.go` | `main.go` |
 
 Generator steps run as argument lists through `vim.system`; project names and paths are not interpolated into a shell command. Output is captured asynchronously. On failure, the last output lines are shown and any partially generated directory is left for inspection.
@@ -63,7 +63,7 @@ Install only the generators you use; missing executables produce a focused error
 | Go | `go.mod` | run, build, test |
 | Java — Maven | `pom.xml` | run a prompted/detected main class, package, test |
 | Flutter | `pubspec.yaml` | run, test, and release-build target picker |
-| C / C++ — CMake | `CMakeLists.txt` | configure + build, test, and cmake-init `run_exe` when detected |
+| C / C++ — CMake | `CMakeLists.txt` | configure + build, test, and cmake-init `run_exe`; `dev` build/test presets or the configure preset’s resolved `binaryDir` |
 
 When multiple marker types share the nearest root, another picker asks which ecosystem to use. **Run** actions compile first when required by that ecosystem.
 

@@ -43,15 +43,50 @@ api.nvim_create_autocmd({ "FocusGained", "TermClose", "TermLeave" }, {
 })
 
 -- Reopen a file at the last cursor line (Vim mark ").
+local pending_cursor_restore = {}
+local function restore_cursor(bufnr, win)
+  if not api.nvim_buf_is_valid(bufnr) or not api.nvim_win_is_valid(win) or api.nvim_win_get_buf(win) ~= bufnr then
+    return false
+  end
+  local mark = api.nvim_buf_get_mark(bufnr, '"')
+  local line_count = api.nvim_buf_line_count(bufnr)
+  if mark[1] <= 0 or mark[1] > line_count then
+    pending_cursor_restore[bufnr] = nil
+    return false
+  end
+  local restored = pcall(api.nvim_win_set_cursor, win, mark)
+  if restored then
+    pending_cursor_restore[bufnr] = nil
+  end
+  return restored
+end
+
 api.nvim_create_autocmd("BufReadPost", {
   group = group,
   desc = "Restore last cursor position",
   callback = function(event)
-    local mark = api.nvim_buf_get_mark(event.buf, '"')
-    local line_count = api.nvim_buf_line_count(event.buf)
-    if mark[1] > 0 and mark[1] <= line_count then
-      pcall(api.nvim_win_set_cursor, 0, mark)
+    local win = vim.fn.bufwinid(event.buf)
+    if win == -1 or not restore_cursor(event.buf, win) then
+      local mark = api.nvim_buf_get_mark(event.buf, '"')
+      if mark[1] > 0 and mark[1] <= api.nvim_buf_line_count(event.buf) then
+        pending_cursor_restore[event.buf] = true
+      end
     end
+  end,
+})
+api.nvim_create_autocmd("BufWinEnter", {
+  group = group,
+  desc = "Finish deferred cursor restoration in the correct window",
+  callback = function(event)
+    if pending_cursor_restore[event.buf] then
+      restore_cursor(event.buf, api.nvim_get_current_win())
+    end
+  end,
+})
+api.nvim_create_autocmd("BufWipeout", {
+  group = group,
+  callback = function(event)
+    pending_cursor_restore[event.buf] = nil
   end,
 })
 

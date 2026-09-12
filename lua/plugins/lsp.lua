@@ -230,11 +230,12 @@ return {
       })
 
       -- Always install these at startup (minimal toolchain).
+      local tool_versions = require("config.tool_versions")
       require("mason-tool-installer").setup({
         ensure_installed = {
-          "lua-language-server", -- package name for lua_ls
-          "stylua", -- Lua formatter used by conform
-          "prettierd", -- FoS for web/json/yaml (formatting.lua allowlist)
+          tool_versions.mason_spec("lua-language-server"), -- package name for lua_ls
+          tool_versions.mason_spec("stylua"), -- Lua formatter used by conform
+          tool_versions.mason_spec("prettierd"), -- FoS for web/json/yaml (formatting.lua allowlist)
           -- "ruff", -- optional: always keep Python format/lint ready
           -- "apex-language-server", -- or rely on on-demand Apex FileType hook
         },
@@ -262,11 +263,10 @@ return {
         local function flush(ok)
           local cbs = ensure_pending[pkg_name] or {}
           ensure_pending[pkg_name] = nil
-          if not ok then
-            return
-          end
           for _, cb in ipairs(cbs) do
-            vim.schedule(cb)
+            vim.schedule(function()
+              cb(ok)
+            end)
           end
         end
 
@@ -275,20 +275,31 @@ return {
           local ok, pkg = pcall(registry.get_package, pkg_name)
           if not ok or not pkg then
             vim.notify("Mason package not found: " .. pkg_name, vim.log.levels.WARN)
-            ensure_pending[pkg_name] = nil
+            flush(false)
             return
           end
-          if pkg:is_installed() then
+          local pin = tool_versions.mason[pkg_name]
+          if not pin then
+            vim.notify("No exact Mason version pin for " .. pkg_name, vim.log.levels.ERROR)
+            flush(false)
+            return
+          end
+          local installed_version = pkg:is_installed() and pkg:get_installed_version() or nil
+          if installed_version == pin then
             flush(true)
             return
           end
 
-          local function on_closed()
-            if pkg:is_installed() then
+          local function on_closed(success)
+            local current_version = pkg:is_installed() and pkg:get_installed_version() or nil
+            if success ~= false and current_version == pin then
               flush(true)
             else
-              vim.notify("Failed to install " .. pkg_name, vim.log.levels.ERROR)
-              ensure_pending[pkg_name] = nil
+              vim.notify(
+                string.format("Failed to install %s at pinned version %s", pkg_name, pin),
+                vim.log.levels.ERROR
+              )
+              flush(false)
             end
           end
 
@@ -300,8 +311,8 @@ return {
             return
           end
 
-          vim.notify("Installing " .. pkg_name .. " (first open)…", vim.log.levels.INFO)
-          pkg:install():once("closed", on_closed)
+          vim.notify(string.format("Installing %s@%s (first open)…", pkg_name, pin), vim.log.levels.INFO)
+          pkg:install({ version = pin, force = installed_version ~= nil, strict = false }, on_closed)
         end)
       end
 
@@ -330,21 +341,19 @@ return {
         -- go = { "gopls" },
       }
 
-      local enabled_once = {} -- remember so we don't re-queue installs
-
       local function enable_server(server)
-        if enabled_once[server] then
-          vim.lsp.enable(server) -- already requested; just ensure enabled
+        if vim.lsp.is_enabled(server) then
           return
         end
-        enabled_once[server] = true
         local pkg = lsp_to_mason(server)
         if not pkg then
           vim.lsp.enable(server) -- config-only / non-Mason package
           return
         end
-        ensure_mason_package(pkg, function()
-          vim.lsp.enable(server)
+        ensure_mason_package(pkg, function(ok)
+          if ok then
+            vim.lsp.enable(server)
+          end
         end)
       end
 
@@ -364,16 +373,12 @@ return {
 
       -- Apex: install apex-language-server on first apex buffer, then enable.
       local function enable_apex_ls()
-        if enabled_once["apex_ls"] then
-          if vim.uv.fs_stat(apex_jar_path) then
-            vim.lsp.enable("apex_ls")
-          end
+        if vim.lsp.is_enabled("apex_ls") and vim.uv.fs_stat(apex_jar_path) then
           return
         end
-        enabled_once["apex_ls"] = true
 
-        local function try_enable()
-          if vim.uv.fs_stat(apex_jar_path) then
+        local function try_enable(ok)
+          if ok ~= false and vim.uv.fs_stat(apex_jar_path) then
             vim.lsp.enable("apex_ls")
           else
             vim.notify_once(
@@ -383,7 +388,7 @@ return {
           end
         end
         if vim.uv.fs_stat(apex_jar_path) then
-          try_enable()
+          try_enable(true)
           return
         end
         ensure_mason_package("apex-language-server", try_enable)

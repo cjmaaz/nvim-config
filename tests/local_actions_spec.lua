@@ -179,6 +179,95 @@ describe("context-aware localleader", function()
       assert.is_true(ids.node)
     end)
 
+    it("uses CMake dev preset paths instead of hard-coded build directories", function()
+      local root = project({
+        ["CMakeLists.txt"] = { "add_custom_target(run_exe)" },
+        ["CMakePresets.json"] = {
+          "{",
+          '  "version": 6,',
+          '  "configurePresets": [',
+          '    { "name": "base", "hidden": true, "environment": { "BUILD_ROOT": "${sourceDir}/out" },',
+          '      "binaryDir": "$env{BUILD_ROOT}/${presetName}" },',
+          '    { "name": "dev", "inherits": "base", "generator": "Ninja" }',
+          "  ]",
+          "}",
+        },
+      })
+
+      local preset = runner._test.cmake_dev_preset(root)
+      assert.are.equal(vim.fs.joinpath(root, "out", "dev"), preset.binary_dir)
+      assert.is_false(preset.build)
+      local steps = runner._test.cmake_steps(root)
+      assert.are.same({ "cmake", "--preset=dev" }, steps[1].args)
+      assert.are.same({ "cmake", "--build", vim.fs.joinpath(root, "out", "dev") }, steps[2].args)
+
+      local actions = runner._test.cmake_actions(root)
+      for _, action in ipairs(actions) do
+        for _, step in ipairs(action.steps) do
+          if step.args[1] == "cmake" and step.args[2] == "--build" then
+            assert.is_false(vim.tbl_contains(step.args, "build"))
+          elseif step.args[1] == "ctest" then
+            assert.are.equal(vim.fs.joinpath(root, "out", "dev"), step.args[3])
+          end
+        end
+      end
+    end)
+
+    it("lets named CMake build and test presets resolve their own directories", function()
+      local root = project({
+        ["CMakeLists.txt"] = { "project(demo)" },
+        ["CMakePresets.json"] = {
+          vim.json.encode({
+            version = 6,
+            configurePresets = { { name = "dev", binaryDir = "${sourceDir}/custom" } },
+            buildPresets = { { name = "dev", configurePreset = "dev" } },
+            testPresets = { { name = "dev", configurePreset = "dev" } },
+          }),
+        },
+      })
+      local actions = runner._test.cmake_actions(root)
+      local build, test
+      for _, action in ipairs(actions) do
+        build = action.kind == "build" and action or build
+        test = action.kind == "test" and action or test
+      end
+      assert.are.same({ "cmake", "--build", "--preset=dev" }, build.steps[2].args)
+      assert.are.same({ "ctest", "--preset=dev", "--output-on-failure" }, test.steps[#test.steps].args)
+    end)
+
+    it("supports versioned CMake include and fileDir semantics", function()
+      local root = project({
+        ["CMakeLists.txt"] = { "project(demo)" },
+        ["presets/base.json"] = {
+          vim.json.encode({
+            version = 7,
+            configurePresets = {
+              { name = "base", hidden = true, binaryDir = "${fileDir}/out" },
+            },
+          }),
+        },
+        ["CMakePresets.json"] = {
+          vim.json.encode({
+            version = 7,
+            include = { "$penv{NVIM_CMAKE_PRESET_DIR}/base.json" },
+            configurePresets = { { name = "dev", inherits = "base" } },
+          }),
+        },
+      })
+      local previous = vim.env.NVIM_CMAKE_PRESET_DIR
+      vim.env.NVIM_CMAKE_PRESET_DIR = vim.fs.joinpath(root, "presets")
+      assert.are.equal(vim.fs.joinpath(root, "out"), runner._test.cmake_dev_preset(root).binary_dir)
+
+      vim.fn.writefile({
+        vim.json.encode({
+          version = 6,
+          configurePresets = { { name = "dev" } },
+        }),
+      }, vim.fs.joinpath(root, "CMakePresets.json"))
+      assert.are.equal(vim.fs.normalize(root), runner._test.cmake_dev_preset(root).binary_dir)
+      vim.env.NVIM_CMAKE_PRESET_DIR = previous
+    end)
+
     it("detects projects for named files before their first write", function()
       local root = project({
         ["Cargo.toml"] = { "[package]", 'name = "new-file"' },
@@ -400,6 +489,49 @@ describe("context-aware localleader", function()
       vim.ui.select = original_select
       assert.are.equal(0, runs)
     end)
+
+    it("keeps an async picker action bound to its originating buffer", function()
+      local root = project({
+        ["a.txt"] = { "a" },
+        ["b.txt"] = { "b" },
+      })
+      local a = buffer(vim.fs.joinpath(root, "a.txt"), "text")
+      local b = buffer(vim.fs.joinpath(root, "b.txt"), "text")
+      local invoked
+      local_actions.register({
+        id = "captured",
+        priority = 10,
+        resolve = function()
+          return {
+            label = "Captured",
+            root = root,
+            actions = {
+              {
+                id = "first",
+                label = "First",
+                run = function(context)
+                  invoked = context
+                end,
+              },
+              { id = "second", label = "Second", run = function() end },
+            },
+          }
+        end,
+      })
+      local original_select = vim.ui.select
+      local selected_items
+      local selected_callback
+      vim.ui.select = function(items, _, callback)
+        selected_items = items
+        selected_callback = callback
+      end
+      local_actions.invoke(a, "<localleader>p")
+      vim.api.nvim_win_set_buf(0, b)
+      selected_callback(selected_items[1])
+      vim.ui.select = original_select
+      assert.are.equal(a, invoked.bufnr)
+      assert.are.equal(vim.fs.normalize(vim.uv.fs_realpath(vim.fs.joinpath(root, "a.txt"))), invoked.path)
+    end)
   end)
 
   describe("domain providers", function()
@@ -430,6 +562,7 @@ describe("context-aware localleader", function()
       local root = project({
         ["package.json"] = { '{"scripts":{"test":"vitest"}}' },
         ["query/demo.soql"] = { "SELECT Id FROM Account" },
+        ["sfdx-project.json"] = { '{"packageDirectories":[{"path":"force-app","default":true}]}' },
       })
       local bufnr = buffer(vim.fs.joinpath(root, "query/demo.soql"), "soql")
       vim.b[bufnr].soql_root = root

@@ -85,8 +85,11 @@ end
 
 function M.new(deps)
   local function sf_method(bufnr, method)
-    return function()
-      deps.guarded_load(deps.sf_action(method), bufnr)
+    return function(invocation)
+      local origin = invocation and invocation.bufnr or bufnr
+      deps.guarded_load(function(ctx)
+        deps.actions()[method](ctx)
+      end, origin)
     end
   end
 
@@ -105,25 +108,33 @@ function M.new(deps)
         {
           id = "org-browser",
           label = "Open Org Browser",
-          run = function()
-            deps.guarded_load(function()
-              vim.cmd("Neotree sf_org toggle left")
-            end, bufnr)
+          run = function(invocation)
+            deps.guarded_load(function(ctx)
+              if ctx and vim.api.nvim_buf_is_valid(ctx.bufnr) then
+                vim.api.nvim_buf_call(ctx.bufnr, function()
+                  vim.cmd("Neotree sf_org toggle left")
+                end)
+              end
+            end, invocation and invocation.bufnr or bufnr)
           end,
         },
         {
           id = "metadata-browser",
           label = "Open metadata/package.xml browser",
-          run = function()
-            deps.guarded_load(function()
-              require("config.salesforce.browser").open()
-            end, bufnr)
+          run = function(invocation)
+            deps.guarded_load(function(ctx)
+              if ctx and vim.api.nvim_buf_is_valid(ctx.bufnr) then
+                vim.api.nvim_buf_call(ctx.bufnr, function()
+                  require("config.salesforce.browser").open()
+                end)
+              end
+            end, invocation and invocation.bufnr or bufnr)
           end,
         },
         {
           id = "open-org",
           label = "Open target org in browser",
-          run = sf_method(bufnr, "org_open"),
+          run = sf_method(bufnr, "open_org"),
         },
         {
           id = "cancel",
@@ -146,17 +157,17 @@ function M.new(deps)
             label = "Save and deploy current metadata",
             desc = "Salesforce: save and deploy current metadata",
             slot = "build",
-            run = sf_method(bufnr, "save_and_push"),
+            run = sf_method(bufnr, "deploy"),
           },
           {
             id = "diff-current",
             label = "Diff current metadata with org",
-            run = sf_method(bufnr, "diff_in_target_org"),
+            run = sf_method(bufnr, "diff"),
           },
           {
             id = "open-current",
             label = "Open current metadata in org",
-            run = sf_method(bufnr, "org_open_current_file"),
+            run = sf_method(bufnr, "open_current"),
           },
         })
       end
@@ -172,7 +183,12 @@ function M.new(deps)
         actions[#actions + 1] = {
           id = "test-current-coverage",
           label = "Run Apex test under cursor with coverage",
-          run = sf_method(bufnr, "run_current_test_with_coverage"),
+          run = function(invocation)
+            local origin = invocation and invocation.bufnr or bufnr
+            deps.guarded_load(function(ctx)
+              deps.actions().run_current_test(ctx, true)
+            end, origin)
+          end,
         }
       end
 

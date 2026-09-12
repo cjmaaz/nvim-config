@@ -111,7 +111,6 @@ iTerm2 and Konsole cannot assign a different family only for italic ASCII text, 
 | **make** | Builds `telescope-fzf-native` (faster sorter); optional | `make --version` | Xcode CLT / `brew install make` · `sudo pacman -S make` (or `base-devel`) |
 | **tree-sitter CLI** | Compiles parsers for `nvim-treesitter` (`main`) | `tree-sitter --version` | `brew install tree-sitter` · `sudo pacman -S tree-sitter` (need **0.26.1+**) |
 | **C compiler** | Builds tree-sitter parser `.so` files | `clang --version` / `gcc --version` | Xcode CLT · `sudo pacman -S base-devel` (or `clang`) |
-| **curl** | sf.nvim SObject refresh (`<leader>Ss`) talks to the org API | `curl --version` | `brew install curl` · `sudo pacman -S curl` (usually preinstalled) |
 
 Without `rg` / `fd`, some Telescope pickers fall back to slower builtins or fail — install both.  
 Without **`fzf`**, fzf-lua aborts (`'fzf' is not a valid executable`) — Salesforce metadata pickers won’t open.  
@@ -132,7 +131,7 @@ Without `tree-sitter` + a C compiler, `:TSUpdate` / parser install will fail.
 | **Java (JDK)** | `apex_ls` / `jdtls` on the JVM | `java -version` | `brew install openjdk` · `sudo pacman -S jdk-openjdk` |
 | **Node.js** | Some Mason LSPs / prettierd / optional `sf` install path | `node --version` | `brew install node` · `sudo pacman -S nodejs npm` |
 | **Salesforce CLI (`sf`)** | `sf.nvim` org/deploy/test/metadata | `sf --version` | [CLI setup](https://developer.salesforce.com/tools/salesforcecli) (npm / installer; not a brew/pacman first-class package on all hosts) |
-| **Vlocity Build Tool** | Managed-package DataPack retrieval (`<leader>SV`) | `vlocity --version` | Node 18+ · `npm install --global vlocity` |
+| **Vlocity Build Tool** | Managed-package DataPack retrieval (`<leader>SV`); project-local binaries/jobs require Neovim trust approval | `vlocity --version` | Node 18+ · `npm install --global vlocity` |
 | **universal-ctags** | Optional Apex jump enhancement (`<leader>Sc`) | `ctags --version` | `brew install universal-ctags` · `sudo pacman -S ctags` |
 
 Yazi works with only its binary. Its official guide recommends optional preview/search helpers such as `ffmpeg`, `7zip`/`sevenzip`, `jq`, `poppler`, `fd`, `rg`, `fzf`, `zoxide`, `resvg`, and ImageMagick.
@@ -185,12 +184,12 @@ For an isolated `cmake-init` install, install `pipx` first with `brew install pi
 | `lua/plugins/treesitter.lua` | Neovim 0.12+, `tree-sitter` CLI 0.26.1+, C compiler; parsers supply structural queries |
 | `lua/plugins/indent.lua` | (none beyond Neovim) |
 | `lua/plugins/autopairs.lua` | Treesitter optional (`check_ts`) |
-| `lua/plugins/lsp.lua` | network (Mason), JDK for Apex; `:Mason` for on-demand servers |
+| `lua/plugins/lsp.lua` | network (Mason), JDK for Apex; startup/on-demand Mason installs use exact versions from `lua/config/tool_versions.lua` |
 | `lua/plugins/formatting.lua` | Mason formatters (`stylua` + `prettierd` auto; others as needed); FoS allowlist |
 | `lua/plugins/linting.lua` | Mason linters lazy-by-ft (`eslint_d`, `ruff`, …); skip until binary on PATH; npm `min-release-age` can block installs — [quiet.md](./diagnostics/quiet.md#example-no-eslint-diagnostics--mason-eslint_d-failed) |
 | `lua/plugins/completion.lua` | optional `make` for LuaSnip jsregexp |
-| `lua/plugins/salesforce.lua` | `sf` CLI; host **`fzf`**; `curl` for Apex SObject stubs; npm `vlocity` for managed-package DataPacks; optional ctags |
+| `lua/plugins/salesforce.lua` | `sf` CLI; host **`fzf`**; npm `vlocity` for managed-package DataPacks; optional ctags |
 | `lua/config/salesforce/schema.lua` | `sf sobject list/describe`; no separate SOQL language server |
 | `lua/config/gremlins.lua` | (none; native Neovim diagnostics) |
-| `lua/config/project_scaffold.lua` | per-generator CLI: `mvn`, `flutter`, `cmake-init`, `cargo`, `npm`, `uv`, or `go` |
+| `lua/config/project_scaffold.lua` | per-generator CLI: `mvn`, `flutter`, `cmake-init`, `cargo`, `npm`, `uv`, or `go`; transient npm/Python packages are exact-version pinned |
 | `lua/config/project_runner.lua` | detected project CLI; shell + native terminal for live task output |

@@ -7,6 +7,7 @@
 local M = {}
 
 local uv = vim.uv or vim.loop
+local scaffold_versions = require("config.tool_versions").scaffold
 local title = "Project scaffold"
 local running = false
 
@@ -282,7 +283,15 @@ local generators = {
       return {
         { args = { "npm", "init", "--yes" }, cwd = context.target },
         {
-          args = { "npm", "install", "--save-dev", "typescript", "tsx", "@types/node" },
+          args = {
+            "npm",
+            "install",
+            "--save-dev",
+            "--save-exact",
+            "typescript@" .. scaffold_versions.typescript,
+            "tsx@" .. scaffold_versions.tsx,
+            "@types/node@" .. scaffold_versions.types_node,
+          },
           cwd = context.target,
         },
         {
@@ -315,7 +324,7 @@ local generators = {
           args = {
             "npm",
             "create",
-            "vite@latest",
+            "vite@" .. scaffold_versions.create_vite,
             context.name,
             "--",
             "--template",
@@ -325,7 +334,17 @@ local generators = {
           cwd = context.parent,
           env = { npm_config_yes = "true" },
         },
-        { args = { "npm", "install" }, cwd = context.target },
+        {
+          args = {
+            "npm",
+            "install",
+            "--save-dev",
+            "--save-exact",
+            "typescript@" .. scaffold_versions.typescript,
+            "vite@" .. scaffold_versions.vite,
+          },
+          cwd = context.target,
+        },
       }
     end,
   },
@@ -564,5 +583,9 @@ function M.open()
     end)
   end)
 end
+
+M._test = {
+  generators = generators,
+}
 
 return M

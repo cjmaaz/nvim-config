@@ -9,6 +9,9 @@ local cancelled = {}
 local next_id = 0
 
 local function error_message(decoded, result)
+  if result and result.cancelled then
+    return "Salesforce operation cancelled."
+  end
   if type(decoded) == "table" then
     return decoded.message
       or decoded.name
@@ -18,7 +21,8 @@ local function error_message(decoded, result)
   return stderr and stderr:gsub("%s+$", "") or "Unknown command error"
 end
 
-function M.shell_join(args)
+-- Display only. Never pass this formatted value to a process API.
+function M.format_argv(args)
   local escaped = {}
   for _, arg in ipairs(args) do
     escaped[#escaped + 1] = vim.fn.shellescape(tostring(arg))
@@ -28,6 +32,7 @@ end
 
 function M.run(args, opts, callback)
   opts = opts or {}
+  callback = callback or function() end
   next_id = next_id + 1
   local id = next_id
 
@@ -40,7 +45,7 @@ function M.run(args, opts, callback)
       active[id] = nil
       if cancelled[id] then
         cancelled[id] = nil
-        return
+        result.cancelled = true
       end
       callback(result)
     end)
@@ -58,6 +63,10 @@ end
 
 function M.run_json(args, opts, callback)
   return M.run(args, opts, function(result)
+    if result.cancelled then
+      callback("Salesforce operation cancelled.", nil, result)
+      return
+    end
     local ok, decoded = pcall(vim.json.decode, result.stdout or "")
     if result.code ~= 0 or not ok or type(decoded) ~= "table" then
       callback(error_message(ok and decoded or nil, result), nil, result)
@@ -81,14 +90,12 @@ function M.run_sf_json(args, opts, callback)
   end)
 end
 
-function M.run_in_term(args, callback)
-  require("sf").run(M.shell_join(args), function(_, _, exit_code)
-    if callback then
-      vim.schedule(function()
-        callback(exit_code == 0, exit_code)
-      end)
-    end
-  end)
+function M.run_in_term(args, opts, callback)
+  if type(opts) == "function" then
+    callback = opts
+    opts = nil
+  end
+  return require("config.salesforce.terminal").run(args, opts, callback)
 end
 
 function M.cancel_background()

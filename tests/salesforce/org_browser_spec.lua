@@ -177,6 +177,9 @@ describe("Salesforce Org Browser metadata service", function()
       end,
     }
     package.loaded["config.salesforce.metadata"] = nil
+    package.loaded["config.salesforce.org_context"] = nil
+    local org_context = require("config.salesforce.org_context")
+    org_context.seed(root, { value = "unit-org" }, "local")
     metadata = require("config.salesforce.metadata")
     vim.g.sf = { types_to_retrieve = {} }
     vim.b.sf_project_root = nil
@@ -184,6 +187,7 @@ describe("Salesforce Org Browser metadata service", function()
 
   after_each(function()
     package.loaded["config.salesforce.metadata"] = nil
+    package.loaded["config.salesforce.org_context"] = nil
     package.loaded["config.salesforce.process"] = nil
     package.loaded["sf.util"] = nil
     vim.g.sf = nil
@@ -306,9 +310,11 @@ describe("Salesforce Org Browser metadata service", function()
       callback_ok = ok
     end)
     util.target_org = "other-org"
+    require("config.salesforce.org_context").seed(root, { value = "other-org" }, "local")
     pending()
     assert.is_false(callback_ok)
     util.target_org = "unit-org"
+    require("config.salesforce.org_context").seed(root, { value = "unit-org" }, "local")
     assert.are.equal(0, #metadata.load_browser_catalog().descriptors)
   end)
 

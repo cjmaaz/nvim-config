@@ -217,12 +217,12 @@ local function salesforce_status()
   local parts = {}
 
   -- Target org alias (set via <leader>So / SF org fetch).
-  local ok_org, org = pcall(sf.get_target_org)
-  if ok_org and org and org ~= "" then
-    table.insert(parts, with_icon(status_icons.salesforce, org))
+  local org_ctx = require("config.salesforce.org_context").for_buffer(0)
+  if org_ctx and org_ctx.org and org_ctx.org ~= "" then
+    table.insert(parts, with_icon(status_icons.salesforce, org_ctx.org))
     -- table.insert(parts, org) -- text only, no prefix
   end
-  -- if not ok_org then … end -- ignore errors (org unset is normal)
+  -- If no root-scoped org is resolved yet, the component stays empty.
 
   -- Apex test coverage % after a coverage run (ST / SA); empty until then.
   local ok_coverage, coverage = pcall(sf.covered_percent)

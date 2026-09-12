@@ -8,6 +8,7 @@ local M = {}
 
 local uv = vim.uv or vim.loop
 local project_context = require("config.project_context")
+local scaffold_versions = require("config.tool_versions").scaffold
 local title = "Project runner"
 local terminal = { buf = nil, win = nil, job = nil, serial = 0 }
 
@@ -295,7 +296,10 @@ local function python_actions(root)
     actions[#actions + 1] = static_action("Build distributions", { "uv", "build" })
   end
   if exists(vim.fs.joinpath(root, "tests"), "directory") then
-    actions[#actions + 1] = static_action("Test", { "uv", "run", "--with", "pytest", "pytest" })
+    actions[#actions + 1] = static_action(
+      "Test",
+      { "uv", "run", "--with", "pytest==" .. scaffold_versions.pytest, "pytest" }
+    )
   end
   return actions
 end
@@ -406,14 +410,221 @@ local function flutter_actions(root)
   return actions
 end
 
-local function cmake_uses_dev_preset(root)
-  for _, filename in ipairs({ "CMakeUserPresets.json", "CMakePresets.json" }) do
-    local path = vim.fs.joinpath(root, filename)
-    if exists(path, "file") and contains_text(path, '"name"%s*:%s*"dev"') then
-      return true
+local function path_is_absolute(path)
+  return path:sub(1, 1) == "/" or path:match("^%a:[/\\]") ~= nil or path:match("^[/\\][/\\]") ~= nil
+end
+
+local function expand_cmake_include(root, file_dir, include, version)
+  local expanded = include
+  if version >= 7 then
+    expanded = expanded:gsub("%$penv{([%w_]+)}", function(key)
+      return vim.env[key] or ""
+    end)
+  end
+  if version >= 9 then
+    local values = {
+      sourceDir = root,
+      sourceParentDir = vim.fs.dirname(root),
+      sourceDirName = vim.fs.basename(root),
+      fileDir = file_dir,
+      pathListSep = package.config:sub(1, 1) == "\\" and ";" or ":",
+      dollar = "$",
+      hostSystemName = uv.os_uname().sysname,
+    }
+    expanded = expanded:gsub("%${([%w_]+)}", function(key)
+      return values[key] or "${" .. key .. "}"
+    end)
+  end
+  if expanded:find("%${") or expanded:find("%$[%w_]+{") then
+    return nil
+  end
+  return path_is_absolute(expanded) and vim.fs.normalize(expanded)
+    or vim.fs.joinpath(file_dir, expanded)
+end
+
+local function cmake_preset_data(root)
+  local presets = {
+    configure = {},
+    build = {},
+    test = {},
+  }
+  local seen = {}
+
+  local function load(path)
+    path = vim.fs.normalize(path)
+    if seen[path] or not exists(path, "file") then
+      return
+    end
+    seen[path] = true
+    local decoded_ok, decoded = pcall(vim.json.decode, read_text(path))
+    if not decoded_ok or type(decoded) ~= "table" then
+      return
+    end
+    local version = tonumber(decoded.version) or 1
+    local includes = type(decoded.include) == "table" and decoded.include
+      or type(decoded.include) == "string" and { decoded.include }
+      or {}
+    for _, included in ipairs(includes) do
+      if type(included) == "string" then
+        local expanded = expand_cmake_include(root, vim.fs.dirname(path), included, version)
+        if expanded then
+          load(expanded)
+        end
+      end
+    end
+    for target, key in pairs({
+      configure = "configurePresets",
+      build = "buildPresets",
+      test = "testPresets",
+    }) do
+      for _, preset in ipairs(type(decoded[key]) == "table" and decoded[key] or {}) do
+        if type(preset) == "table" and type(preset.name) == "string" then
+          preset._file_dir = vim.fs.dirname(path)
+          preset._schema_version = version
+          presets[target][preset.name] = preset
+        end
+      end
     end
   end
-  return false
+
+  load(vim.fs.joinpath(root, "CMakePresets.json"))
+  load(vim.fs.joinpath(root, "CMakeUserPresets.json"))
+  return presets
+end
+
+local function inherited_field(all_presets, name, field, visiting)
+  local preset = all_presets[name]
+  if not preset then
+    return nil
+  end
+  if preset[field] ~= nil then
+    return preset[field], preset
+  end
+  visiting = visiting or {}
+  if visiting[name] then
+    return nil
+  end
+  visiting[name] = true
+  local parents = type(preset.inherits) == "table" and preset.inherits
+    or type(preset.inherits) == "string" and { preset.inherits }
+    or {}
+  for _, parent in ipairs(parents) do
+    local value, origin = inherited_field(all_presets, parent, field, visiting)
+    if value ~= nil then
+      visiting[name] = nil
+      return value, origin
+    end
+  end
+  visiting[name] = nil
+  return nil
+end
+
+local function inherited_environment(all_presets, name, visiting)
+  local preset = all_presets[name]
+  if not preset then
+    return {}
+  end
+  visiting = visiting or {}
+  if visiting[name] then
+    return {}
+  end
+  visiting[name] = true
+  local environment = {}
+  local parents = type(preset.inherits) == "table" and preset.inherits
+    or type(preset.inherits) == "string" and { preset.inherits }
+    or {}
+  for index = #parents, 1, -1 do
+    environment = vim.tbl_extend("force", environment, inherited_environment(all_presets, parents[index], visiting))
+  end
+  for key, value in pairs(type(preset.environment) == "table" and preset.environment or {}) do
+    environment[key] = value
+  end
+  visiting[name] = nil
+  return environment
+end
+
+local function expand_cmake_binary_dir(root, name, binary_dir, generator, environment, file_dir)
+  if type(binary_dir) ~= "string" or binary_dir == "" then
+    return root
+  end
+  local source_name = vim.fs.basename(root)
+  local values = {
+    sourceDir = root,
+    sourceParentDir = vim.fs.dirname(root),
+    sourceDirName = source_name,
+    presetName = name,
+    generator = generator or "",
+    hostSystemName = uv.os_uname().sysname,
+    fileDir = file_dir or root,
+    pathListSep = package.config:sub(1, 1) == "\\" and ";" or ":",
+    dollar = "$",
+  }
+  local expanded = binary_dir:gsub("%${([%w_]+)}", function(key)
+    return values[key] or "${" .. key .. "}"
+  end)
+  local resolving = {}
+  local function preset_env(key)
+    local value = environment and environment[key] or nil
+    if value == vim.NIL then
+      return ""
+    end
+    if value == nil then
+      return vim.env[key] or ""
+    end
+    if resolving[key] then
+      return ""
+    end
+    resolving[key] = true
+    local resolved = tostring(value)
+    resolved = resolved:gsub("%$penv{([%w_]+)}", function(parent)
+      return vim.env[parent] or ""
+    end)
+    resolved = resolved:gsub("%$env{([%w_]+)}", preset_env)
+    resolved = resolved:gsub("%${([%w_]+)}", function(macro)
+      return values[macro] or "${" .. macro .. "}"
+    end)
+    resolving[key] = nil
+    return resolved
+  end
+  expanded = expanded:gsub("%$penv{([%w_]+)}", function(key)
+    return vim.env[key] or ""
+  end)
+  expanded = expanded:gsub("%$env{([%w_]+)}", preset_env)
+  if expanded:find("%${") or expanded:find("%$[%w_]+{") then
+    return nil
+  end
+  if not path_is_absolute(expanded) then
+    expanded = vim.fs.joinpath(root, expanded)
+  end
+  return vim.fs.normalize(expanded)
+end
+
+local function cmake_dev_preset(root)
+  local data = cmake_preset_data(root)
+  local configure = data.configure.dev
+  if not configure or configure.hidden == true then
+    return nil
+  end
+  local binary_value, binary_origin = inherited_field(data.configure, "dev", "binaryDir")
+  local generator = inherited_field(data.configure, "dev", "generator")
+  local schema_version = tonumber(binary_origin and binary_origin._schema_version)
+    or tonumber(configure._schema_version)
+    or 1
+  local file_dir = schema_version >= 12 and binary_origin and binary_origin._file_dir or configure._file_dir
+  local binary_dir = expand_cmake_binary_dir(
+    root,
+    "dev",
+    binary_value,
+    generator,
+    inherited_environment(data.configure, "dev"),
+    file_dir or root
+  )
+  return {
+    binary_dir = binary_dir or root,
+    build = data.build.dev ~= nil and data.build.dev.hidden ~= true,
+    configure = true,
+    test = data.test.dev ~= nil and data.test.dev.hidden ~= true,
+  }
 end
 
 local function cmake_has_run_target(root)
@@ -429,10 +640,15 @@ local function cmake_has_run_target(root)
 end
 
 local function cmake_steps(root)
-  if cmake_uses_dev_preset(root) then
+  local preset = cmake_dev_preset(root)
+  if preset then
     return {
       { args = { "cmake", "--preset=dev" } },
-      { args = { "cmake", "--build", "build" } },
+      {
+        args = preset.build
+            and { "cmake", "--build", "--preset=dev" }
+          or { "cmake", "--build", preset.binary_dir },
+      },
     }
   end
   return {
@@ -442,17 +658,24 @@ local function cmake_steps(root)
 end
 
 local function cmake_actions(root)
+  local preset = cmake_dev_preset(root)
   local build = cmake_steps(root)
+  local test_step = preset and preset.test
+      and { args = { "ctest", "--preset=dev", "--output-on-failure" } }
+    or { args = { "ctest", "--test-dir", preset and preset.binary_dir or "build", "--output-on-failure" } }
   local actions = {
     multi_action("Build (configure first)", build),
     multi_action("Test (build first)", vim.list_extend(vim.deepcopy(build), {
-      { args = { "ctest", "--test-dir", "build", "--output-on-failure" } },
+      test_step,
     })),
   }
   if cmake_has_run_target(root) then
+    local run_args = preset and preset.build
+        and { "cmake", "--build", "--preset=dev", "-t", "run_exe" }
+      or { "cmake", "--build", preset and preset.binary_dir or "build", "-t", "run_exe" }
     table.insert(actions, 1, multi_action("Run executable (builds first)", {
       build[1],
-      { args = { "cmake", "--build", "build", "-t", "run_exe" } },
+      { args = run_args },
     }))
   end
   return actions
@@ -620,6 +843,10 @@ end
 M._test = {
   action_kind = action_kind,
   actions_for_project = actions_for_project,
+  cmake_actions = cmake_actions,
+  cmake_dev_preset = cmake_dev_preset,
+  cmake_preset_data = cmake_preset_data,
+  cmake_steps = cmake_steps,
   detected_projects = detected_projects,
   project_types = project_types,
 }

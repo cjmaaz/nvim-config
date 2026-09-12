@@ -8,6 +8,7 @@ local uv = vim.uv or vim.loop
 local metadata = require("config.salesforce.metadata")
 local process = require("config.salesforce.process")
 local schema = require("config.salesforce.schema")
+local safety = require("config.salesforce.safety")
 
 local function notify(message, level)
   vim.notify(message, level or vim.log.levels.INFO, { title = "SOQL builder" })
@@ -105,17 +106,16 @@ end
 
 local function open_draft(ctx, object_name, fields, replace)
   local path = draft_path(ctx, object_name)
-  vim.fn.mkdir(vim.fs.dirname(path), "p")
   local exists = uv.fs_stat(path) ~= nil
   if not exists or replace then
-    local ok, error_message = pcall(vim.fn.writefile, query_lines(object_name, fields), path)
+    local ok, error_message = safety.atomic_write_lines(ctx.root, path, query_lines(object_name, fields))
     if not ok then
       notify("Could not write SOQL draft:\n" .. tostring(error_message), vim.log.levels.ERROR)
       return
     end
   end
 
-  vim.cmd("edit " .. vim.fn.fnameescape(path))
+  vim.cmd.edit({ args = { path } })
   vim.bo.filetype = "soql"
   set_buffer_context(0, ctx, object_name)
   require("config.local_actions").reconcile(0)
@@ -242,7 +242,7 @@ function M.run_current(tooling, bufnr)
   if tooling then
     args[#args + 1] = "--use-tooling-api"
   end
-  process.run_in_term(args)
+  process.run_in_term(args, { cwd = ctx.root })
 end
 
 function M.setup()
