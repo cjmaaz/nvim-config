@@ -53,6 +53,7 @@ Examples:
 
 - A normal Node file uses `\r` dev/start, `\b` build, and `\t` test.
 - An LWC JavaScript file can show both Salesforce and Node actions in `\p`; Salesforce save-and-deploy owns `\b`, while Node still owns `\r` and `\t`.
+- An ordinary Salesforce-project script such as `scripts/setup.ts` keeps Node’s `\b`; cloud file actions are limited to Apex and recognized Aura/LWC/Visualforce/static-resource paths.
 - An Apex file uses `\b` for save-and-deploy and `\t` for the test under the cursor.
 - A SOQL draft preserves `\f` fields, `\o` SObject, `\r` standard query, and `\t` Tooling query.
 

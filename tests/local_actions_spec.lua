@@ -1,6 +1,9 @@
 package.loaded["config.project_context"] = dofile("lua/config/project_context.lua")
 package.loaded["config.project_runner"] = dofile("lua/config/project_runner.lua")
 package.loaded["config.local_actions"] = dofile("lua/config/local_actions.lua")
+package.loaded["config.local_actions.project"] = dofile("lua/config/local_actions/project.lua")
+package.loaded["config.local_actions.salesforce"] = dofile("lua/config/local_actions/salesforce.lua")
+package.loaded["config.local_actions.soql"] = dofile("lua/config/local_actions/soql.lua")
 
 local local_actions = package.loaded["config.local_actions"]
 local runner = package.loaded["config.project_runner"]
@@ -194,10 +197,14 @@ describe("context-aware localleader", function()
   describe("local action reconciliation", function()
     it("merges menus while higher-priority providers own direct slots", function()
       local root = project({
+        ["sfdx-project.json"] = { '{"packageDirectories":[{"path":"force-app","default":true}]}' },
         ["package.json"] = { '{"scripts":{"dev":"vite","build":"vite build","test":"vitest"}}' },
-        ["src/app.ts"] = { "export {}" },
+        ["force-app/main/default/lwc/demo/demo.ts"] = { "export {}" },
+        ["scripts/setup.ts"] = { "export {}" },
+        ["scripts/lwc/helper.ts"] = { "export {}" },
+        ["scripts/Test.cls"] = { "class Test {}" },
       })
-      local bufnr = buffer(vim.fs.joinpath(root, "src/app.ts"), "typescript")
+      local bufnr = buffer(vim.fs.joinpath(root, "force-app/main/default/lwc/demo/demo.ts"), "typescript")
 
       local_actions.register(require("config.local_actions.project"))
       local_actions.register(require("config.local_actions.salesforce").new({
@@ -222,6 +229,26 @@ describe("context-aware localleader", function()
       assert.is_truthy(mapping(bufnr, "\\r"))
       assert.is_truthy(mapping(bufnr, "\\b"))
       assert.is_truthy(mapping(bufnr, "\\t"))
+
+      local script_buf = buffer(vim.fs.joinpath(root, "scripts/setup.ts"), "typescript")
+      local script_actions = local_actions.collect(script_buf)
+      assert.are.equal("project", script_actions.direct["\\b"][1].provider)
+      assert.is_true(require("config.local_actions.salesforce")._test.is_metadata_buffer({
+        filetype = "typescript",
+        path = vim.fs.joinpath(root, "force-app/main/default/lwc/demo/demo.ts"),
+      }, root))
+      assert.is_false(require("config.local_actions.salesforce")._test.is_metadata_buffer({
+        filetype = "typescript",
+        path = vim.fs.joinpath(root, "scripts/setup.ts"),
+      }, root))
+      assert.is_false(require("config.local_actions.salesforce")._test.is_metadata_buffer({
+        filetype = "typescript",
+        path = vim.fs.joinpath(root, "scripts/lwc/helper.ts"),
+      }, root))
+      assert.is_false(require("config.local_actions.salesforce")._test.is_metadata_buffer({
+        filetype = "apex",
+        path = vim.fs.joinpath(root, "scripts/Test.cls"),
+      }, root))
     end)
 
     it("preserves foreign mappings and removes only owned stale actions", function()
@@ -376,6 +403,29 @@ describe("context-aware localleader", function()
   end)
 
   describe("domain providers", function()
+    it("recognizes metadata below a symlinked package directory", function()
+      local root = project({
+        ["sfdx-project.json"] = { '{"packageDirectories":[{"path":"force-app","default":true}]}' },
+        ["actual/main/default/lwc/demo/demo.ts"] = { "export {}" },
+      })
+      assert(vim.uv.fs_symlink(vim.fs.joinpath(root, "actual"), vim.fs.joinpath(root, "force-app")))
+      assert.is_true(require("config.local_actions.salesforce")._test.is_metadata_buffer({
+        filetype = "typescript",
+        path = vim.fs.joinpath(root, "force-app/main/default/lwc/demo/demo.ts"),
+      }, root))
+    end)
+
+    it("maps a standalone SOQL buffer before sf.nvim has loaded", function()
+      local root = project({ ["query.soql"] = { "SELECT Id FROM Account" } })
+      local bufnr = buffer(vim.fs.joinpath(root, "query.soql"), "soql")
+      local_actions.register(require("config.local_actions.soql"))
+      local_actions.reconcile(bufnr)
+      assert.are.equal("SOQL", vim.b[bufnr].local_actions_context)
+      for _, lhs in ipairs({ "\\p", "\\f", "\\o", "\\r", "\\t" }) do
+        assert.is_truthy(mapping(bufnr, lhs), lhs)
+      end
+    end)
+
     it("gives SOQL explicit mappings priority over project test slots", function()
       local root = project({
         ["package.json"] = { '{"scripts":{"test":"vitest"}}' },
@@ -424,6 +474,14 @@ describe("context-aware localleader", function()
       assert.are.equal("soql", vim.bo[draft_buf].filetype)
       assert.is_truthy(mapping(draft_buf, "\\f"))
       assert.is_truthy(mapping(draft_buf, "\\r"))
+      assert.is_nil(local_actions._test.owned[0])
+      assert.is_not_nil(local_actions._test.owned[draft_buf])
+
+      vim.bo[draft_buf].filetype = "text"
+      local_actions.reconcile(draft_buf)
+      assert.is_nil(mapping(draft_buf, "\\f"))
+      assert.is_nil(mapping(draft_buf, "\\o"))
+      assert.is_nil(mapping(draft_buf, "\\r"))
 
       package.loaded["config.salesforce.query"] = nil
       package.loaded["config.salesforce.metadata"] = nil

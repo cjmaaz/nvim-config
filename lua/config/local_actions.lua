@@ -23,6 +23,13 @@ local SLOT_LABEL = {
   test = "Test",
 }
 
+local function normalize_bufnr(bufnr)
+  if not bufnr or bufnr == 0 then
+    return api.nvim_get_current_buf()
+  end
+  return bufnr
+end
+
 local function expanded_lhs(lhs)
   return lhs:gsub("<localleader>", vim.g.maplocalleader or "\\")
 end
@@ -80,7 +87,7 @@ local function normalize_action(provider, resolved, action, index)
 end
 
 function M.collect(bufnr)
-  bufnr = bufnr or api.nvim_get_current_buf()
+  bufnr = normalize_bufnr(bufnr)
   if not eligible(bufnr) then
     return {
       actions = {},
@@ -213,7 +220,7 @@ local function select_action(bufnr, actions, prompt)
 end
 
 function M.invoke(bufnr, lhs)
-  bufnr = bufnr or api.nvim_get_current_buf()
+  bufnr = normalize_bufnr(bufnr)
   local collected = M.collect(bufnr)
   local expanded = expanded_lhs(lhs)
   local actions = expanded == expanded_lhs(MENU_LHS) and collected.actions or collected.direct[expanded] or {}
@@ -225,6 +232,7 @@ function M.invoke(bufnr, lhs)
 end
 
 local function clear_owned(bufnr)
+  bufnr = normalize_bufnr(bufnr)
   for _, item in pairs(owned[bufnr] or {}) do
     local mapping = find_buffer_map(bufnr, item.expanded)
     if is_owned_mapping(mapping, item) then
@@ -238,7 +246,7 @@ local function clear_owned(bufnr)
 end
 
 function M.reconcile(bufnr)
-  bufnr = bufnr or api.nvim_get_current_buf()
+  bufnr = normalize_bufnr(bufnr)
   if not eligible(bufnr) then
     if api.nvim_buf_is_valid(bufnr) then
       clear_owned(bufnr)
@@ -345,6 +353,7 @@ function M.setup()
   end
   setup_done = true
   M.register(require("config.local_actions.project"))
+  M.register(require("config.local_actions.soql"))
 
   local group = api.nvim_create_augroup("contextual_local_actions", { clear = true })
   api.nvim_create_autocmd({ "BufEnter", "FileType" }, {
@@ -381,6 +390,7 @@ M._test = {
   clear_owned = clear_owned,
   eligible = eligible,
   expanded_lhs = expanded_lhs,
+  normalize_bufnr = normalize_bufnr,
   owned = owned,
   pending_reconcile = pending_reconcile,
   providers = providers,

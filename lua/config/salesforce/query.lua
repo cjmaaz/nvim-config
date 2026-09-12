@@ -246,60 +246,7 @@ function M.run_current(tooling, bufnr)
 end
 
 function M.setup()
-  require("config.local_actions").register({
-    id = "soql",
-    label = "SOQL",
-    priority = 100,
-    resolve = function(context)
-      if context.filetype ~= "soql" then
-        return nil
-      end
-      local bufnr = context.bufnr
-      return {
-        label = "SOQL",
-        root = vim.b[bufnr].soql_root or require("config.project_context").salesforce_root(bufnr),
-        actions = {
-          {
-            id = "pick-fields",
-            label = "Pick fields",
-            desc = "SOQL: pick fields",
-            lhs = "<localleader>f",
-            run = function()
-              M.pick_fields(bufnr)
-            end,
-          },
-          {
-            id = "change-object",
-            label = "Change SObject",
-            desc = "SOQL: change SObject",
-            lhs = "<localleader>o",
-            run = function()
-              M.change_object(bufnr)
-            end,
-          },
-          {
-            id = "run-query",
-            label = "Run query",
-            desc = "SOQL: run query",
-            lhs = "<localleader>r",
-            slot = "run",
-            run = function()
-              M.run_current(false, bufnr)
-            end,
-          },
-          {
-            id = "run-tooling-query",
-            label = "Run Tooling query",
-            desc = "SOQL: run Tooling query",
-            lhs = "<localleader>t",
-            run = function()
-              M.run_current(true, bufnr)
-            end,
-          },
-        },
-      }
-    end,
-  })
+  require("config.local_actions").register(require("config.local_actions.soql"))
 end
 
 M._test = {

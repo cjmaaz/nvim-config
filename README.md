@@ -64,7 +64,8 @@ nvim-config/
     │   ├── local_actions.lua # context provider registry + owned buffer maps
     │   ├── local_actions/
     │   │   ├── project.lua # native runner capabilities
-    │   │   └── salesforce.lua # guarded Salesforce capabilities
+    │   │   ├── salesforce.lua # guarded Salesforce capabilities
+    │   │   └── soql.lua # standalone-safe SOQL mappings
     │   ├── gremlins.lua  # invisible/confusable Unicode diagnostics
     │   ├── autocmds.lua  # yank, trim, final newline (Apex exempt), filetypes
     │   ├── winbar.lua    # non-overlapping file + LSP context row

@@ -114,7 +114,7 @@ Inside the SOQL field picker, `<Tab>` toggles a field and `<CR>` confirms the se
 | `<localleader>r` (`\r`) | Save and run standard SOQL |
 | `<localleader>t` (`\t`) | Save and run through the Tooling API |
 
-These remain buffer-local but are now owned by the shared context registry, so they appear alongside Salesforce/project actions in `\p` and clean up consistently when the buffer context changes.
+These are registered on the first named `.soql` buffer even when sf.nvim has not loaded yet. They remain buffer-local and are owned by the shared context registry, so they appear alongside Salesforce/project actions in `\p` and clean up consistently when the buffer context changes. Actions that need an org validate Salesforce project/target context when invoked.
 
 Normal `<leader>Sq` saves the whole `.soql` buffer before execution. Visual `<leader>Sq` keeps sf.nvim’s existing selected-text runner. Results use SFTerm and the captured project/org context.
 
