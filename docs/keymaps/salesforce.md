@@ -49,7 +49,8 @@ Also: `:SF` then Tab for command categories.
 | `<leader>Sq` | n | Save and run the current `.soql` file |
 | `<leader>Sq` | x | Run **visual** selection as SOQL |
 | `<leader>Sm` | n | Pick cached metadata to retrieve (fzf-lua) |
-| `<leader>Su` | n | Open the cached multi-select metadata browser |
+| `<leader>Su` | n | Open the advanced cached metadata browser (multi-select/package.xml) |
+| `<leader>SE` | n | Toggle the live Salesforce Org Browser sidebar |
 | `<leader>SU` | n | Update **Common** or **All** metadata inventory |
 | `<leader>SP` | n | Search package manifests under `manifest/` and its subdirectories |
 | `<leader>Ss` | n | Refresh SObject definitions (helps `apex_ls`) |
@@ -101,9 +102,33 @@ Normal `<leader>Sq` saves the whole `.soql` buffer before execution. Visual `<le
 
 ---
 
-## Metadata browser (`<leader>Su`)
+## Org Browser (`<leader>SE`)
 
-Inventory is project-local under `sf_cache/`. `SF` only refreshes sf.nvim’s org list/default target, while `So` changes only the local target. `SU` is the metadata inventory refresh: choose **Common** or **All enabled types**. The old `SM` mapping was removed because it performed the same Common refresh. The legacy `SK`/`Sk` type-catalog pair is also removed; **All** refreshes that catalog internally before scanning members. The All path can take several minutes and also traverses Report, Dashboard, Document, and EmailTemplate folders.
+`<leader>SE` opens a VS Code-inspired Neo-tree source in the normal left sidebar. `<leader>fe` switches that sidebar back to project files. The tree is:
+
+`target org → metadata type → folder (when required) → component`
+
+Inventory stays project- and org-scoped below `sf_cache/metadata-browser/`. Cached nodes render immediately. Catalog/type/folder slices older than five minutes refresh in the background; uncached children are fetched only when expanded. This avoids the several-minute eager scan required by `<leader>SU` → **All**. `R` always bypasses freshness and requests the selected branch live.
+
+Rows show cached count/age plus `stale`, `refreshing`, `empty`, `read-only`, or retryable error state. Expansion and cursor location survive asynchronous redraws. Installed metadata that Salesforce marks non-editable remains visible but cannot be retrieved.
+
+| Key | Action |
+| --- | --- |
+| `<CR>` / `l` | Expand a type/folder; on a component, confirm, retrieve, and open its first source file |
+| `h` | Collapse the current branch or move to its parent |
+| `r` | Confirm and retrieve the focused component without opening it |
+| `A` | Refresh and retrieve every retrievable component of the focused type |
+| `R` | Force-refresh the catalog, type, folder, or component’s parent branch |
+| `K` | Show descriptor/audit details in a float |
+| `o` | Change the local target org and redraw from that org’s cache |
+| `/` | Fuzzy-filter currently loaded tree nodes |
+| `P` | Open the advanced cached fzf batch browser |
+| `?` | Show source-local Neo-tree help |
+| `q` | Close the sidebar |
+
+Every retrieve names the target org and warns that existing local source can be overwritten. It first runs without `--ignore-conflicts`; only an explicit second confirmation retries a reported conflict with overwrite enabled. Single-component retrieval opens a source file in the editor window, not inside the Neo-tree sidebar. Folder-type `A` retrieval enumerates Report, Dashboard, Document, or EmailTemplate folders and their components instead of retrieving folder definitions alone. `<leader>Sx` cancels active list/retrieve jobs.
+
+### Advanced batch browser (`<leader>Su` or `P` inside Org Browser)
 
 The browser uses three panes: focused-item audit details across the upper-left, searchable results below, and live selected-item summaries on the right. Member details include creator/date, modifier/date, metadata ID, file, namespace, and manageable state; category details show descriptor/cache fields. A selected category appears once in the right pane as `Type — all N cached members` with a distinct color rather than listing every child.
 
@@ -148,8 +173,8 @@ Both actions run in SFTerm. Toggle the float with `<leader>Se`; cancel with `Esc
 ## Notes
 
 - **Project isolation:** sf.nvim, fzf-lua, query schema modules, and the global `vim.system` token workaround load only after a current buffer/cwd resolves to `sfdx-project.json` or `.forceignore`. Ordinary HTML/JS/TS/SOQL projects keep lightweight guarded mappings only. Once sf.nvim has been used in a Neovim process it remains loaded, but mappings, SOQL completion, and statusline output continue to re-check the active project root.
-- **Org flow:** `<leader>SF` runs the upstream org-list fetch; `<leader>So` and `<leader>SO` change only the local/global target. None fetch metadata—run `<leader>SU` when you want to refresh inventory.
-- **SFTerm** (float after deploy/retrieve/metadata): stays open so you can read output. `<leader>Se` toggles it; focused `q` also hides it. `Esc` is a cancel key, not a visibility toggle.
+- **Org flow:** `<leader>SF` refreshes sf.nvim’s org list; `<leader>So` and `<leader>SO` change the local/global target. The Org Browser fetches stale branches lazily; `<leader>SU` remains the explicit Common/All eager inventory refresh.
+- **SFTerm** stays open after current-file, advanced batch, deploy, manifest, query, and test actions. Org Browser sidebar list/retrieve jobs instead report status in the tree and notifications. `<leader>Se` toggles SFTerm; focused `q` also hides it.
 - **Cancel:** `Esc` and `<leader>Sx` send Ctrl-C to running SFTerm channels and stop background inventory processes without requiring `<C-w>w`, whether the float is focused, unfocused, hidden, or absent. Normal-mode `<C-c>` inside SFTerm also cancels; terminal-mode `<C-c>` remains the terminal’s native interrupt. With nothing running, normal-mode `Esc` still clears search highlighting. Cancellation is best-effort after Salesforce has accepted a server-side deploy job.
 - **fzf-lua** is installed for metadata pickers only; everyday file search remains **Telescope** (`<leader>sf` / `sg`). Needs host **`fzf`** (`brew install fzf` · `sudo pacman -S fzf`) — see [TOOLS.md](../TOOLS.md).
 - Coverage signs appear after a **coverage** test run (`ST` / `SA`) when `auto_display_code_sign` is on.

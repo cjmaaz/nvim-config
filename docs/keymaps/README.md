@@ -58,7 +58,7 @@ Defined in `init.lua`.
 | Treesitter / indent / pairs | Highlight, folds, structural objects, detected indentation, guides, autopairs — [treesitter.md](./treesitter.md) |
 | LSP / format / blink | `gd`/`K`/`gr` · `<leader>cf` · `<C-y>` — [lsp.md](./lsp.md) |
 | Lint (nvim-lint) | `<leader>cl` · `<leader>tl` toggle auto · lazy Mason — [lsp.md](./lsp.md#linting-luapluginslintinglua) |
-| Salesforce | `<leader>S…` · Vlocity `SV` · SOQL `SQ`/`Sq` · metadata `Su` · cancel `Sx` — [salesforce.md](./salesforce.md) |
+| Salesforce | `<leader>S…` · Org Browser `SE` · metadata/package.xml `Su` · Vlocity `SV` · SOQL `SQ`/`Sq` — [salesforce.md](./salesforce.md) |
 | Docs / comments / TODO | Neogen `cn`; `gcc`; colored annotations; search `st`; Trouble tree `xt` — [comment.md](./comment.md) |
 | QoL | Bare-`nvim` session resume · Gremlins · Trouble · surround · flash · undotree · yanky · dial · rainbow · colorizer — [qol.md](./qol.md) |
 | Colorscheme | Noctis Bordo on `#18181B`; italic comments/keywords/types/properties and bold control flow/parameters |

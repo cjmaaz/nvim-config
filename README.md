@@ -32,7 +32,7 @@ nvim-config/
 │   │   └── which-key.md
 │   ├── anki/
 │   │   ├── README.md     # import instructions and tag guide
-│   │   └── neovim-keymaps.tsv # 729-card Anki import
+│   │   └── neovim-keymaps.tsv # 742-card Anki import
 │   ├── diagnostics/      # where diagnostics show + settings + Java FAQ
 │   │   ├── README.md
 │   │   ├── display.md
@@ -44,6 +44,9 @@ nvim-config/
 │   ├── DIAGNOSTICS.md    # stub → docs/diagnostics/
 │   ├── TOOLS.md          # external prerequisites / optional tools
 │   └── COMMITIZEN.md     # optional cz helper
+├── tests/
+│   ├── minimal_init.lua  # headless Plenary runtime
+│   └── salesforce/       # mocked Org Browser/cache/retrieve specs
 ├── init.lua              # entry: loader, leaders, require config.*
 ├── lazy-lock.json        # pinned plugin commits (commit this)
 ├── queries/
@@ -65,7 +68,8 @@ nvim-config/
     │   └── salesforce/
     │       ├── process.lua # shared safe CLI/SFTerm/cancellation helpers
     │       ├── metadata.lua # org inventory, sf_cache, manifests, actions
-    │       ├── browser.lua # fzf metadata hierarchy + multi-select
+    │       ├── browser.lua # advanced fzf metadata batch actions
+    │       ├── org_browser/ # Neo-tree source, nodes, renderers, commands
     │       ├── manifests.lua # search/retrieve/deploy project manifests
     │       ├── vlocity.lua # managed-package DataPack retrieval
     │       ├── schema.lua # org-scoped SObject describe cache
@@ -78,7 +82,7 @@ nvim-config/
         ├── statusline.lua  # ordered dark bubble footer
         ├── bufferline.lua # matching buffer bar (not tabpages)
         ├── cursor.lua     # calm smear animation across buffers/windows
-        ├── explorer.lua  # filesystem-only neo-tree
+        ├── explorer.lua  # filesystem + Salesforce Neo-tree sources
         ├── yazi.lua      # optional executable-gated terminal file manager
         ├── markdown.lua  # rendered Markdown + side preview
         ├── telescope.lua # fuzzy find / grep / buffers
@@ -91,13 +95,22 @@ nvim-config/
         ├── completion.lua # blink.cmp + LuaSnip
         ├── formatting.lua # conform; <leader>cf / tf
         ├── linting.lua   # nvim-lint; <leader>cl / tl; lazy Mason
-        ├── salesforce.lua # sf.nvim + fzf-lua; <leader>S… (Sp push, Sx cancel)
+        ├── salesforce.lua # sf.nvim + Org Browser; <leader>S… (SE tree, Su batch)
         ├── comment.lua   # Comment.nvim + context-commentstring
         ├── neogen.lua    # lazy docstring/Javadoc/Doxygen generation
         ├── todo-comments.lua # colored annotations + Telescope/Trouble TODO views
         ├── breadcrumbs.lua # disabled Dropbar alternate
         ├── git.lua       # gitsigns signs + hunk keymaps
         └── which-key.lua # leader popup / group labels
+```
+
+## Tests
+
+Run the mocked Salesforce Org Browser suite without contacting an org:
+
+```sh
+nvim --headless -u tests/minimal_init.lua \
+  -c "PlenaryBustedDirectory tests/salesforce { minimal_init = 'tests/minimal_init.lua' }"
 ```
 
 ## Quick start

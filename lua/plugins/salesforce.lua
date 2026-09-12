@@ -290,8 +290,16 @@ local plugin = {
         "<leader>Su",
         function()
           require("config.salesforce.browser").open()
+          -- vim.cmd("Neotree sf_org toggle left") -- put the Org Browser on Su instead
         end,
         desc = "Browse metadata inventory",
+      },
+      {
+        "<leader>SE",
+        function()
+          vim.cmd("Neotree sf_org toggle left")
+        end,
+        desc = "Toggle Org Browser",
       },
       {
         "<leader>SP",

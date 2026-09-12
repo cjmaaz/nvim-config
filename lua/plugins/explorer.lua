@@ -1,5 +1,5 @@
 --------------------------------------------------------------------------------
--- Explorer: neo-tree (sidebar file tree)
+-- Explorer: neo-tree (filesystem + Salesforce Org Browser sidebar sources)
 -- Refs: Kickstart optional neo-tree.lua; CodeOSS parked editor.lua (defaults we keep).
 -- Alts considered: oil.nvim · mini.files · netrw · snacks.explorer — user picked neo-tree.
 -- Cheatsheet: docs/keymaps/explorer.md
@@ -61,9 +61,9 @@ return {
       -- { "\\", "<cmd>Neotree reveal<CR>", desc = "Neo-tree reveal (Kickstart)" }, -- conflicts with maplocalleader
     },
     opts = {
-      -- Keep Neo-tree focused on files; buffers use <leader><leader>, Git uses LazyGit.
-      sources = { "filesystem" },
-      -- sources = { "filesystem", "buffers", "git_status" }, -- restore all source views
+      -- Files remain primary; Salesforce uses a guarded external sidebar source.
+      sources = { "filesystem", "config.salesforce.org_browser" },
+      -- sources = { "filesystem" } -- omit the Salesforce Org Browser source
 
       -- Close neo-tree if it would be the last window (avoids empty layout).
       close_if_last_window = true,
@@ -76,6 +76,7 @@ return {
         statusline = false, -- lualine owns the global statusline
         sources = {
           { source = "filesystem", display_name = "Files" },
+          { source = "sf_org", display_name = "Org" },
           -- { source = "buffers", display_name = "Buffers" },
           -- { source = "git_status", display_name = "Git" },
         },

@@ -131,10 +131,10 @@ return {
           { pattern = "open org in browser", icon = "󰖟", color = "blue" },
           { pattern = "open current metadata", icon = "󰈙", color = "blue" },
 
-          -- Retrieve / metadata inventory (Sr Sm Su SU) → azure
+          -- Retrieve / metadata inventory (Sr Sm Su SU SE) → azure
           { pattern = "retrieve current file", icon = "󰇚", color = "azure" },
           { pattern = "pick cached metadata to retrieve", icon = "󰉓", color = "azure" },
-          { pattern = "browse metadata inventory", icon = "󰉓", color = "azure" },
+          { pattern = "toggle org browser", icon = "󰢎", color = "azure" },
           { pattern = "refresh metadata inventory", icon = "󰓅", color = "azure" },
           { pattern = "browse package manifests", icon = "󰈙", color = "azure" },
           { pattern = "retrieve vlocity datapacks", icon = "󰇚", color = "azure" },

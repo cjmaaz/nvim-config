@@ -1,6 +1,6 @@
 # File managers (Neo-tree + optional Yazi)
 
-Defined in `lua/plugins/explorer.lua`. Neo-tree is now a filesystem-only sidebar (not netrw / oil) with auto-expanding width for long names. Buffer selection stays on `<leader><leader>` and Git browsing stays in LazyGit; filesystem Git badges remain enabled. Neo-tree, bufferline, and the statusline language corner share `nvim-web-devicons`; `lua/plugins/icons.lua` forces the Salesforce cloud for Apex `.cls`, `.trigger`, and `.apex` files on every surface. Press `?` inside the tree for neo-tree’s own help. Shared neutral Catppuccin chrome matches bufferline, lualine, which-key, and Telescope.
+Defined in `lua/plugins/explorer.lua`. Neo-tree hosts the normal filesystem sidebar plus a guarded Salesforce Org Browser source; source tabs stay hidden and each feature has an explicit key. Buffer selection stays on `<leader><leader>` and Git browsing stays in LazyGit. Neo-tree, bufferline, and the statusline language corner share `nvim-web-devicons`; `lua/plugins/icons.lua` forces the Salesforce cloud for Apex `.cls`, `.trigger`, and `.apex` files on every surface. Press `?` inside either tree for source-local help. Shared neutral Catppuccin chrome matches bufferline, lualine, which-key, and Telescope.
 
 Nav: [index](./README.md) · [core](./core.md) · [git](./git.md) · [telescope](./telescope.md) · [treesitter](./treesitter.md) · [lsp](./lsp.md) · [which-key](./which-key.md)
 
@@ -12,10 +12,13 @@ Nav: [index](./README.md) · [core](./core.md) · [git](./git.md) · [telescope]
 | --- | --- | --- |
 | `<leader>fe` | Toggle filesystem tree (left) | Same key again closes it |
 | `<leader>fE` | Reveal the current file in the tree | Opens the tree and jumps to this buffer’s path |
+| `<leader>SE` | Toggle Salesforce Org Browser (left) | Salesforce projects only; lazy live metadata tree |
 
 `<leader>` is **Space**, so e.g. `Space` then `f` then `e`. which-key shows groups **File/Find** (`f`) and **Git** (`g`) — [which-key.md](./which-key.md).
 
 Fuzzy find without the tree: [telescope.md](./telescope.md) (`<leader>sf`).
+
+The Org Browser reuses the same sidebar without changing filesystem mappings. Its metadata-specific controls and retrieval safety are documented in [salesforce.md](./salesforce.md#org-browser-leaderse); press `<leader>fe` to switch back to files.
 
 ## Optional Yazi file manager
 
@@ -95,8 +98,8 @@ Focus must be **in** the tree (click it or move with `<C-h>` if it’s on the le
 | `hijack_netrw_behavior` | `open_default` | Opening a directory uses neo-tree instead of netrw |
 | `follow_current_file` | on | Tree tracks the file you’re editing |
 | `use_libuv_file_watcher` | on | Auto-refresh when files change outside Neovim |
-| Active sources | filesystem only | Buffer picker and LazyGit replace the redundant Buffer/Git source views |
-| Source selector | off | No single-item Files tab consumes winbar space |
+| Active sources | filesystem + guarded `sf_org` | Explicit keys switch sources; Buffer picker and LazyGit replace redundant Buffer/Git views |
+| Source selector | off | Explicit `fe` / `SE` keys avoid permanent source tabs |
 | Opened-file markers | all | Files represented by open buffers use `NeoTreeFileNameOpened` styling |
 | Fuzzy filter reset | on file open | Reopening the tree does not retain a stale `/` filter |
 | `git_status_scope_to_path` | **true** | Faster when a monorepo worktree is above the displayed root; set the commented `false` alternate in `explorer.lua` if scoped results do not suit you |

@@ -4,8 +4,8 @@ Import [`neovim-keymaps.tsv`](./neovim-keymaps.tsv) into Anki to study this repo
 
 ## Contents
 
-- **729 Basic notes**
-- **292 config cards:** global mappings plus curated Telescope, Neo-tree, Yazi, Trouble, Git, LSP, Salesforce, picker, and terminal-local controls
+- **742 Basic notes**
+- **305 config cards:** global mappings plus curated Telescope, Neo-tree, Yazi, Trouble, Git, LSP, Salesforce, picker, and terminal-local controls
 - **437 native cards:** modes, motions, operators, text objects, practical editing recipes, registers, search, marks, windows, buffers, folds, quickfix, macros, terminal use, and useful Ex commands
 - Config overrides and collisions are called out explicitly rather than teaching the stock behavior as active.
 

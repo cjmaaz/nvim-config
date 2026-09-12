@@ -1,5 +1,5 @@
 --------------------------------------------------------------------------------
--- Salesforce metadata browser — fzf hierarchy, upper details, right selections
+-- Salesforce advanced batch browser — fzf hierarchy, details, selections
 -- Inventory and member audit fields come from the project-local sf_cache.
 --------------------------------------------------------------------------------
 

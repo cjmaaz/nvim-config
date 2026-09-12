@@ -8,6 +8,12 @@ local M = {}
 local process = require("config.salesforce.process")
 
 local SCHEMA_VERSION = 1
+local BROWSER_SLICE_SCHEMA = 1
+
+-- Cached branches paint immediately; older branches refresh in the background.
+local BROWSER_TTL_SECONDS = 300
+-- local BROWSER_TTL_SECONDS = 0 -- always revalidate every opened branch
+
 -- Bound org-list calls so an All refresh does not flood Metadata API.
 local CONCURRENCY = 4
 -- local CONCURRENCY = 2 -- gentler on slower orgs, but roughly twice as long
@@ -27,6 +33,13 @@ local refreshing = false
 local orgs = {}
 local orgs_root
 local current_identity
+local browser_inflight = {}
+local browser_retrieving = false
+local browser_retrieve_callback
+local browser_retrieve_generation = 0
+local target_selection_generation = 0
+local target_selection_running = false
+local pending_target_selection
 
 local function notify(message, level)
   vim.notify(message, level or vim.log.levels.INFO, { title = "SF metadata" })
@@ -39,6 +52,11 @@ end
 local function safe_name(value)
   local sanitized = tostring(value or ""):gsub("[/\\:%z]", "_")
   return sanitized
+end
+
+local function cache_name(value)
+  local text = tostring(value or "")
+  return string.format("%s_%s", safe_name(text), vim.fn.sha256(text):sub(1, 12))
 end
 
 local function read_json(path)
@@ -88,7 +106,16 @@ local function atomic_write_lines(path, lines)
 end
 
 local function project_root()
-  local ok, root = pcall(sf_util().get_sf_root)
+  local bufnr = vim.api.nvim_get_current_buf()
+  local tagged_root = vim.b[bufnr].sf_project_root
+  if type(tagged_root) == "string" and tagged_root ~= "" then
+    return vim.fs.normalize(tagged_root)
+  end
+  local util_ok, util = pcall(sf_util)
+  local ok, root = false, nil
+  if util_ok then
+    ok, root = pcall(util.get_sf_root)
+  end
   if not ok or not root then
     notify("Open this from a Salesforce project (sfdx-project.json required).", vim.log.levels.ERROR)
     return nil
@@ -114,8 +141,10 @@ local function source_api_version(root)
 end
 
 local function cache_paths(root, org)
-  local cache = vim.fs.normalize(sf_util().get_plugin_folder_path())
+  local folder = ((vim.g.sf or {}).plugin_folder_name or "sf_cache"):gsub("^[/\\]+", ""):gsub("[/\\]+$", "")
+  local cache = vim.fs.joinpath(root, folder)
   local browser = vim.fs.joinpath(cache, "metadata-browser", safe_name(org))
+  local slices = vim.fs.joinpath(browser, "slices")
   return {
     root = cache,
     browser = browser,
@@ -125,6 +154,12 @@ local function cache_paths(root, org)
       return vim.fs.joinpath(cache, string.format("%s_%s.json", safe_name(metadata_type), safe_name(org)))
     end,
     manifests = vim.fs.joinpath(browser, "manifests"),
+    type_slice = function(metadata_type)
+      return vim.fs.joinpath(slices, "types", cache_name(metadata_type) .. ".json")
+    end,
+    folder_slice = function(metadata_type, folder)
+      return vim.fs.joinpath(slices, "folders", cache_name(metadata_type), cache_name(folder) .. ".json")
+    end,
   }
 end
 
@@ -174,14 +209,18 @@ local function read_index(ctx)
       org = ctx.org,
       api_version = ctx.api_version,
       updated_at = nil,
+      catalog_fetched_at = nil,
+      catalog_error = nil,
       types = {},
       fetched = {},
       errors = {},
+      browser_errors = {},
     }
   end
   index.types = index.types or {}
   index.fetched = index.fetched or {}
   index.errors = index.errors or {}
+  index.browser_errors = index.browser_errors or {}
   index.org = ctx.org
   index.api_version = ctx.api_version
   if ctx.identity then
@@ -219,6 +258,134 @@ local function save_index(ctx, index)
   end
 end
 
+local function is_stale(timestamp, ttl)
+  if not timestamp or BROWSER_TTL_SECONDS == 0 then
+    return true
+  end
+  return os.time() - timestamp >= (ttl or BROWSER_TTL_SECONDS)
+end
+
+local function browser_context_id(ctx)
+  return table.concat({ ctx.root, ctx.org }, "\0")
+end
+
+local function browser_context_is_current(ctx, token)
+  if token ~= generation then
+    return false
+  end
+  local ok, util = pcall(require, "sf.util")
+  if not ok or util.target_org ~= ctx.org then
+    return false
+  end
+  return true
+end
+
+local function complete_browser_request(key, ...)
+  local request = browser_inflight[key]
+  browser_inflight[key] = nil
+  for _, callback in ipairs((request and request.callbacks) or {}) do
+    local ok, err = pcall(callback, ...)
+    if not ok then
+      notify("Org Browser callback failed: " .. tostring(err), vim.log.levels.ERROR)
+    end
+  end
+end
+
+local function invalidate_browser_requests(reason)
+  generation = generation + 1
+  refreshing = false
+  browser_retrieving = false
+  browser_retrieve_generation = browser_retrieve_generation + 1
+  target_selection_generation = target_selection_generation + 1
+  target_selection_running = false
+  pending_target_selection = nil
+  local retrieve_callback = browser_retrieve_callback
+  browser_retrieve_callback = nil
+  local pending = browser_inflight
+  browser_inflight = {}
+  for _, request in pairs(pending) do
+    for _, callback in ipairs(request.callbacks or {}) do
+      pcall(callback, false, nil, reason or "Salesforce context changed.")
+    end
+  end
+  if retrieve_callback then
+    pcall(retrieve_callback, false, nil, reason or "Salesforce context changed.")
+  end
+end
+
+local function begin_browser_request(ctx, operation, callback, starter)
+  local key = table.concat({ browser_context_id(ctx), operation }, "\0")
+  if browser_inflight[key] then
+    if callback then
+      browser_inflight[key].callbacks[#browser_inflight[key].callbacks + 1] = callback
+    end
+    return browser_inflight[key].handle
+  end
+
+  local request = { callbacks = callback and { callback } or {} }
+  browser_inflight[key] = request
+  request.handle = starter(function(...)
+    complete_browser_request(key, ...)
+  end)
+  return request.handle
+end
+
+local function slice_spec(ctx, reference, descriptor)
+  if reference.folder then
+    return {
+      kind = "components",
+      path = ctx.paths.folder_slice(reference.type, reference.folder),
+    }
+  end
+  if descriptor and descriptor.inFolder == true then
+    return {
+      kind = "folders",
+      path = ctx.paths.type_slice(reference.type),
+    }
+  end
+  return {
+    kind = "components",
+    path = ctx.paths.type_slice(reference.type),
+  }
+end
+
+local function read_browser_slice(ctx, reference, descriptor)
+  local spec = slice_spec(ctx, reference, descriptor)
+  local slice = read_json(spec.path)
+  if
+    type(slice) ~= "table"
+    or slice.schema ~= BROWSER_SLICE_SCHEMA
+    or slice.org ~= ctx.org
+    or slice.type ~= reference.type
+    or slice.folder ~= reference.folder
+  then
+    return nil
+  end
+  slice.kind = spec.kind
+  slice.items = type(slice.items) == "table" and slice.items or {}
+  slice.stale = is_stale(slice.fetched_at)
+  return slice
+end
+
+local function write_browser_slice(ctx, reference, descriptor, items)
+  local spec = slice_spec(ctx, reference, descriptor)
+  local payload = {
+    schema = BROWSER_SLICE_SCHEMA,
+    org = ctx.org,
+    kind = spec.kind,
+    type = reference.type,
+    folder = reference.folder,
+    fetched_at = os.time(),
+    items = items or {},
+  }
+  local ok, err = atomic_write_json(spec.path, payload)
+  if not ok then
+    return nil, tostring(err)
+  end
+  payload.stale = false
+  return payload
+end
+
 local function descriptor_map(index)
   local result = {}
   for _, descriptor in ipairs(index.types or {}) do
@@ -229,7 +396,11 @@ local function descriptor_map(index)
   return result
 end
 
-local function list_metadata(ctx, metadata_type, folder, callback)
+local function metadata_descriptor(index, metadata_type)
+  return descriptor_map(index)[metadata_type]
+end
+
+local function list_metadata_args(ctx, metadata_type, folder)
   local args = {
     "sf",
     "org",
@@ -244,7 +415,11 @@ local function list_metadata(ctx, metadata_type, folder, callback)
   if folder and folder ~= "" then
     vim.list_extend(args, { "--folder", folder })
   end
-  run_json(with_api_version(args, ctx.api_version), { cwd = ctx.root }, callback)
+  return with_api_version(args, ctx.api_version)
+end
+
+local function list_metadata(ctx, metadata_type, folder, callback)
+  run_json(list_metadata_args(ctx, metadata_type, folder), { cwd = ctx.root }, callback)
 end
 
 local function run_queue(items, worker, done, limit)
@@ -444,6 +619,8 @@ function M.refresh_all(callback)
 
     local index = read_index(ctx)
     index.types = result.metadataObjects or {}
+    index.catalog_fetched_at = os.time()
+    index.catalog_error = nil
     atomic_write_json(ctx.paths.metadata_types, result)
 
     local types = {}
@@ -476,6 +653,318 @@ function M.refresh_type(metadata_type, callback)
     if callback then
       callback(ok, updated)
     end
+  end)
+end
+
+local function browser_catalog_snapshot(ctx, index)
+  return {
+    context = ctx,
+    descriptors = index.types or {},
+    fetched_at = index.catalog_fetched_at,
+    stale = is_stale(index.catalog_fetched_at),
+    error = index.catalog_error,
+  }
+end
+
+local function browser_operation(reference)
+  if not reference then
+    return "catalog"
+  end
+  return table.concat({ "children", reference.type or "", reference.folder or "" }, ":")
+end
+
+local function browser_operation_key(ctx, reference)
+  return table.concat({ browser_context_id(ctx), browser_operation(reference) }, "\0")
+end
+
+function M.load_browser_catalog()
+  local ctx = context()
+  if not ctx then
+    return nil
+  end
+  return browser_catalog_snapshot(ctx, read_index(ctx))
+end
+
+function M.is_browser_loading(reference)
+  local ctx = context()
+  return ctx ~= nil and browser_inflight[browser_operation_key(ctx, reference)] ~= nil
+end
+
+function M.refresh_browser_catalog(callback)
+  local ctx = context()
+  if not ctx then
+    return nil
+  end
+  local token = generation
+  local args = {
+    "sf",
+    "org",
+    "list",
+    "metadata-types",
+    "--target-org",
+    ctx.org,
+    "--json",
+  }
+  with_api_version(args, ctx.api_version)
+
+  return begin_browser_request(ctx, browser_operation(), callback, function(done)
+    return process.run_sf_json(args, { cwd = ctx.root }, function(err, result)
+      if not browser_context_is_current(ctx, token) then
+        done(false, nil, "Target org or Salesforce project changed.")
+        return
+      end
+
+      local index = read_index(ctx)
+      if err or type(result) ~= "table" then
+        index.catalog_error = err or "Invalid metadata type response."
+        save_index(ctx, index)
+        done(false, browser_catalog_snapshot(ctx, index), index.catalog_error)
+        return
+      end
+
+      local descriptors = result.metadataObjects or result
+      if type(descriptors) ~= "table" then
+        index.catalog_error = "Metadata type response did not contain metadataObjects."
+        save_index(ctx, index)
+        done(false, browser_catalog_snapshot(ctx, index), index.catalog_error)
+        return
+      end
+
+      index.types = descriptors
+      index.catalog_fetched_at = os.time()
+      index.catalog_error = nil
+      atomic_write_json(ctx.paths.metadata_types, { metadataObjects = descriptors })
+      save_index(ctx, index)
+      done(true, browser_catalog_snapshot(ctx, index))
+    end)
+  end)
+end
+
+function M.ensure_browser_catalog(opts, callback)
+  opts = opts or {}
+  local snapshot = M.load_browser_catalog()
+  if not snapshot then
+    return nil
+  end
+  if not opts.force and #snapshot.descriptors > 0 and not snapshot.stale then
+    if callback then
+      callback(true, snapshot)
+    end
+    return nil
+  end
+  return M.refresh_browser_catalog(callback)
+end
+
+local function legacy_browser_slice(ctx, index, reference, descriptor)
+  local members = read_json(ctx.paths.member(reference.type))
+  if type(members) ~= "table" then
+    return nil
+  end
+
+  local fetched = index.fetched[reference.type]
+  local items = members
+  local kind = "components"
+  if descriptor and descriptor.inFolder == true then
+    if reference.folder then
+      local prefix = reference.folder .. "/"
+      items = vim.tbl_filter(function(member)
+        return member.fullName == reference.folder or vim.startswith(tostring(member.fullName or ""), prefix)
+      end, members)
+    else
+      kind = "folders"
+      items = {}
+      local seen = {}
+      for _, member in ipairs(members) do
+        local folder = tostring(member.fullName or ""):match("^(.*)/[^/]+$")
+        if folder and not seen[folder] then
+          seen[folder] = true
+          items[#items + 1] = {
+            type = FOLDER_TYPES[reference.type] or (reference.type .. "Folder"),
+            fullName = folder,
+          }
+        end
+      end
+    end
+  end
+
+  return {
+    schema = BROWSER_SLICE_SCHEMA,
+    org = ctx.org,
+    kind = kind,
+    type = reference.type,
+    folder = reference.folder,
+    fetched_at = fetched and fetched.at,
+    items = items,
+    stale = is_stale(fetched and fetched.at),
+    legacy = true,
+  }
+end
+
+function M.load_browser_children(reference)
+  if type(reference) ~= "table" or not reference.type then
+    return nil
+  end
+  local ctx = context()
+  if not ctx then
+    return nil
+  end
+  local index = read_index(ctx)
+  local descriptor = metadata_descriptor(index, reference.type)
+  if not descriptor then
+    return {
+      context = ctx,
+      reference = vim.deepcopy(reference),
+      kind = "components",
+      items = {},
+      stale = true,
+      error = "Metadata type is not present in the current catalog.",
+    }
+  end
+
+  local slice = read_browser_slice(ctx, reference, descriptor)
+    or legacy_browser_slice(ctx, index, reference, descriptor)
+  if not slice then
+    slice = {
+      kind = descriptor.inFolder == true and not reference.folder and "folders" or "components",
+      items = {},
+      stale = true,
+    }
+  end
+  slice.context = ctx
+  slice.reference = vim.deepcopy(reference)
+  slice.descriptor = descriptor
+  slice.error = index.browser_errors[browser_operation(reference)]
+  return slice
+end
+
+function M.refresh_browser_children(reference, callback)
+  if type(reference) ~= "table" or not reference.type then
+    if callback then
+      callback(false, nil, "Metadata type is required.")
+    end
+    return nil
+  end
+
+  local ctx = context()
+  if not ctx then
+    return nil
+  end
+  local token = generation
+  local index = read_index(ctx)
+  local descriptor = metadata_descriptor(index, reference.type)
+  if not descriptor then
+    if callback then
+      callback(false, nil, "Metadata type is not present in the current catalog.")
+    end
+    return nil
+  end
+
+  local listed_type = reference.type
+  if descriptor.inFolder == true and not reference.folder then
+    listed_type = FOLDER_TYPES[reference.type] or (reference.type .. "Folder")
+  end
+  local args = list_metadata_args(ctx, listed_type, reference.folder)
+
+  return begin_browser_request(ctx, browser_operation(reference), callback, function(done)
+    return process.run_sf_json(args, { cwd = ctx.root }, function(err, result)
+      if not browser_context_is_current(ctx, token) then
+        done(false, nil, "Target org or Salesforce project changed.")
+        return
+      end
+
+      local current_index = read_index(ctx)
+      local operation = browser_operation(reference)
+      if err or type(result) ~= "table" then
+        current_index.browser_errors[operation] = err or "Invalid metadata member response."
+        save_index(ctx, current_index)
+        local previous = M.load_browser_children(reference)
+        done(false, previous, current_index.browser_errors[operation])
+        return
+      end
+
+      local slice, write_err = write_browser_slice(ctx, reference, descriptor, result)
+      if not slice then
+        current_index.browser_errors[operation] = write_err
+        save_index(ctx, current_index)
+        done(false, M.load_browser_children(reference), write_err)
+        return
+      end
+
+      current_index.browser_errors[operation] = nil
+      if descriptor.inFolder ~= true and not reference.folder then
+        atomic_write_json(ctx.paths.member(reference.type), result)
+        current_index.fetched[reference.type] = {
+          at = slice.fetched_at,
+          count = #result,
+        }
+      end
+      save_index(ctx, current_index)
+      slice.context = ctx
+      slice.reference = vim.deepcopy(reference)
+      slice.descriptor = descriptor
+      done(true, slice)
+    end)
+  end)
+end
+
+function M.ensure_browser_children(reference, opts, callback)
+  opts = opts or {}
+  local slice = M.load_browser_children(reference)
+  if not slice then
+    return nil
+  end
+  if not opts.force and slice.fetched_at and not slice.stale then
+    if callback then
+      callback(true, slice)
+    end
+    return nil
+  end
+  return M.refresh_browser_children(reference, callback)
+end
+
+function M.refresh_browser_type_members(metadata_type, callback)
+  callback = callback or function() end
+  M.refresh_browser_children({ type = metadata_type }, function(ok, root_slice, err)
+    if not ok or not root_slice then
+      callback(false, root_slice and root_slice.items or {}, err)
+      return
+    end
+    if root_slice.kind ~= "folders" then
+      callback(true, root_slice.items)
+      return
+    end
+
+    local members = {}
+    local folders = root_slice.items
+    local function refresh_folder(index_number)
+      if index_number > #folders then
+        local ctx = root_slice.context
+        local index = read_index(ctx)
+        atomic_write_json(ctx.paths.member(metadata_type), members)
+        index.fetched[metadata_type] = {
+          at = os.time(),
+          count = #members,
+        }
+        index.errors[metadata_type] = nil
+        save_index(ctx, index)
+        callback(true, members)
+        return
+      end
+
+      local folder = folders[index_number]
+      M.refresh_browser_children({
+        type = metadata_type,
+        folder = folder.fullName,
+      }, function(folder_ok, folder_slice, folder_err)
+        if not folder_ok or not folder_slice then
+          callback(false, members, string.format("%s: %s", folder.fullName or "?", folder_err or "refresh failed"))
+          return
+        end
+        vim.list_extend(members, folder_slice.items)
+        refresh_folder(index_number + 1)
+      end)
+    end
+    refresh_folder(1)
   end)
 end
 
@@ -568,7 +1057,9 @@ local function choose_org(prompt, callback)
       format_item = function(item)
         return (item.is_scratch and "[S] " or "") .. item.value
       end,
-    }, callback)
+    }, function(choice)
+      callback(choice, root)
+    end)
   end
 
   if #orgs > 0 and orgs_root == root then
@@ -582,11 +1073,36 @@ local function choose_org(prompt, callback)
   end
 end
 
-local function set_org(choice, global, callback)
+local start_target_selection
+start_target_selection = function(request)
+  target_selection_running = true
+  process.run_sf_json(request.args, { cwd = request.root }, function(err)
+    local is_latest = request.token == target_selection_generation
+    if is_latest and err then
+      notify("Could not set target org: " .. err, vim.log.levels.ERROR)
+    elseif is_latest then
+      sync_target(request.choice)
+      invalidate_browser_requests("Target org or Salesforce project changed.")
+      notify(string.format("%s target org set: %s", request.global and "Global" or "Local", request.choice.value))
+      if request.callback then
+        request.callback(request.choice)
+      end
+    end
+
+    target_selection_running = false
+    local next_request = pending_target_selection
+    pending_target_selection = nil
+    if next_request then
+      start_target_selection(next_request)
+    end
+  end)
+end
+
+local function set_org(choice, global, callback, selected_root)
   if not choice then
     return
   end
-  local root = project_root()
+  local root = selected_root or project_root()
   if not root then
     return
   end
@@ -597,28 +1113,31 @@ local function set_org(choice, global, callback)
   end
   vim.list_extend(args, { "target-org", choice.value, "--json" })
 
-  run_json(args, { cwd = root }, function(err)
-    if err then
-      notify("Could not set target org: " .. err, vim.log.levels.ERROR)
-      return
-    end
-    sync_target(choice)
-    notify(string.format("%s target org set: %s", global and "Global" or "Local", choice.value))
-    if callback then
-      callback(choice)
-    end
+  target_selection_generation = target_selection_generation + 1
+  local request = {
+    args = args,
+    callback = callback,
+    choice = choice,
+    global = global,
+    root = root,
+    token = target_selection_generation,
+  }
+  if target_selection_running then
+    pending_target_selection = request
+  else
+    start_target_selection(request)
+  end
+end
+
+function M.select_target(callback)
+  choose_org("Local target org:", function(choice, root)
+    set_org(choice, false, callback, root)
   end)
 end
 
-function M.select_target()
-  choose_org("Local target org:", function(choice)
-    set_org(choice, false)
-  end)
-end
-
-function M.select_global_target()
-  choose_org("Global target org:", function(choice)
-    set_org(choice, true)
+function M.select_global_target(callback)
+  choose_org("Global target org:", function(choice, root)
+    set_org(choice, true, callback, root)
   end)
 end
 
@@ -877,6 +1396,112 @@ function M.retrieve(items, callback)
   }, callback)
 end
 
+local function retrieve_file_paths(ctx, result)
+  local paths = {}
+  local seen = {}
+  local files = type(result) == "table" and result.files or nil
+  files = type(files) == "table" and files or {}
+  for _, file in ipairs(files) do
+    local path = file.filePath or file.path
+    if path and file.state ~= "Failed" then
+      if vim.startswith(path, "\\") and not vim.startswith(path, "\\\\") then
+        path = "/" .. path:sub(2)
+      end
+      path = vim.fs.normalize(path)
+      local absolute = vim.startswith(path, "/") or path:match("^%a:[/\\]") ~= nil or vim.startswith(path, "\\\\")
+      if not absolute then
+        path = vim.fs.joinpath(ctx.root, path)
+      end
+      if not seen[path] then
+        seen[path] = true
+        paths[#paths + 1] = path
+      end
+    end
+  end
+  table.sort(paths)
+  return paths
+end
+
+function M.retrieve_browser(items, opts, callback)
+  opts = opts or {}
+  if browser_retrieving then
+    if callback then
+      callback(false, nil, "Another Org Browser retrieve is already running.")
+    end
+    return nil
+  end
+
+  local ctx, manifests = action_context(items)
+  if not ctx then
+    if callback then
+      callback(false, nil, "Salesforce project or target org is unavailable.")
+    end
+    return nil
+  end
+
+  local token = generation
+  local args = {
+    "sf",
+    "project",
+    "retrieve",
+    "start",
+    "--target-org",
+    ctx.org,
+    "--manifest",
+    manifests.selected_package,
+    "--json",
+  }
+  if opts.ignore_conflicts then
+    args[#args + 1] = "--ignore-conflicts"
+  end
+
+  browser_retrieving = true
+  browser_retrieve_callback = callback
+  browser_retrieve_generation = browser_retrieve_generation + 1
+  local retrieve_token = browser_retrieve_generation
+  return process.run_sf_json(args, { cwd = ctx.root }, function(err, result)
+    if retrieve_token ~= browser_retrieve_generation then
+      return
+    end
+    if retrieve_token == browser_retrieve_generation and browser_retrieve_callback == callback then
+      browser_retrieve_callback = nil
+      browser_retrieving = false
+    end
+    if not browser_context_is_current(ctx, token) then
+      if callback then
+        callback(false, nil, "Target org or Salesforce project changed.")
+      end
+      return
+    end
+    if err then
+      if callback then
+        callback(false, nil, err)
+      end
+      return
+    end
+
+    local payload = {
+      context = ctx,
+      files = retrieve_file_paths(ctx, result),
+      result = result,
+    }
+    if callback then
+      callback(true, payload)
+    end
+  end)
+end
+
+function M.is_browser_retrieving()
+  return browser_retrieving
+end
+
+function M.is_conflict_error(err)
+  local message = tostring(err or ""):lower()
+  return message:find("conflict", 1, true) ~= nil
+    or message:find("overwrite", 1, true) ~= nil
+    or message:find("local changes", 1, true) ~= nil
+end
+
 function M.deploy(items, callback)
   local ctx, manifests = action_context(items)
   if not ctx then
@@ -944,8 +1569,7 @@ function M.get_context()
 end
 
 function M.cancel_background()
-  generation = generation + 1
-  refreshing = false
+  invalidate_browser_requests("Salesforce operation cancelled.")
   return process.cancel_background()
 end
 
@@ -956,10 +1580,14 @@ end
 M._test = {
   atomic_write_lines = atomic_write_lines,
   atomic_write_json = atomic_write_json,
+  cache_name = cache_name,
+  is_stale = is_stale,
   manifest_base_name = manifest_base_name,
   manifest_lines = manifest_lines,
   normalize_orgs = normalize_orgs,
+  retrieve_file_paths = retrieve_file_paths,
   safe_name = safe_name,
+  set_org = set_org,
   shell_join = process.shell_join,
   validate_manifest_path = validate_manifest_path,
 }
