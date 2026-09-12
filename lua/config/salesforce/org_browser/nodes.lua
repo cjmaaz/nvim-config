@@ -57,6 +57,29 @@ local function sorted_copy(items)
   return copy
 end
 
+local function matches(value, query)
+  return query == "" or tostring(value or ""):lower():find(query:lower(), 1, true) ~= nil
+end
+
+function M.parse_filter(value)
+  local raw = vim.trim(tostring(value or ""))
+  if raw == "" then
+    return nil
+  end
+  local slash = raw:find("/", 1, true)
+  if not slash then
+    return {
+      raw = raw,
+      category = raw,
+    }
+  end
+  return {
+    raw = raw,
+    category = vim.trim(raw:sub(1, slash - 1)),
+    inner = vim.trim(raw:sub(slash + 1)),
+  }
+end
+
 local function message_node(context, parent, kind, message, detail)
   return {
     id = stable_id(context, "message", parent.type, table.concat({ parent.folder or "", kind, message }, ":")),
@@ -98,9 +121,10 @@ local function component_node(context, metadata_type, folder, member)
   }
 end
 
-local function branch_children(context, ref, slice, load_slice, is_loading)
+local function branch_children(context, ref, slice, load_slice, is_loading, inner_query, expand_ids)
   local children = {}
   local loading = is_loading(ref)
+  local matched = false
 
   if slice and slice.error then
     children[#children + 1] = message_node(context, ref, "error", "Refresh failed — press R to retry", slice.error)
@@ -112,28 +136,42 @@ local function branch_children(context, ref, slice, load_slice, is_loading)
       local folder_name = tostring(folder.fullName or "")
       local folder_ref = reference(ref.type, folder_name)
       local folder_slice = load_slice(folder_ref)
-      children[#children + 1] = {
-        id = stable_id(context, "folder", ref.type, folder_name),
-        name = folder_name,
-        type = "directory",
-        loaded = folder_slice and folder_slice.fetched_at ~= nil,
-        children = branch_children(context, folder_ref, folder_slice, load_slice, is_loading),
-        extra = {
-          kind = "folder",
-          reference = folder_ref,
-          search_path = search_path(context, ref.type, folder_name),
-          fetched_at = folder_slice and folder_slice.fetched_at,
-          stale = folder_slice and folder_slice.fetched_at ~= nil and folder_slice.stale or false,
-          loading = is_loading(folder_ref),
-          count = folder_slice and #(folder_slice.items or {}) or nil,
-          raw = folder,
-        },
-      }
+      local folder_matches = inner_query == nil or matches(folder_name, inner_query)
+      local child_query = folder_matches and nil or inner_query
+      local folder_children, child_matched =
+        branch_children(context, folder_ref, folder_slice, load_slice, is_loading, child_query, expand_ids)
+      if inner_query == nil or folder_matches or child_matched then
+        local folder_id = stable_id(context, "folder", ref.type, folder_name)
+        children[#children + 1] = {
+          id = folder_id,
+          name = folder_name,
+          type = "directory",
+          loaded = folder_slice and folder_slice.fetched_at ~= nil,
+          children = folder_children,
+          extra = {
+            kind = "folder",
+            reference = folder_ref,
+            search_path = search_path(context, ref.type, folder_name),
+            fetched_at = folder_slice and folder_slice.fetched_at,
+            stale = folder_slice and folder_slice.fetched_at ~= nil and folder_slice.stale or false,
+            loading = is_loading(folder_ref),
+            count = folder_slice and #(folder_slice.items or {}) or nil,
+            raw = folder,
+          },
+        }
+        if inner_query ~= nil and folder_children then
+          expand_ids[#expand_ids + 1] = folder_id
+        end
+        matched = true
+      end
     end
   elseif slice then
     local members = sorted_copy(slice.items)
     for _, member in ipairs(members) do
-      children[#children + 1] = component_node(context, ref.type, ref.folder, member)
+      if inner_query == nil or matches(member.fullName, inner_query) then
+        children[#children + 1] = component_node(context, ref.type, ref.folder, member)
+        matched = true
+      end
     end
   end
 
@@ -141,31 +179,35 @@ local function branch_children(context, ref, slice, load_slice, is_loading)
     if loading then
       children[1] = message_node(context, ref, "loading", "Loading from org…")
     elseif slice and slice.fetched_at then
-      children[1] = message_node(context, ref, "empty", "No components")
+      local message = inner_query ~= nil and ("No loaded matches for " .. inner_query) or "No components"
+      children[1] = message_node(context, ref, "empty", message)
     else
-      return nil
+      return nil, false
     end
   elseif loading then
     table.insert(children, 1, message_node(context, ref, "loading", "Refreshing from org…"))
   end
-  return children
+  return children, matched
 end
 
-function M.build(catalog, load_slice, is_loading)
+function M.build(catalog, load_slice, is_loading, filter)
   local context = catalog.context
   local descriptors = sorted_copy(catalog.descriptors)
+  local expand_ids = {}
 
   local type_nodes = {}
   for _, descriptor in ipairs(descriptors) do
-    if descriptor.xmlName then
+    if descriptor.xmlName and (not filter or matches(descriptor.xmlName, filter.category)) then
       local ref = reference(descriptor.xmlName)
       local slice = load_slice(ref)
+      local type_id = stable_id(context, "type", descriptor.xmlName)
+      local children = branch_children(context, ref, slice, load_slice, is_loading, filter and filter.inner, expand_ids)
       type_nodes[#type_nodes + 1] = {
-        id = stable_id(context, "type", descriptor.xmlName),
+        id = type_id,
         name = descriptor.xmlName,
         type = "directory",
         loaded = slice and slice.fetched_at ~= nil,
-        children = branch_children(context, ref, slice, load_slice, is_loading),
+        children = children,
         extra = {
           kind = "metadata_type",
           reference = ref,
@@ -177,6 +219,9 @@ function M.build(catalog, load_slice, is_loading)
           count = slice and #(slice.items or {}) or nil,
         },
       }
+      if filter and filter.inner ~= nil and children then
+        expand_ids[#expand_ids + 1] = type_id
+      end
     end
   end
 
@@ -192,11 +237,15 @@ function M.build(catalog, load_slice, is_loading)
     table.insert(type_nodes, 1, message_node(context, root_ref, "loading", catalog.operation))
   end
   if #type_nodes == 0 then
+    local empty_message = "No metadata types cached — press R"
+    if filter then
+      empty_message = "No category matches " .. (filter.category ~= "" and filter.category or "(all categories)")
+    end
     type_nodes[1] = message_node(
       context,
       root_ref,
       is_loading(nil) and "loading" or "empty",
-      is_loading(nil) and "Loading metadata types…" or "No metadata types cached — press R"
+      is_loading(nil) and "Loading metadata types…" or empty_message
     )
   elseif is_loading(nil) then
     table.insert(type_nodes, 1, message_node(context, root_ref, "loading", "Refreshing metadata types…"))
@@ -216,9 +265,11 @@ function M.build(catalog, load_slice, is_loading)
         stale = catalog.stale,
         loading = is_loading(nil),
         count = #descriptors,
+        filter = filter and filter.raw,
       },
     },
-  }
+  },
+    expand_ids
 end
 
 M._test = {

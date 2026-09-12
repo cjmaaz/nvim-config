@@ -63,6 +63,59 @@ describe("Salesforce Org Browser nodes", function()
     assert.is_false(nodes._test.retrievable({ manageableState = "installed" }))
     assert.is_true(nodes._test.retrievable({ manageableState = "installedEditable" }))
   end)
+
+  it("uses text before slash for categories and text after slash for components", function()
+    assert.are.same({ raw = "Apex", category = "Apex" }, nodes.parse_filter(" Apex "))
+    assert.are.same(
+      { raw = "ApexClass/Account", category = "ApexClass", inner = "Account" },
+      nodes.parse_filter("ApexClass/Account")
+    )
+
+    local slices = {
+      ApexClass = {
+        kind = "components",
+        fetched_at = os.time(),
+        stale = false,
+        items = {
+          { fullName = "AccountService" },
+          { fullName = "FlowNamedClass" },
+        },
+      },
+      Flow = {
+        kind = "components",
+        fetched_at = os.time(),
+        stale = false,
+        items = { { fullName = "AccountFlow" } },
+      },
+    }
+    local catalog = {
+      context = context,
+      descriptors = {
+        { xmlName = "ApexClass", inFolder = false },
+        { xmlName = "Flow", inFolder = false },
+      },
+      stale = false,
+    }
+
+    local category_tree = nodes.build(catalog, function(reference)
+      return slices[reference.type]
+    end, function()
+      return false
+    end, nodes.parse_filter("Flow"))
+    assert.are.equal(1, #category_tree[1].children)
+    assert.are.equal("Flow", category_tree[1].children[1].name)
+
+    local component_tree, expanded = nodes.build(catalog, function(reference)
+      return slices[reference.type]
+    end, function()
+      return false
+    end, nodes.parse_filter("ApexClass/Account"))
+    assert.are.equal(1, #component_tree[1].children)
+    assert.are.equal("ApexClass", component_tree[1].children[1].name)
+    assert.are.equal("AccountService", component_tree[1].children[1].children[1].name)
+    assert.are.equal(1, #expanded)
+    assert.are.equal(component_tree[1].children[1].id, expanded[1])
+  end)
 end)
 
 describe("Salesforce Org Browser metadata service", function()

@@ -4,7 +4,6 @@
 
 local common = require("neo-tree.sources.common.commands")
 local M = vim.tbl_extend("force", {}, common)
-local filters = require("neo-tree.sources.common.filters")
 local RETRIEVABLE_STATES = {
   unmanaged = true,
   installedEditable = true,
@@ -33,7 +32,72 @@ local function retrievable_member(member)
 end
 
 function M.filter(state)
-  filters.show_filter(state, true)
+  if
+    state.sf_org_filter_input
+    and state.sf_org_filter_input.winid
+    and vim.api.nvim_win_is_valid(state.sf_org_filter_input.winid)
+  then
+    vim.api.nvim_set_current_win(state.sf_org_filter_input.winid)
+    return
+  end
+
+  local Input = require("nui.input")
+  local previous = state.sf_org_filter_raw or ""
+  local previous_expanded = require("neo-tree.ui.renderer").get_expanded_nodes(state.tree)
+  local input
+  local function focus_tree()
+    state.sf_org_filter_input = nil
+    vim.schedule(function()
+      if state.winid and vim.api.nvim_win_is_valid(state.winid) then
+        vim.api.nvim_set_current_win(state.winid)
+      end
+    end)
+  end
+  local function update(value)
+    local category_only = not tostring(value or ""):find("/", 1, true)
+    source().set_filter(state, value, category_only and previous_expanded or nil)
+  end
+
+  input = Input({
+    relative = "win",
+    winid = state.winid,
+    position = {
+      row = math.max(vim.api.nvim_win_get_height(state.winid) - 3, 0),
+      col = 0,
+    },
+    size = {
+      width = math.max(vim.api.nvim_win_get_width(state.winid) - 2, 10),
+    },
+    border = {
+      style = "rounded",
+      text = {
+        top = " Category/Component ",
+        top_align = "left",
+      },
+    },
+    win_options = {
+      winhighlight = "Normal:NeoTreeNormal,FloatBorder:NeoTreeFloatBorder",
+    },
+  }, {
+    prompt = " / ",
+    default_value = previous,
+    on_change = function(value)
+      update(value)
+    end,
+    on_submit = function(value)
+      update(value)
+      focus_tree()
+    end,
+    on_close = function()
+      source().set_filter(state, previous, previous_expanded)
+      focus_tree()
+    end,
+  })
+  state.sf_org_filter_input = input
+  input:map("i", "<Esc>", function()
+    input:unmount()
+  end, { noremap = true, nowait = true })
+  input:mount()
 end
 
 local function retrieve_summary(ctx, members, metadata_type)

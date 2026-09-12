@@ -101,6 +101,9 @@ function M.status(_, node)
   if extra.count ~= nil then
     pieces[#pieces + 1] = tostring(extra.count)
   end
+  if extra.filter then
+    pieces[#pieces + 1] = "filter " .. extra.filter
+  end
   local fetched_age = age(extra.fetched_at)
   if fetched_age then
     pieces[#pieces + 1] = fetched_age

@@ -157,16 +157,30 @@ function M.render(state, callback)
   state.sf_org_slices = state.sf_org_slices or {}
   state.sf_org_loading = state.sf_org_loading or {}
 
-  local tree_nodes = nodes.build(catalog, function(reference)
+  local tree_nodes, filter_expanded = nodes.build(catalog, function(reference)
     return state.sf_org_slices[reference_key(reference)]
   end, function(reference)
     return state.sf_org_loading[reference_key(reference)] == true
-  end)
+  end, state.sf_org_filter)
 
-  if state.sf_org_expand_once then
-    state.default_expanded_nodes = state.sf_org_expand_once
-  elseif not state.tree then
-    state.default_expanded_nodes = { tree_nodes[1].id }
+  local defaults = {}
+  local function include(ids)
+    for _, id in ipairs(ids or {}) do
+      if not vim.tbl_contains(defaults, id) then
+        defaults[#defaults + 1] = id
+      end
+    end
+  end
+  if state.sf_org_filter and state.sf_org_filter.inner ~= nil then
+    include({ tree_nodes[1].id })
+    include(filter_expanded)
+  end
+  include(state.sf_org_expand_once)
+  if not state.tree then
+    include({ tree_nodes[1].id })
+  end
+  if #defaults > 0 then
+    state.default_expanded_nodes = defaults
   end
   renderer.show_nodes(tree_nodes, state)
   if state.bufnr and vim.api.nvim_buf_is_valid(state.bufnr) and state.sf_org_project_root then
@@ -178,6 +192,23 @@ function M.render(state, callback)
     vim.schedule(callback)
   end
   return catalog
+end
+
+function M.set_filter(state, value, expanded)
+  local filter = nodes.parse_filter(value)
+  state.sf_org_filter = filter
+  state.sf_org_filter_raw = filter and filter.raw or nil
+  if expanded then
+    state.force_open_folders = {}
+    state.sf_org_expand_once = vim.deepcopy(expanded)
+  end
+  state.sf_org_filter_generation = (state.sf_org_filter_generation or 0) + 1
+  local generation = state.sf_org_filter_generation
+  vim.schedule(function()
+    if generation == state.sf_org_filter_generation and state_is_visible(state) then
+      M.render(state)
+    end
+  end)
 end
 
 function M.refresh_catalog(state, force)

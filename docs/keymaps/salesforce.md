@@ -121,10 +121,12 @@ Rows show cached count/age plus `stale`, `refreshing`, `empty`, `read-only`, or 
 | `R` | Force-refresh the catalog, type, folder, or component’s parent branch |
 | `K` | Show descriptor/audit details in a float |
 | `o` | Change the local target org and redraw from that org’s cache |
-| `/` | Fuzzy-filter currently loaded tree nodes |
+| `/` | Open the live `Category/Component` filter |
 | `P` | Open the advanced cached fzf batch browser |
 | `?` | Show source-local Neo-tree help |
 | `q` | Close the sidebar |
+
+Filter text before the separator searches metadata categories only: `Apex` matches category names without opening matches hidden in collapsed components. Add `/` inside the prompt to search within that category: `ApexClass/Account` filters loaded Apex classes, while `Report/Sales/Pipeline` can match a loaded folder/component path. With an inner query active, matching loaded branches expand automatically; an unloaded category remains selectable so `<CR>` / `l` can fetch it. `Enter` commits the filter, `Esc` restores the value from before the prompt opened, and submitting an empty value clears it.
 
 Every retrieve names the target org and warns that existing local source can be overwritten. It first runs without `--ignore-conflicts`; only an explicit second confirmation retries a reported conflict with overwrite enabled. Single-component retrieval opens a source file in the editor window, not inside the Neo-tree sidebar. Folder-type `A` retrieval enumerates Report, Dashboard, Document, or EmailTemplate folders and their components instead of retrieving folder definitions alone. `<leader>Sx` cancels active list/retrieve jobs.
 
