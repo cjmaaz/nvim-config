@@ -124,6 +124,15 @@ return {
 
       local ensure_pending = {} -- package → originating buffers waiting for install
 
+      -- Same fast-event boundary as lsp.lua: Mason callbacks must not vim.notify.
+      local function on_main(fn)
+        if vim.in_fast_event() then
+          vim.schedule(fn)
+        else
+          fn() -- stay synchronous for tests and a warm registry cache
+        end
+      end
+
       -- nvim-lint notifies ERROR on ENOENT; during BufEnter that aborts the autocmd
       -- (E5108 via neo-tree open, etc.). Only run linters whose cmd is on PATH.
       -- Declared before ensure_mason_package so the install callback can call it.
@@ -181,48 +190,55 @@ return {
           ensure_pending[pkg_name][bufnr] = ft
         end
         registry.refresh(function()
-          local ok, pkg = pcall(registry.get_package, pkg_name)
-          if not ok or not pkg then
-            vim.notify("Mason package not found: " .. pkg_name, vim.log.levels.WARN)
-            ensure_pending[pkg_name] = nil
-            return
-          end
-          local pin = tool_versions.mason[pkg_name]
-          if not pin then
-            ensure_pending[pkg_name] = nil
-            vim.notify("No exact Mason version pin for " .. pkg_name, vim.log.levels.ERROR)
-            return
-          end
-          local installed_version = pkg:is_installed() and pkg:get_installed_version() or nil
-          if installed_version == pin then
-            ensure_pending[pkg_name] = nil
-            return
-          end
-          local function on_closed(success)
-            local origins = ensure_pending[pkg_name] or {}
-            ensure_pending[pkg_name] = nil
-            local current_version = pkg:is_installed() and pkg:get_installed_version() or nil
-            if success == false or current_version ~= pin then
-              vim.notify(
-                string.format("Failed to install %s at pinned version %s", pkg_name, pin),
-                vim.log.levels.ERROR
-              )
+          on_main(function()
+            local ok, pkg = pcall(registry.get_package, pkg_name)
+            if not ok or not pkg then
+              vim.notify("Mason package not found: " .. pkg_name, vim.log.levels.WARN)
+              ensure_pending[pkg_name] = nil
               return
             end
-            vim.schedule(function()
-              for origin, origin_ft in pairs(origins) do
-                lint_origin(origin, origin_ft)
-              end
-            end)
-          end
-          if pkg.is_installing and pkg:is_installing() then
-            pkg:get_install_handle():if_present(function(handle)
-              handle:once("closed", on_closed)
-            end)
-            return
-          end
-          vim.notify(string.format("Installing %s@%s (first lint filetype)…", pkg_name, pin), vim.log.levels.INFO)
-          pkg:install({ version = pin, force = installed_version ~= nil, strict = false }, on_closed)
+            local pin = tool_versions.mason[pkg_name]
+            if not pin then
+              ensure_pending[pkg_name] = nil
+              vim.notify("No exact Mason version pin for " .. pkg_name, vim.log.levels.ERROR)
+              return
+            end
+            local installed_version = pkg:is_installed() and pkg:get_installed_version() or nil
+            if installed_version == pin then
+              ensure_pending[pkg_name] = nil
+              return
+            end
+            local function on_closed(success)
+              -- Release the single-flight lock before leaving the libuv callback.
+              local origins = ensure_pending[pkg_name] or {}
+              ensure_pending[pkg_name] = nil
+              on_main(function()
+                local current_version = pkg:is_installed() and pkg:get_installed_version() or nil
+                if success == false or current_version ~= pin then
+                  vim.notify(
+                    string.format("Failed to install %s at pinned version %s", pkg_name, pin),
+                    vim.log.levels.ERROR
+                  )
+                  return
+                end
+                vim.schedule(function()
+                  for origin, origin_ft in pairs(origins) do
+                    lint_origin(origin, origin_ft)
+                  end
+                end)
+              end)
+            end
+            if pkg.is_installing and pkg:is_installing() then
+              pkg:get_install_handle():if_present(function(handle)
+                handle:once("closed", on_closed)
+              end)
+              return
+            end
+            -- Pin missing or different. Also after a long gap, not only the first buffer.
+            vim.notify(string.format("Installing %s@%s…", pkg_name, pin), vim.log.levels.INFO)
+            -- vim.notify(string.format("Installing %s@%s (first lint filetype)…", pkg_name, pin), vim.log.levels.INFO)
+            pkg:install({ version = pin, force = installed_version ~= nil, strict = false }, on_closed)
+          end)
         end)
       end
 

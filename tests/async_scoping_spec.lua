@@ -169,6 +169,30 @@ describe("asynchronous buffer and window scoping", function()
     end))
     assert.are.same({ a }, linted_buffers)
 
+    -- Mason calls this from a libuv callback. nvim_echo there is E5560.
+    local notified
+    local original_notify = vim.notify
+    vim.notify = function(msg, level)
+      notified = { msg, level }
+    end
+    installed = false
+    local timer = vim.uv.new_timer()
+    local fast_ok, fast_err
+    timer:start(0, 0, function()
+      timer:stop()
+      timer:close()
+      fast_ok, fast_err = pcall(function()
+        assert.is_true(vim.in_fast_event())
+        install_done(false)
+      end)
+    end)
+    assert(vim.wait(1000, function()
+      return fast_ok ~= nil and notified ~= nil
+    end))
+    assert.is_true(fast_ok, fast_err)
+    assert.are.equal(vim.log.levels.ERROR, notified[2])
+    vim.notify = original_notify
+
     pcall(vim.api.nvim_del_augroup_by_name, "user_lint")
     pcall(vim.api.nvim_buf_delete, a, { force = true })
     pcall(vim.api.nvim_buf_delete, b, { force = true })

@@ -251,7 +251,19 @@ return {
       -- Install a Mason package if needed, then run on_done (on main loop).
       -- Single-flight: concurrent FileType (e.g. netrw opening several .cls) must not
       -- call pkg:install() twice — Mason asserts "Package is already installing."
+      --
+      -- Registry refresh (after the 24h cache) and the install "closed" callback run
+      -- inside Mason's libuv coroutine. vim.notify → nvim_echo there is E5560.
+      -- Same boundary nvim-lspconfig uses for on_exit notifies.
       local ensure_pending = {} -- pkg_name → { on_done, … }
+
+      local function on_main(fn)
+        if vim.in_fast_event() then
+          vim.schedule(fn)
+        else
+          fn() -- stay synchronous for tests and a warm registry cache
+        end
+      end
 
       local function ensure_mason_package(pkg_name, on_done)
         if ensure_pending[pkg_name] then
@@ -272,47 +284,54 @@ return {
 
         local registry = require("mason-registry")
         registry.refresh(function()
-          local ok, pkg = pcall(registry.get_package, pkg_name)
-          if not ok or not pkg then
-            vim.notify("Mason package not found: " .. pkg_name, vim.log.levels.WARN)
-            flush(false)
-            return
-          end
-          local pin = tool_versions.mason[pkg_name]
-          if not pin then
-            vim.notify("No exact Mason version pin for " .. pkg_name, vim.log.levels.ERROR)
-            flush(false)
-            return
-          end
-          local installed_version = pkg:is_installed() and pkg:get_installed_version() or nil
-          if installed_version == pin then
-            flush(true)
-            return
-          end
-
-          local function on_closed(success)
-            local current_version = pkg:is_installed() and pkg:get_installed_version() or nil
-            if success ~= false and current_version == pin then
-              flush(true)
-            else
-              vim.notify(
-                string.format("Failed to install %s at pinned version %s", pkg_name, pin),
-                vim.log.levels.ERROR
-              )
+          on_main(function()
+            local ok, pkg = pcall(registry.get_package, pkg_name)
+            if not ok or not pkg then
+              vim.notify("Mason package not found: " .. pkg_name, vim.log.levels.WARN)
               flush(false)
+              return
             end
-          end
+            local pin = tool_versions.mason[pkg_name]
+            if not pin then
+              vim.notify("No exact Mason version pin for " .. pkg_name, vim.log.levels.ERROR)
+              flush(false)
+              return
+            end
+            local installed_version = pkg:is_installed() and pkg:get_installed_version() or nil
+            if installed_version == pin then
+              flush(true)
+              return
+            end
 
-          -- Another path already kicked off install (or we raced past pending).
-          if pkg:is_installing() then
-            pkg:get_install_handle():if_present(function(handle)
-              handle:once("closed", on_closed)
-            end)
-            return
-          end
+            local function on_closed(success)
+              -- InstallRunner calls this from async.scope; a throw here is the red E5560 screen.
+              on_main(function()
+                local current_version = pkg:is_installed() and pkg:get_installed_version() or nil
+                if success ~= false and current_version == pin then
+                  flush(true)
+                else
+                  vim.notify(
+                    string.format("Failed to install %s at pinned version %s", pkg_name, pin),
+                    vim.log.levels.ERROR
+                  )
+                  flush(false)
+                end
+              end)
+            end
 
-          vim.notify(string.format("Installing %s@%s (first open)…", pkg_name, pin), vim.log.levels.INFO)
-          pkg:install({ version = pin, force = installed_version ~= nil, strict = false }, on_closed)
+            -- Another path already kicked off install (or we raced past pending).
+            if pkg:is_installing() then
+              pkg:get_install_handle():if_present(function(handle)
+                handle:once("closed", on_closed)
+              end)
+              return
+            end
+
+            -- Pin missing or different. Also after a long gap, not only the first buffer.
+            vim.notify(string.format("Installing %s@%s…", pkg_name, pin), vim.log.levels.INFO)
+            -- vim.notify(string.format("Installing %s@%s (first open)…", pkg_name, pin), vim.log.levels.INFO)
+            pkg:install({ version = pin, force = installed_version ~= nil, strict = false }, on_closed)
+          end)
         end)
       end
 
