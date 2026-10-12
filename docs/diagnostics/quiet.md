@@ -105,7 +105,7 @@ Check: `:echo executable('eslint_d')` → `1`, or `~/.local/share/nvim/mason/bin
 
 ### 2. If install fails with `ETARGET` / “date before …”
 
-Mason uses **npm**. A host `~/.npmrc` with supply-chain delay can block a brand-new Mason pin:
+Mason uses **npm**. A host `~/.npmrc` with supply-chain delay can block the current package selected by Mason:
 
 ```ini
 min-release-age=7

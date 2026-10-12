@@ -1,11 +1,4 @@
-describe("reproducible dependency inputs", function()
-  it("uses exact Mason startup specifications", function()
-    local versions = dofile("lua/config/tool_versions.lua")
-    assert.are.same({ "lua-language-server", version = "3.19.1" }, versions.mason_spec("lua-language-server"))
-    assert.are.same({ "stylua", version = "v2.5.2" }, versions.mason_spec("stylua"))
-    assert.are.same({ "prettierd", version = "0.29.0" }, versions.mason_spec("prettierd"))
-  end)
-
+describe("reproducible scaffold inputs", function()
   it("pins Node and Vite scaffold packages exactly", function()
     package.loaded["config.tool_versions"] = dofile("lua/config/tool_versions.lua")
     local generators = dofile("lua/config/project_scaffold.lua")._test.generators

@@ -36,7 +36,6 @@ return {
     },
     config = function()
       local lint = require("lint")
-      local tool_versions = require("config.tool_versions")
 
       -- --- Which linter runs for which filetype ---
       -- To turn a language OFF: comment its line (statusline-style).
@@ -197,14 +196,7 @@ return {
               ensure_pending[pkg_name] = nil
               return
             end
-            local pin = tool_versions.mason[pkg_name]
-            if not pin then
-              ensure_pending[pkg_name] = nil
-              vim.notify("No exact Mason version pin for " .. pkg_name, vim.log.levels.ERROR)
-              return
-            end
-            local installed_version = pkg:is_installed() and pkg:get_installed_version() or nil
-            if installed_version == pin then
+            if pkg:is_installed() then
               ensure_pending[pkg_name] = nil
               return
             end
@@ -213,12 +205,8 @@ return {
               local origins = ensure_pending[pkg_name] or {}
               ensure_pending[pkg_name] = nil
               on_main(function()
-                local current_version = pkg:is_installed() and pkg:get_installed_version() or nil
-                if success == false or current_version ~= pin then
-                  vim.notify(
-                    string.format("Failed to install %s at pinned version %s", pkg_name, pin),
-                    vim.log.levels.ERROR
-                  )
+                if success == false or not pkg:is_installed() then
+                  vim.notify("Failed to install " .. pkg_name .. "; check :MasonLog", vim.log.levels.ERROR)
                   return
                 end
                 vim.schedule(function()
@@ -234,10 +222,10 @@ return {
               end)
               return
             end
-            -- Pin missing or different. Also after a long gap, not only the first buffer.
-            vim.notify(string.format("Installing %s@%s…", pkg_name, pin), vim.log.levels.INFO)
-            -- vim.notify(string.format("Installing %s@%s (first lint filetype)…", pkg_name, pin), vim.log.levels.INFO)
-            pkg:install({ version = pin, force = installed_version ~= nil, strict = false }, on_closed)
+            -- Install the registry's current version once; never replace an installed version here.
+            vim.notify("Installing " .. pkg_name .. "…", vim.log.levels.INFO)
+            -- vim.notify("Install " .. pkg_name .. " manually with :Mason", vim.log.levels.INFO)
+            pkg:install({ strict = false }, on_closed)
           end)
         end)
       end

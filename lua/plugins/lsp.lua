@@ -65,7 +65,7 @@ return {
     event = { "BufReadPre", "BufNewFile", "VeryLazy" }, -- load before most buffers
     -- lazy = false, -- always load at startup
     dependencies = {
-      { "mason-org/mason.nvim", opts = {} }, -- UI + install binaries (:Mason)
+      "mason-org/mason.nvim", -- UI + install binaries (:Mason); setup below
       "mason-org/mason-lspconfig.nvim", -- maps Mason pkgs ↔ lspconfig names
       "WhoIsSethDaniel/mason-tool-installer.nvim", -- ensure_installed at startup
       -- "saghen/blink.cmp", -- simpler, but forces Blink + LuaSnip before InsertEnter
@@ -230,15 +230,16 @@ return {
       })
 
       -- Always install these at startup (minimal toolchain).
-      local tool_versions = require("config.tool_versions")
       require("mason-tool-installer").setup({
         ensure_installed = {
-          tool_versions.mason_spec("lua-language-server"), -- package name for lua_ls
-          tool_versions.mason_spec("stylua"), -- Lua formatter used by conform
-          tool_versions.mason_spec("prettierd"), -- FoS for web/json/yaml (formatting.lua allowlist)
+          "lua-language-server", -- package name for lua_ls
+          "stylua", -- Lua formatter used by conform
+          "prettierd", -- FoS for web/json/yaml (formatting.lua allowlist)
           -- "ruff", -- optional: always keep Python format/lint ready
           -- "apex-language-server", -- or rely on on-demand Apex FileType hook
         },
+        auto_update = false, -- keep an installed version until you update it in :Mason
+        -- auto_update = true, -- follow the current registry version on startup
         run_on_start = true, -- install missing on Neovim start
         -- run_on_start = false, -- only :MasonInstall manually
         start_delay = 1000, -- ms before first install run
@@ -291,14 +292,7 @@ return {
               flush(false)
               return
             end
-            local pin = tool_versions.mason[pkg_name]
-            if not pin then
-              vim.notify("No exact Mason version pin for " .. pkg_name, vim.log.levels.ERROR)
-              flush(false)
-              return
-            end
-            local installed_version = pkg:is_installed() and pkg:get_installed_version() or nil
-            if installed_version == pin then
+            if pkg:is_installed() then
               flush(true)
               return
             end
@@ -306,14 +300,10 @@ return {
             local function on_closed(success)
               -- InstallRunner calls this from async.scope; a throw here is the red E5560 screen.
               on_main(function()
-                local current_version = pkg:is_installed() and pkg:get_installed_version() or nil
-                if success ~= false and current_version == pin then
+                if success ~= false and pkg:is_installed() then
                   flush(true)
                 else
-                  vim.notify(
-                    string.format("Failed to install %s at pinned version %s", pkg_name, pin),
-                    vim.log.levels.ERROR
-                  )
+                  vim.notify("Failed to install " .. pkg_name .. "; check :MasonLog", vim.log.levels.ERROR)
                   flush(false)
                 end
               end)
@@ -327,10 +317,10 @@ return {
               return
             end
 
-            -- Pin missing or different. Also after a long gap, not only the first buffer.
-            vim.notify(string.format("Installing %s@%s…", pkg_name, pin), vim.log.levels.INFO)
-            -- vim.notify(string.format("Installing %s@%s (first open)…", pkg_name, pin), vim.log.levels.INFO)
-            pkg:install({ version = pin, force = installed_version ~= nil, strict = false }, on_closed)
+            -- Install the registry's current version once; never replace an installed version here.
+            vim.notify("Installing " .. pkg_name .. "…", vim.log.levels.INFO)
+            -- vim.notify("Install " .. pkg_name .. " manually with :Mason", vim.log.levels.INFO)
+            pkg:install({ strict = false }, on_closed)
           end)
         end)
       end

@@ -64,7 +64,7 @@ nvim-config/
     │   ├── project_runner.lua # project-aware run / build / test terminal
     │   ├── project_context.lua # shared start-path/root helpers + SF gate
     │   ├── local_actions.lua # context provider registry + owned buffer maps
-    │   ├── tool_versions.lua # exact Mason/scaffold dependency pins
+    │   ├── tool_versions.lua # exact transient scaffold dependency pins
     │   ├── local_actions/
     │   │   ├── project.lua # native runner capabilities
     │   │   ├── salesforce.lua # guarded Salesforce capabilities

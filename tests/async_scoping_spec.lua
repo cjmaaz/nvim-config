@@ -117,6 +117,8 @@ describe("asynchronous buffer and window scoping", function()
     local original_registry = package.loaded["mason-registry"]
     local installed = false
     local install_done
+    local install_count = 0
+    local install_opts
     local linted_buffers = {}
     package.loaded.lint = {
       linters = {
@@ -136,12 +138,14 @@ describe("asynchronous buffer and window scoping", function()
         return installed
       end,
       get_installed_version = function()
-        return installed and "15.0.3" or nil
+        return installed and "any-installed-version" or nil
       end,
       is_installing = function()
         return false
       end,
-      install = function(_, _, callback)
+      install = function(_, opts, callback)
+        install_count = install_count + 1
+        install_opts = opts
         install_done = callback
         return {}
       end,
@@ -162,12 +166,20 @@ describe("asynchronous buffer and window scoping", function()
     vim.api.nvim_win_set_buf(0, b)
     vim.bo[a].filetype = "javascript"
     assert.is_function(install_done)
+    assert.are.equal(1, install_count)
+    assert.is_nil(install_opts.version)
+    assert.is_nil(install_opts.force)
     installed = true
     install_done()
     assert(vim.wait(1000, function()
       return #linted_buffers > 0
     end))
     assert.are.same({ a }, linted_buffers)
+
+    -- An installed tool is accepted regardless of its receipt version.
+    local c = vim.api.nvim_create_buf(false, true)
+    vim.bo[c].filetype = "javascript"
+    assert.are.equal(1, install_count)
 
     -- Mason calls this from a libuv callback. nvim_echo there is E5560.
     local notified
@@ -196,6 +208,7 @@ describe("asynchronous buffer and window scoping", function()
     pcall(vim.api.nvim_del_augroup_by_name, "user_lint")
     pcall(vim.api.nvim_buf_delete, a, { force = true })
     pcall(vim.api.nvim_buf_delete, b, { force = true })
+    pcall(vim.api.nvim_buf_delete, c, { force = true })
     package.loaded.lint = original_lint
     package.loaded["mason-registry"] = original_registry
   end)

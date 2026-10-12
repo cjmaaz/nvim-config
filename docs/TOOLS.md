@@ -184,7 +184,7 @@ For an isolated `cmake-init` install, install `pipx` first with `brew install pi
 | `lua/plugins/treesitter.lua` | Neovim 0.12+, `tree-sitter` CLI 0.26.1+, C compiler; parsers supply structural queries |
 | `lua/plugins/indent.lua` | (none beyond Neovim) |
 | `lua/plugins/autopairs.lua` | Treesitter optional (`check_ts`) |
-| `lua/plugins/lsp.lua` | network (Mason), JDK for Apex; startup/on-demand Mason installs use exact versions from `lua/config/tool_versions.lua` |
+| `lua/plugins/lsp.lua` | network (Mason), JDK for Apex/Java; missing Mason tools install from the current registry, while installed versions are retained |
 | `lua/plugins/formatting.lua` | Mason formatters (`stylua` + `prettierd` auto; others as needed); FoS allowlist |
 | `lua/plugins/linting.lua` | Mason linters lazy-by-ft (`eslint_d`, `ruff`, …); skip until binary on PATH; npm `min-release-age` can block installs — [quiet.md](./diagnostics/quiet.md#example-no-eslint-diagnostics--mason-eslint_d-failed) |
 | `lua/plugins/completion.lua` | optional `make` for LuaSnip jsregexp |
